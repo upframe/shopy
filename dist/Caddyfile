@@ -1,3 +1,12 @@
 localhost
 
+gzip
 upframe
+root ./public
+
+errors {
+    log errors.log
+    404 templates/404.html
+    500 templates/500.html
+    *   templates/error.html
+}
