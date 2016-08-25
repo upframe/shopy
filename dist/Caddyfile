@@ -2,7 +2,7 @@ localhost
 
 gzip
 upframe
-root ./public
+root public/
 
 errors {
     log errors.log
