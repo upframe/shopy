@@ -1,4 +1,12 @@
 {{ define "title" }}Register | Upframe{{ end }}
 {{ define "content" }}
 <h1>Register</h1>
+
+<form>
+    <input type="text" placeholder="Full Name" name="name" required>
+    <input type="text" placeholder="Email" name="email" required>
+    <input type="password" placeholder="Password" name="password" required>
+    <input type="password" placeholder="Confirm Password" name="password" required>
+    <button type="submit">Login</button>
+</form>
 {{ end }}
