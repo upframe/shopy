@@ -17,7 +17,7 @@ type Product struct {
 	Description string
 	Price       int
 	Picture     string
-	CreatedAt   *time.Tine
+	CreatedAt   *time.Time
 }
 
 type Promocode struct {

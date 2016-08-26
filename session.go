@@ -1,4 +1,4 @@
-package Upframe
+package upframe
 
 import "time"
 
