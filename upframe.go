@@ -16,6 +16,23 @@ func (u Upframe) ServeHTTP(w http.ResponseWriter, r *http.Request) (int, error) 
 	if shouldHandle(r.URL.Path) {
 		w.Write([]byte("We are Upframe"))
 
+		switch r.URL.Path {
+		case "/register":
+
+		case "/login":
+
+		case "/settings":
+			// Needs to be logged in
+		case "/store":
+
+		case "/cart":
+			// Needs to be logged in
+		case "/checkout":
+			// Needs to be logged in
+		case "/wishlist":
+			// Needs to be logged in
+		}
+
 		return http.StatusOK, nil
 	}
 
