@@ -1,10 +1,10 @@
-localhost
+http://localhost {
+    gzip
+    upframe
+    root static/
 
-gzip
-upframe
-root public/
-
-errors {
-    log errors.log
-    404 404.html
+    errors {
+        log errors.log
+        404 404.html
+    }
 }

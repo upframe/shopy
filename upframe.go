@@ -2,8 +2,9 @@ package upframe
 
 import (
 	"net/http"
-	"strings"
+	"os"
 
+	"github.com/hacdias/upframe/utils"
 	"github.com/mholt/caddy/caddyhttp/httpserver"
 )
 
@@ -13,40 +14,36 @@ type Upframe struct {
 }
 
 func (u Upframe) ServeHTTP(w http.ResponseWriter, r *http.Request) (int, error) {
-	if shouldHandle(r.URL.Path) {
-		w.Write([]byte("We are Upframe"))
-
+	// Checks if a static file (not directory) exists for this path. If it doesn't, we
+	// handle the request.
+	if info, err := os.Stat("static" + r.URL.Path); os.IsNotExist(err) || info.IsDir() {
 		switch r.URL.Path {
+		case "/":
+			return utils.RenderHTML(w, nil, "index")
 		case "/register":
-
+			// if logged in redirect to / or /store
+			return utils.RenderHTML(w, nil, "register")
 		case "/login":
-
+			// if logged in redirect to / or /store
+			return utils.RenderHTML(w, nil, "login")
 		case "/settings":
-			// Needs to be logged in
+			// if not logged in redirect to /login
+			return utils.RenderHTML(w, nil, "settings")
 		case "/store":
-
+			return utils.RenderHTML(w, nil, "store")
 		case "/cart":
-			// Needs to be logged in
+			// if not logged in redirect to /login
+			return utils.RenderHTML(w, nil, "cart")
 		case "/checkout":
-			// Needs to be logged in
+			/// if not logged in redirect to /login
+			return utils.RenderHTML(w, nil, "checkout")
 		case "/wishlist":
-			// Needs to be logged in
+			// if not logged in redirect to /login
+			return utils.RenderHTML(w, nil, "wishlist")
 		}
 
-		return http.StatusOK, nil
+		return http.StatusNotFound, nil
 	}
 
 	return u.Next.ServeHTTP(w, r)
-}
-
-func shouldHandle(path string) bool {
-	paths := []string{"/css", "/js", "/imgs"}
-
-	for i := range paths {
-		if strings.HasPrefix(path, paths[i]) {
-			return false
-		}
-	}
-
-	return true
 }

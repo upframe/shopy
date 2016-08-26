@@ -1,4 +1,4 @@
-package upframe
+package utils
 
 import (
 	"bytes"
@@ -8,13 +8,10 @@ import (
 	"net/http"
 )
 
-type Page struct {
-	Title string
-	Info  interface{}
-}
-
-func (p *Page) Render(w http.ResponseWriter, templates ...string) (int, error) {
-	templates = append(templates, "actions", "base")
+// RenderHTML renders an HTML response and send it to the client based on the
+// choosen tempaltes
+func RenderHTML(w http.ResponseWriter, data interface{}, templates ...string) (int, error) {
+	templates = append(templates, "base")
 	var tpl *template.Template
 
 	// For each template, add it to the the tpl variable
@@ -43,7 +40,7 @@ func (p *Page) Render(w http.ResponseWriter, templates ...string) (int, error) {
 	}
 
 	buf := &bytes.Buffer{}
-	err := tpl.Execute(buf, p.Info)
+	err := tpl.Execute(buf, data)
 
 	if err != nil {
 		return http.StatusInternalServerError, err
