@@ -14,17 +14,6 @@ type Upframe struct {
 }
 
 func (u Upframe) ServeHTTP(w http.ResponseWriter, r *http.Request) (int, error) {
-
-	/* 	session, err := mgo.Dial("127.0.0.1")
-
-	   	c := session.DB("upframe").C("users")
-	   	err = c.Insert(&User{Email: "hacdias@gmail.com"})
-
-	   	fmt.Println(err)
-	*/
-
-	// mongodb://myuser:mypass@localhost:40001,otherhost:40001/mydb
-
 	// Checks if a static file (not directory) exists for this path. If it doesn't, we
 	// handle the request.
 	if info, err := os.Stat("static" + r.URL.Path); os.IsNotExist(err) || info.IsDir() {

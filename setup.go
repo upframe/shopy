@@ -19,6 +19,8 @@ func setup(c *caddy.Controller) error {
 		}
 	}
 
+	//models.SetupDatabase()
+
 	httpserver.GetConfig(c).AddMiddleware(mid)
 	return nil
 }
