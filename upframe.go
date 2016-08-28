@@ -3,8 +3,9 @@ package upframe
 import (
 	"net/http"
 	"os"
+	"path/filepath"
 
-	"github.com/hacdias/upframe/utils"
+	"github.com/hacdias/upframe/pages"
 	"github.com/mholt/caddy/caddyhttp/httpserver"
 )
 
@@ -19,27 +20,30 @@ func (u Upframe) ServeHTTP(w http.ResponseWriter, r *http.Request) (int, error) 
 	if info, err := os.Stat("static" + r.URL.Path); os.IsNotExist(err) || info.IsDir() {
 		switch r.URL.Path {
 		case "/":
-			return utils.RenderHTML(w, nil, "index")
+			return pages.IndexGET(w, r)
 		case "/register":
 			// if logged in redirect to / or /store
-			return utils.RenderHTML(w, nil, "register")
+			return pages.RegisterGET(w, r)
 		case "/login":
 			// if logged in redirect to / or /store
-			return utils.RenderHTML(w, nil, "login")
+			return pages.LoginGET(w, r)
 		case "/settings":
 			// if not logged in redirect to /login
-			return utils.RenderHTML(w, nil, "settings")
+			return pages.SettingsGET(w, r)
 		case "/store":
-			return utils.RenderHTML(w, nil, "store")
+			//return utils.RenderHTML(w, nil, "store")
+			return pages.StoreGET(w, r)
 		case "/cart":
 			// if not logged in redirect to /login
-			return utils.RenderHTML(w, nil, "cart")
+			return pages.CartGET(w, r)
 		case "/checkout":
 			/// if not logged in redirect to /login
-			return utils.RenderHTML(w, nil, "checkout")
-		case "/wishlist":
-			// if not logged in redirect to /login
-			return utils.RenderHTML(w, nil, "wishlist")
+			return pages.CheckoutGET(w, r)
+		}
+
+		// Checks if there is a template for this page
+		if _, err := os.Stat(filepath.Clean("templates" + r.URL.Path + ".tmpl")); err == nil {
+			return pages.RenderHTML(w, nil, r.URL.Path)
 		}
 
 		return http.StatusNotFound, nil
