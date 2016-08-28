@@ -5,8 +5,20 @@ import "github.com/jmoiron/sqlx"
 var db *sqlx.DB
 
 // InitDB establishes a connection with the database
-func InitDB() error {
+func InitDB(username, password, address, port, dbname string) error {
+	var err error
 
-	// ? parseTime=true
+	// Prepares the connection with the database
+	db, err = sqlx.Open("mysql", username+":"+password+"@tcp("+address+":"+port+")/"+dbname+"?parseTime=true")
+	if err != nil {
+		return err
+	}
+
+	// Pings the database to check if the connection is OK
+	err = db.Ping()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
