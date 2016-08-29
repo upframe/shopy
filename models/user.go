@@ -4,6 +4,7 @@ import "database/sql"
 
 // User contains the information of an User
 type User struct {
+	ID           int            `db:"id"`
 	FirstName    string         `db:"first_name"`
 	LastName     string         `db:"last_name"`
 	Email        string         `db:"email"`
@@ -18,26 +19,64 @@ type User struct {
 }
 
 // Update updates the current User struct into the database
-func (u User) Update() error {
+func (u User) Update(fields ...string) error {
 	return nil
 }
 
-// Insert inserts the current User struct into the database
+// Insert inserts the current User struct into the database and returns an error
+// if something goes wrong.
 func (u User) Insert() error {
-	return nil
+	if u.ID != 0 {
+		return nil
+	}
+
+	_, err := db.NamedExec(
+		`INSERT INTO users
+		            (first_name,
+		             last_name,
+		             email,
+		             address,
+		             invites,
+		             credit,
+		             confirmed,
+		             referrer_hash,
+		             referred_by,
+		             password_salt,
+		             password_hash)
+		VALUES      (:first_name,
+		             :last_name,
+		             :email,
+		             :address,
+		             :invites,
+		             :credit,
+		             :confirmed,
+		             :referrer_hash,
+		             :referred_by,
+		             :password_salt,
+		             :password_hash)`, u)
+
+	return err
 }
 
 // CheckPassword checks if the password of the user is correct
-func (u User) CheckPassword(password string) bool {
+func (u User) CheckPassword(hash string) bool {
 	return false
+}
+
+// ChangePassword allows you to change the password of the user
+func (u User) ChangePassword(oldHash, newHash string) error {
+	return nil
 }
 
 // DeleteUser deletes a user from the database using its email
 func DeleteUser(email string) error {
-	return nil
+	_, err := db.Exec("DELETE FROM users WHERE email=?", email)
+	return err
 }
 
 // GetUser retrieves a user from the database using its email
 func GetUser(email string) (*User, error) {
-	return &User{}, nil
+	user := &User{}
+	err := db.Get(&user, "SELECT * FROM users WHERE email=?", email)
+	return user, err
 }
