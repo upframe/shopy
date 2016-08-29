@@ -1,9 +1,13 @@
 http://localhost {
-
-
-    upframe
     root static/
 
+    upframe {
+        db_user root
+        db_pass root
+        db_host localhost
+        db_name upframe
+    }
+    
     errors {
         log errors.log
         404 404.html
