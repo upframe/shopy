@@ -145,6 +145,13 @@ func DeleteUser(email string) error {
 	return err
 }
 
+// GetUserByID retrieves a user from the database using its ID
+func GetUserByID(id string) (*User, error) {
+	user := User{}
+	err := db.Get(&user, "SELECT * FROM users WHERE id=?", id)
+	return &user, err
+}
+
 // GetUserByEmail retrieves a user from the database using its email
 func GetUserByEmail(email string) (*User, error) {
 	user := User{}
