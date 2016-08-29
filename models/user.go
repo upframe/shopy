@@ -2,12 +2,10 @@ package models
 
 import (
 	"crypto/rand"
-	"crypto/sha256"
 	"database/sql"
 	"encoding/hex"
 	"io"
 	"strconv"
-	"time"
 
 	"golang.org/x/crypto/scrypt"
 )
@@ -35,23 +33,7 @@ type User struct {
 
 // Update updates the current User struct into the database
 func (u User) Update(fields ...string) error {
-	// Starts writing the query
-	query := "UPDATE users SET "
-
-	// Add the fields that we are going to update to the queyr
-	for i := range fields {
-		if i == len(fields)-1 {
-			query += fields[i] + "=:" + fields[i]
-		} else {
-			query += fields[i] + ":" + fields[i] + ", "
-		}
-	}
-
-	// Finish the query adding the 'id' filter
-	query += " WHERE id=" + strconv.Itoa(u.ID)
-
-	// Execute the query and returns the error/nil
-	_, err := db.NamedExec(query, u)
+	_, err := db.NamedExec(updateQuery("users", "id", strconv.Itoa(u.ID), fields), u)
 	return err
 }
 
@@ -134,9 +116,7 @@ func (u *User) GenerateReferralHash() {
 		return
 	}
 
-	data := u.Email + time.Now().Format(time.ANSIC)
-	hash := sha256.Sum256([]byte(data))
-	u.Referral = hex.EncodeToString(hash[:])
+	u.Referral = UniqueHash(u.Email)
 }
 
 // DeleteUser deletes a user from the database using its email
