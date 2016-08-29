@@ -14,6 +14,7 @@ func init() {
 }
 
 func setup(c *caddy.Controller) error {
+
 	// Initializes DB connection information
 	dbUser := "root"
 	dbPass := "root"

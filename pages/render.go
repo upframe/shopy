@@ -9,7 +9,7 @@ import (
 )
 
 // RenderHTML renders an HTML response and send it to the client based on the
-// choosen tempaltes
+// choosen templates
 func RenderHTML(w http.ResponseWriter, data interface{}, templates ...string) (int, error) {
 	templates = append(templates, "base")
 	var tpl *template.Template

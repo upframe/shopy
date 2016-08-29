@@ -26,14 +26,16 @@ type User struct {
 	Invites      int            `db:"invites"`
 	Credit       int            `db:"credit"`
 	Confirmed    bool           `db:"confirmed"`
-	ReferrerHash string         `db:"referrer_hash"`
-	Referredby   sql.NullInt64  `db:"referred_by"`
+	Referral     string         `db:"referral"`
+	Referrer     sql.NullInt64  `db:"referrer"`
 	PasswordSalt string         `db:"password_salt"`
 	PasswordHash string         `db:"password_hash"`
 }
 
 // Update updates the current User struct into the database
 func (u User) Update(fields ...string) error {
+
+	// UPDATE t1 SET col1 = col1 + 1;
 	return nil
 }
 
@@ -53,8 +55,8 @@ func (u User) Insert() error {
 		             invites,
 		             credit,
 		             confirmed,
-		             referrer_hash,
-		             referred_by,
+		             referral,
+		             referrer,
 		             password_salt,
 		             password_hash)
 		VALUES      (:first_name,
@@ -64,8 +66,8 @@ func (u User) Insert() error {
 		             :invites,
 		             :credit,
 		             :confirmed,
-		             :referrer_hash,
-		             :referred_by,
+		             :referral,
+		             :referrer,
 		             :password_salt,
 		             :password_hash)`, u)
 
@@ -110,15 +112,15 @@ func (u *User) ChangePassword(oldHash, newHash string) error {
 	return nil
 }
 
-// GenerateReferrerHash generates a new referrer hash for a new user
-func (u *User) GenerateReferrerHash() {
-	if u.ReferrerHash != "" {
+// GenerateReferralHash generates a new referrer hash for a new user
+func (u *User) GenerateReferralHash() {
+	if u.Referral != "" {
 		return
 	}
 
 	data := u.Email + time.Now().Format(time.ANSIC)
 	hash := sha256.Sum256([]byte(data))
-	u.ReferrerHash = hex.EncodeToString(hash[:])
+	u.Referral = hex.EncodeToString(hash[:])
 }
 
 // DeleteUser deletes a user from the database using its email
@@ -131,5 +133,12 @@ func DeleteUser(email string) error {
 func GetUserByEmail(email string) (*User, error) {
 	user := User{}
 	err := db.Get(&user, "SELECT * FROM users WHERE email=?", email)
+	return &user, err
+}
+
+// GetUserByReferral retrieves a user from the database using its email
+func GetUserByReferral(referral string) (*User, error) {
+	user := User{}
+	err := db.Get(&user, "SELECT * FROM users WHERE referral=?", referral)
 	return &user, err
 }
