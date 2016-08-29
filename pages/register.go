@@ -10,6 +10,11 @@ import (
 
 // RegisterGET handles the GET request for register page
 func RegisterGET(w http.ResponseWriter, r *http.Request) (int, error) {
+	// If we're in the success page, show it, LOL
+	if r.URL.Query().Get("success") != "" {
+		return RenderHTML(w, nil, "register-success")
+	}
+
 	// Gets the referrer user
 	referrer, err := models.GetUserByReferral(r.URL.Query().Get("ref"))
 
@@ -21,7 +26,7 @@ func RegisterGET(w http.ResponseWriter, r *http.Request) (int, error) {
 
 	// If the user exists, but doesn't have invites, show that information
 	if referrer.Invites < 1 {
-		return RenderHTML(w, &Page{Data: referrer}, "register-gone")
+		return RenderHTML(w, map[string]interface{}{"Referrer": referrer}, "register-gone")
 	}
 
 	// Otherwise, show the registration page
@@ -102,8 +107,9 @@ func RegisterPOST(w http.ResponseWriter, r *http.Request) (int, error) {
 
 	// TODO: Send confirmation email
 
-	// Redirect to success page as a Temporary Redirect; TODO: Move this redirect to javascript
-	http.Redirect(w, r, "/register/success", http.StatusTemporaryRedirect)
+	// Redirect to success page as a Temporary Redirect
+	// TODO: JavaScript "popup" to show this information instead of redirect?
+	http.Redirect(w, r, "/register?success=true", http.StatusTemporaryRedirect)
 	return http.StatusCreated, nil
 }
 
