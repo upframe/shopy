@@ -11,6 +11,7 @@
     <body>
         <p>
             <strong>Hello {{ .User.FirstName }} {{ .User.LastName }},</strong>,<br>
-            We're proud of having you in our crowd. There's only one more step: click on <a href=""
+            We're proud of having you in our crowd. There's only one more step: click on <a href="{{ .Host }}/register?confirm={{ .Hash }}">this link</a> to confirm your subscription!
+        </p>
     </body>
 </html>

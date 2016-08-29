@@ -27,7 +27,7 @@ func RegisterGET(w http.ResponseWriter, r *http.Request) (int, error) {
 
 	// If the user exists, but doesn't have invites, show that information
 	if referrer.Invites < 1 {
-		return RenderHTML(w, map[string]interface{}{"Referrer": referrer}, "register-gone")
+		return RenderHTML(w, referrer, "register-gone")
 	}
 
 	// Otherwise, show the registration page
