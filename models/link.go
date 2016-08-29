@@ -3,10 +3,6 @@ package models
 import "time"
 
 const (
-	deleteAction  = "DEL"
-	confirmAction = "CON"
-	resetAction   = "RES"
-
 	deleteExpiration  = 60 * 60 * 2       // 2 Hours in seconds
 	confirmExpiration = 60 * 60 * 24 * 20 // 20 Days in seconds
 	resetExpiration   = 60 * 60 * 2       // 2 Hours in seconds
@@ -20,7 +16,7 @@ const (
 type Link struct {
 	Hash    string     `db:"hash"`
 	User    int        `db:"user_id"`
-	Action  string     `db:"action"`
+	Path    string     `db:"path"`
 	Used    bool       `db:"used"`
 	Time    *time.Time `db:"time"`
 	Expires *time.Time `db:"expires"`
