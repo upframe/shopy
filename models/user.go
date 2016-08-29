@@ -128,12 +128,6 @@ func (u User) CheckPassword(password string) (bool, error) {
 	return (hex.EncodeToString(hash) == u.PasswordHash), nil
 }
 
-// ChangePassword allows you to change the password of the user
-func (u *User) ChangePassword(oldHash, newHash string) error {
-
-	return nil
-}
-
 // GenerateReferralHash generates a new referrer hash for a new user
 func (u *User) GenerateReferralHash() {
 	if u.Referral != "" {
