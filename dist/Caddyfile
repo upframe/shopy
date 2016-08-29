@@ -8,10 +8,10 @@ http://localhost {
         db_host localhost
         db_name upframe
 
-        smpt_user noreply@bitsn.me
-        smpt_pass noreplytesteupframe
-        smpt_host smtp.mailgun.org
-        smpt_port 465
+        smtp_user noreply@bitsn.me
+        smtp_pass noreplytesteupframe
+        smtp_host smtp.mailgun.org
+        smtp_port 465
     }
 
     errors {

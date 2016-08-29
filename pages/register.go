@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/hacdias/upframe/models"
 )
@@ -105,8 +104,31 @@ func RegisterPOST(w http.ResponseWriter, r *http.Request) (int, error) {
 	if err != nil {
 		log.Println("INVITE DECREMENT ERROR: " + err.Error())
 	}
+	/*
+		// TODO: Send confirmation email
+		now := time.Now()
+		expires := now.Add(models.ConfirmExpiration)
 
-	// TODO: Send confirmation email
+		link := &models.Link{
+			Path:    "/register",
+			Hash:    models.UniqueHash(u.Email),
+			User:    u.ID,
+			Used:    false,
+			Time:    &now,
+			Expires: &expires,
+		}
+
+		err := link.Insert()
+		if err != nil {
+			return err
+		}
+
+		data := make(map[string]interface{})
+		data["Name"] = user.FirstName + " " + user.LastName
+		data["Hash"] = link.Hash
+		data["Host"] = r.URL.Scheme + "://" + r.URL.Host */
+
+	// TODO: Finish
 
 	// Redirect to success page as a Temporary Redirect
 	// TODO: JavaScript "popup" to show this information instead of redirect?
@@ -126,27 +148,4 @@ func isExistentUser(email string) (bool, error) {
 	// Checks if the user ID is different from 0, which means that it is valid
 	// if so, returns true and nil
 	return (user.ID != 0), nil
-}
-
-func sendConfirmationEmail(u *models.User) error {
-	now := time.Now()
-	expires := now.Add(models.ConfirmExpiration)
-
-	link := &models.Link{
-		Path:    "/register",
-		Hash:    models.UniqueHash(u.Email),
-		User:    u.ID,
-		Used:    false,
-		Time:    &now,
-		Expires: &expires,
-	}
-
-	err := link.Insert()
-	if err != nil {
-		return err
-	}
-
-	// TODO: Finish
-
-	return nil
 }

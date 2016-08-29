@@ -53,21 +53,3 @@ func (l Link) Insert() error {
 func (l Link) IsValid() bool {
 	return l.Expires.Unix() < time.Now().Unix() && !l.Used
 }
-
-// NewConfirmationLink generates a new confirmation link to be used within
-// confirmation emails
-func NewConfirmationLink(u *User) *Link {
-	now := time.Now()
-	expires := now.Add(confirmExpiration)
-
-	link := &Link{
-		Path:    "/register",
-		Hash:    UniqueHash(u.Email),
-		User:    u.ID,
-		Used:    false,
-		Time:    &now,
-		Expires: &expires,
-	}
-
-	return link
-}

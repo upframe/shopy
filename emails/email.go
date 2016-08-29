@@ -1,4 +1,4 @@
-package lib
+package emails
 
 import (
 	"crypto/tls"
@@ -12,11 +12,11 @@ import (
 // NOTE: THIS ARE TESTS ONLY
 
 var (
-	from *mail.Address
-	user string
-	pass string
-	host string
-	port string
+	smtpFrom *mail.Address
+	SMTPUser string
+	SMTPPass string
+	SMTPHost string
+	SMTPPort string
 )
 
 // InitEmail configures the email variables
