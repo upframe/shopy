@@ -27,7 +27,7 @@ type User struct {
 	Credit       int            `db:"credit"`
 	Confirmed    bool           `db:"confirmed"`
 	ReferrerHash string         `db:"referrer_hash"`
-	ReferredBy   sql.NullInt64  `db:"referred_by"`
+	Referredby   sql.NullInt64  `db:"referred_by"`
 	PasswordSalt string         `db:"password_salt"`
 	PasswordHash string         `db:"password_hash"`
 }
@@ -44,29 +44,30 @@ func (u User) Insert() error {
 		return nil
 	}
 
-	_, err := db.NamedExec(`INSERT INTO users
-            (first_name,
-             last_name,
-             email,
-             address,
-             invites,
-             credit,
-             confirmed,
-             referrer_hash,
-             referred_by,
-             password_salt,
-             password_hash)
-VALUES      (:first_name,
-             :last_name,
-             :email,
-             :address,
-             :invites,
-             :credit,
-             :confirmed,
-             :referrer_hash,
-             :referred_by,
-             :password_salt,
-             :password_hash)`, u)
+	_, err := db.NamedExec(
+		`INSERT INTO users
+		            (first_name,
+		             last_name,
+		             email,
+		             address,
+		             invites,
+		             credit,
+		             confirmed,
+		             referrer_hash,
+		             referred_by,
+		             password_salt,
+		             password_hash)
+		VALUES      (:first_name,
+		             :last_name,
+		             :email,
+		             :address,
+		             :invites,
+		             :credit,
+		             :confirmed,
+		             :referrer_hash,
+		             :referred_by,
+		             :password_salt,
+		             :password_hash)`, u)
 
 	return err
 }
@@ -126,8 +127,8 @@ func DeleteUser(email string) error {
 	return err
 }
 
-// GetUser retrieves a user from the database using its email
-func GetUser(email string) (*User, error) {
+// GetUserByEmail retrieves a user from the database using its email
+func GetUserByEmail(email string) (*User, error) {
 	user := User{}
 	err := db.Get(&user, "SELECT * FROM users WHERE email=?", email)
 	return &user, err

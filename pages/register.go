@@ -59,7 +59,7 @@ func RegisterPOST(w http.ResponseWriter, r *http.Request) (int, error) {
 }
 
 func isExistentUser(email string) (bool, error) {
-	user, err := models.GetUser(email)
+	user, err := models.GetUserByEmail(email)
 	if err != nil {
 		return false, err
 	}
