@@ -8,9 +8,15 @@ import (
 	"net/http"
 )
 
+// Page contains the information for this specific page
+type Page struct {
+	Session interface{} // Do this later
+	Data    interface{} //Main page data
+}
+
 // RenderHTML renders an HTML response and send it to the client based on the
 // choosen templates
-func RenderHTML(w http.ResponseWriter, data interface{}, templates ...string) (int, error) {
+func RenderHTML(w http.ResponseWriter, data *Page, templates ...string) (int, error) {
 	templates = append(templates, "base")
 	var tpl *template.Template
 

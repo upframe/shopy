@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"encoding/hex"
 	"io"
+	"strconv"
 	"time"
 
 	"golang.org/x/crypto/scrypt"
@@ -34,9 +35,24 @@ type User struct {
 
 // Update updates the current User struct into the database
 func (u User) Update(fields ...string) error {
+	// Starts writing the query
+	query := "UPDATE users SET "
 
-	// UPDATE t1 SET col1 = col1 + 1;
-	return nil
+	// Add the fields that we are going to update to the queyr
+	for i := range fields {
+		if i == len(fields)-1 {
+			query += fields[i] + "=:" + fields[i]
+		} else {
+			query += fields[i] + ":" + fields[i] + ", "
+		}
+	}
+
+	// Finish the query adding the 'id' filter
+	query += " WHERE id=" + strconv.Itoa(u.ID)
+
+	// Execute the query and returns the error/nil
+	_, err := db.NamedExec(query, u)
+	return err
 }
 
 // Insert inserts the current User struct into the database and returns an error
@@ -76,17 +92,20 @@ func (u User) Insert() error {
 
 // SetPassword generates the salt and the hash of the user password
 func (u *User) SetPassword(password string) error {
+	// Generates a random salt
 	salt := make([]byte, passwordSaltBytes)
 	_, err := io.ReadFull(rand.Reader, salt)
 	if err != nil {
 		return err
 	}
 
+	// Creates the hash from the salt and password
 	hash, err := scrypt.Key([]byte(password), salt, 1<<14, 8, 1, passwordHashBytes)
 	if err != nil {
 		return err
 	}
 
+	// Stores the hash and salt in hexadecimal form
 	u.PasswordSalt = hex.EncodeToString(salt)
 	u.PasswordHash = hex.EncodeToString(hash)
 	return nil
@@ -94,11 +113,13 @@ func (u *User) SetPassword(password string) error {
 
 // CheckPassword checks if the password of the user is correct
 func (u User) CheckPassword(password string) (bool, error) {
+	// Decodes the hexadecimal salt into a []byte
 	salt, err := hex.DecodeString(u.PasswordSalt)
 	if err != nil {
 		return false, err
 	}
 
+	// Makes an hash from the password and salt
 	hash, err := scrypt.Key([]byte(password), salt, 1<<14, 8, 1, passwordHashBytes)
 	if err != nil {
 		return false, err
@@ -109,6 +130,7 @@ func (u User) CheckPassword(password string) (bool, error) {
 
 // ChangePassword allows you to change the password of the user
 func (u *User) ChangePassword(oldHash, newHash string) error {
+
 	return nil
 }
 

@@ -2,6 +2,7 @@ package pages
 
 import (
 	"database/sql"
+	"log"
 	"net/http"
 
 	"github.com/hacdias/upframe/models"
@@ -9,18 +10,37 @@ import (
 
 // RegisterGET handles the GET request for register page
 func RegisterGET(w http.ResponseWriter, r *http.Request) (int, error) {
-	// TODO: Check url for referrer hash or show a "Registrations only available by invite" page
+	// Gets the referrer user
+	referrer, err := models.GetUserByReferral(r.URL.Query().Get("ref"))
 
+	// If the user doesn't exist show a page telling that registration
+	// is invitation only
+	if err != nil {
+		return RenderHTML(w, nil, "register-invite")
+	}
+
+	// If the user exists, but doesn't have invites, show that information
+	if referrer.Invites < 1 {
+		return RenderHTML(w, &Page{Data: referrer}, "register-gone")
+	}
+
+	// Otherwise, show the registration page
 	return RenderHTML(w, nil, "register")
 }
 
 // RegisterPOST handles the POST http request in register page
 func RegisterPOST(w http.ResponseWriter, r *http.Request) (int, error) {
 	// Gets the referrer user using the ?referral= option in the URL. If it doesn't
-	// find the user, return a 403 Forbidden status.
+	// find the user, return a 403 Forbidden status
 	referrer, err := models.GetUserByReferral(r.URL.Query().Get("ref"))
 	if err != nil {
 		return http.StatusForbidden, nil
+	}
+
+	// Checks if the referrer still has invites available! This is important! If
+	// it doesn't, return a 410 Status Gone
+	if referrer.Invites < 1 {
+		return http.StatusGone, nil
 	}
 
 	// Parses the form and checks for errors
@@ -66,8 +86,24 @@ func RegisterPOST(w http.ResponseWriter, r *http.Request) (int, error) {
 		return http.StatusInternalServerError, err
 	}
 
+	// Decrement one value from the referrer invites number and updates it in
+	// the database and checks for errors. In this case, if there is an error
+	// we will keep the registration going because it's no user-fault and the
+	// refferer had invites available.
+	//
+	// The error is logged using a prefix and can be checked afterwards by
+	// system administrators.
+	referrer.Invites--
+	err = referrer.Update("invites")
+
+	if err != nil {
+		log.Println("INVITE DECREMENT ERROR: " + err.Error())
+	}
+
 	// TODO: Send confirmation email
 
+	// Redirect to success page as a Temporary Redirect; TODO: Move this redirect to javascript
+	http.Redirect(w, r, "/register/success", http.StatusTemporaryRedirect)
 	return http.StatusCreated, nil
 }
 

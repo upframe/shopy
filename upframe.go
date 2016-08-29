@@ -49,6 +49,7 @@ func (u Upframe) ServeHTTP(w http.ResponseWriter, r *http.Request) (int, error) 
 			return pages.CheckoutGET(w, r)
 		}
 
+		// NOTE: BUG: TODO: This should be removed as this can be evil... and we should not BE EVIL!
 		// Checks if there is a template for this page
 		if _, err := os.Stat(filepath.Clean("templates" + r.URL.Path + ".tmpl")); err == nil {
 			return pages.RenderHTML(w, nil, r.URL.Path)
