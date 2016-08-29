@@ -1,6 +1,7 @@
 http://localhost {
-    gzip
-    upframe 
+
+
+    upframe
     root static/
 
     errors {

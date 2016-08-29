@@ -23,7 +23,15 @@ func (u Upframe) ServeHTTP(w http.ResponseWriter, r *http.Request) (int, error) 
 			return pages.IndexGET(w, r)
 		case "/register":
 			// if logged in redirect to / or /store
-			return pages.RegisterGET(w, r)
+			// else:
+
+			if r.Method == http.MethodGet {
+				return pages.RegisterGET(w, r)
+			} else if r.Method == http.MethodPost {
+				return pages.RegisterPOST(w, r)
+			}
+
+			return http.StatusNotImplemented, nil
 		case "/login":
 			// if logged in redirect to / or /store
 			return pages.LoginGET(w, r)
