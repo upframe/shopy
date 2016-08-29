@@ -1,4 +1,4 @@
-## Get the environment ready
+## Get the environment ready FOR DEVELOPMENT
 
 Certify yourself that the variable `GOPATH` is set and that `$GOPATH/bin` is in your `PATH`.
 
