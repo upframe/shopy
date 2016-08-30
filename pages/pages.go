@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+
+	"github.com/gorilla/sessions"
 )
 
 // BaseAddress is the base URL of the website
@@ -51,5 +53,19 @@ func RenderHTML(w http.ResponseWriter, data interface{}, templates ...string) (i
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	_, err = buf.WriteTo(w)
+	return http.StatusOK, nil
+}
+
+func isLoggedIn(s *sessions.Session) bool {
+	switch s.Values["logged"].(type) {
+	case bool:
+		return s.Values["logged"].(bool)
+	}
+
+	return false
+}
+
+func redirect(w http.ResponseWriter, r *http.Request, path string) (int, error) {
+	http.Redirect(w, r, path, http.StatusTemporaryRedirect)
 	return http.StatusOK, nil
 }

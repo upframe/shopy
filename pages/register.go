@@ -7,13 +7,16 @@ import (
 	"net/mail"
 	"time"
 
+	"github.com/gorilla/sessions"
 	"github.com/hacdias/upframe/models"
 )
 
-// TODO: add handler with sql.ErrNoRows
-
 // RegisterGET handles the GET request for register page
-func RegisterGET(w http.ResponseWriter, r *http.Request) (int, error) {
+func RegisterGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, error) {
+	if isLoggedIn(s) {
+		return redirect(w, r, "/")
+	}
+
 	if r.URL.Query().Get("confirm") != "" {
 		link, err := models.GetLinkByHash(r.URL.Query().Get("confirm"))
 
@@ -65,7 +68,11 @@ func RegisterGET(w http.ResponseWriter, r *http.Request) (int, error) {
 }
 
 // RegisterPOST handles the POST http request in register page
-func RegisterPOST(w http.ResponseWriter, r *http.Request) (int, error) {
+func RegisterPOST(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, error) {
+	if isLoggedIn(s) {
+		return http.StatusBadRequest, nil
+	}
+
 	// Gets the referrer user using the ?referral= option in the URL. If it doesn't
 	// find the user, return a 403 Forbidden status
 	referrer, err := models.GetUserByReferral(r.URL.Query().Get("ref"))

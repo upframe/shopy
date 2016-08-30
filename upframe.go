@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/gorilla/sessions"
 	"github.com/hacdias/upframe/pages"
 	"github.com/mholt/caddy/caddyhttp/httpserver"
 )
@@ -17,52 +18,66 @@ type Upframe struct {
 func (u Upframe) ServeHTTP(w http.ResponseWriter, r *http.Request) (int, error) {
 	// Checks if a static file (not directory) exists for this path. If it doesn't, we
 	// handle the request.
-	if info, err := os.Stat("static" + r.URL.Path); os.IsNotExist(err) || info.IsDir() {
-		switch r.URL.Path {
-		case "/":
-			return pages.IndexGET(w, r)
-		case "/register":
-			// if logged in redirect to / or /store
-			// else:
-
-			if r.Method == http.MethodGet {
-				return pages.RegisterGET(w, r)
-			} else if r.Method == http.MethodPost {
-				return pages.RegisterPOST(w, r)
-			}
-
-			return http.StatusNotImplemented, nil
-		case "/login":
-			// if logged in redirect to / or /store
-
-			if r.Method == http.MethodGet {
-				return pages.LoginGET(w, r)
-			} else if r.Method == http.MethodPost {
-				return pages.LoginPOST(w, r)
-			}
-
-			return http.StatusNotImplemented, nil
-		case "/settings":
-			// if not logged in redirect to /login
-			return pages.SettingsGET(w, r)
-		case "/store":
-			//return utils.RenderHTML(w, nil, "store")
-			return pages.StoreGET(w, r)
-		case "/cart":
-			// if not logged in redirect to /login
-			return pages.CartGET(w, r)
-		case "/checkout":
-			/// if not logged in redirect to /login
-			return pages.CheckoutGET(w, r)
-		}
-
-		// Checks if there is a static template for this page. If so, show it!
-		if _, err := os.Stat(filepath.Clean("templates/static" + r.URL.Path + ".tmpl")); err == nil {
-			return pages.RenderHTML(w, nil, r.URL.Path)
-		}
-
-		return http.StatusNotFound, nil
+	if info, err := os.Stat("static" + r.URL.Path); !(os.IsNotExist(err) || info.IsDir()) {
+		return u.Next.ServeHTTP(w, r)
 	}
 
-	return u.Next.ServeHTTP(w, r)
+	// Gets the current session or creates a new one if there is some error
+	// decrypting it or if it doesn't exist
+	s, _ := store.Get(r, "upframe-auth")
+
+	// Saves the session in the cookie and checks for errors
+	err := s.Save(r, w)
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	// Routes the pages to the respective functions
+	switch {
+	case r.URL.Path == "/" && r.Method == http.MethodGet:
+		return pages.IndexGET(w, r, s)
+	case r.URL.Path == "/register" && r.Method == http.MethodGet:
+		return pages.RegisterGET(w, r, s)
+	case r.URL.Path == "/register" && r.Method == http.MethodPost:
+		return pages.RegisterPOST(w, r, s)
+	case r.URL.Path == "/login" && r.Method == http.MethodGet:
+		return pages.LoginGET(w, r, s)
+	case r.URL.Path == "/login" && r.Method == http.MethodPost:
+		return pages.LoginPOST(w, r, s)
+	case r.URL.Path == "/settings" && r.Method == http.MethodGet:
+		return pages.SettingsGET(w, r, s)
+	case r.URL.Path == "/store" && r.Method == http.MethodGet:
+		return pages.StoreGET(w, r, s)
+	case r.URL.Path == "/cart" && r.Method == http.MethodGet:
+		return pages.CartGET(w, r, s)
+	case r.URL.Path == "/checkout" && r.Method == http.MethodGet:
+		return pages.CheckoutGET(w, r, s)
+	case r.URL.Path == "/logout":
+		return logout(w, r, s)
+	}
+
+	// If the request doesn't match any route and it isn't a GET request
+	// return a Status Not Implemented
+	if r.Method != http.MethodGet {
+		return http.StatusNotImplemented, nil
+	}
+
+	// Checks if there is a static template for this page. If so, show it!
+	if _, err := os.Stat(filepath.Clean("templates/static" + r.URL.Path + ".tmpl")); err == nil {
+		return pages.RenderHTML(w, nil, r.URL.Path)
+	}
+
+	// Return 404 Not Found for the rest
+	return http.StatusNotFound, nil
+}
+
+func logout(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, error) {
+	s.Values = nil
+	err := s.Save(r, w)
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+	return http.StatusOK, nil
 }

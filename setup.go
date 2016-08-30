@@ -1,13 +1,43 @@
 package upframe
 
 import (
+	"crypto/rand"
+	"io"
+	"log"
+
+	"github.com/gorilla/sessions"
 	"github.com/hacdias/upframe/models"
 	"github.com/hacdias/upframe/pages"
 	"github.com/mholt/caddy"
 	"github.com/mholt/caddy/caddyhttp/httpserver"
 )
 
+var store *sessions.CookieStore
+
 func init() {
+	// Generates 5 random key pairs to secure the cookies
+	// NOTE: generating this at startup will automatically log out the
+	// users when the server is rebooted
+	keyPairs := [][]byte{}
+
+	for i := 0; i < 5; i++ {
+		keyPairs = append(keyPairs, make([]byte, 32))
+		_, err := io.ReadFull(rand.Reader, keyPairs[i])
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	// Creates the new cookie session
+	store = sessions.NewCookieStore(keyPairs...)
+	store.Options = &sessions.Options{
+		Path:     "/",
+		MaxAge:   3600 * 3, // 3 hours
+		Secure:   false,    // TODO: Change this to true on the final website
+		HttpOnly: true,
+	}
+
+	// Regists the caddy middleware
 	caddy.RegisterPlugin("upframe", caddy.Plugin{
 		ServerType: "http",
 		Action:     setup,
@@ -18,6 +48,7 @@ func setup(c *caddy.Controller) error {
 	// Gets the base address
 	cfg := httpserver.GetConfig(c)
 	pages.BaseAddress = cfg.Addr.String()
+	store.Options.Domain = cfg.Host()
 
 	// Initialize our pretty variables
 	var (
