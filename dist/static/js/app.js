@@ -30,9 +30,9 @@ var registerHandler = function(event) {
         // passwords match. so que let fica condicionado ao if{} e var fica na funcao toda
         var form = new Object();
         // ugly names!!!
-        form.first_name = this.querySelectorAll('input[name=first_name]')[0].value,
-            form.last_name = this.querySelectorAll('input[name=last_name]')[0].value,
-            form.email = this.querySelectorAll("input[name=email]")[0].value,
+        form.first_name = this.querySelectorAll('input[name=first_name]')[0].value.trim(),
+            form.last_name = this.querySelectorAll('input[name=last_name]')[0].value.trim(),
+            form.email = this.querySelectorAll("input[name=email]")[0].value.trim(),
             form.password = this.querySelectorAll("input[name=password]")[0].value;
 
         let pwdHash = new jsSHA("SHA-256", "TEXT");
