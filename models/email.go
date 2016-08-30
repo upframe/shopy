@@ -110,7 +110,7 @@ func (e Email) Send() error {
 		return err
 	}
 
-	c, err := smtp.NewClient(conn, host)
+	c, err := smtp.NewClient(conn, smtpHost)
 	if err != nil {
 		return err
 	}
