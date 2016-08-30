@@ -26,7 +26,8 @@ func (u Upframe) ServeHTTP(w http.ResponseWriter, r *http.Request) (int, error) 
 	// decrypting it or if it doesn't exist
 	s, _ := store.Get(r, "upframe-auth")
 
-	// Saves the session in the cookie and checks for errors
+	// Saves the session in the cookie and checks for errors. This is useful
+	// to reset the expiration time.
 	err := s.Save(r, w)
 	if err != nil {
 		return http.StatusInternalServerError, err
