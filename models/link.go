@@ -24,7 +24,7 @@ type Link struct {
 
 // Update updates the current link object in the database
 func (l Link) Update(fields ...string) error {
-	_, err := db.NamedExec(updateQuery("links", "hash", l.Hash, fields), l)
+	_, err := db.NamedExec(updateQuery("links", "hash", fields), l)
 	return err
 }
 
@@ -52,4 +52,12 @@ func (l Link) Insert() error {
 // IsValid returns if the link is still valid and not used
 func (l Link) IsValid() bool {
 	return l.Expires.Unix() < time.Now().Unix() && !l.Used
+}
+
+// GetLinkByHash returns a link using its hash and an error if your database sucks
+func GetLinkByHash(hash string) (*Link, error) {
+	link := &Link{}
+	err := db.Get(link, "SELECT * FROM links WHERE hash=?", hash)
+
+	return link, err
 }

@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"encoding/hex"
 	"io"
-	"strconv"
 
 	"golang.org/x/crypto/scrypt"
 )
@@ -33,7 +32,7 @@ type User struct {
 
 // Update updates the current User struct into the database
 func (u User) Update(fields ...string) error {
-	_, err := db.NamedExec(updateQuery("users", "id", strconv.Itoa(u.ID), fields), u)
+	_, err := db.NamedExec(updateQuery("users", "id", fields), u)
 	return err
 }
 
@@ -126,7 +125,7 @@ func DeleteUser(email string) error {
 }
 
 // GetUserByID retrieves a user from the database using its ID
-func GetUserByID(id string) (*User, error) {
+func GetUserByID(id int) (*User, error) {
 	user := User{}
 	err := db.Get(&user, "SELECT * FROM users WHERE id=?", id)
 	return &user, err

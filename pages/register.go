@@ -12,26 +12,36 @@ import (
 
 // RegisterGET handles the GET request for register page
 func RegisterGET(w http.ResponseWriter, r *http.Request) (int, error) {
-	/*	TODO: Handle links with ?confirm= in the url. Use r.URL.Query().Get()
+	if r.URL.Query().Get("confirm") != "" {
+		link, err := models.GetLinkByHash(r.URL.Query().Get("confirm"))
 
-		obter o link da base de dados usando a info obtida. confirmar se o link é valido
-		ou seja, se nao foi ja usado, se existe e se ainda n passou a data de validade
+		if err != nil || link.Used || link.Expires.Unix() < time.Now().Unix() || link.Path != "/register" {
+			return RenderHTML(w, nil, "invalidhash") // create a file for this
+		}
 
-		se nao for valido, mostrear uma pagina a dizer q nao é valido
+		user, err := models.GetUserByID(link.User)
 
-		se for valido:
-			pega-se no user ID e obtem-se o utilizador
-			mete-se o utilizador confirmado
-			faz-se update ao utilizador
+		if err != nil {
+			return http.StatusInternalServerError, err
+		}
 
-			mete-se o link como usado
-			faz-se update ao link
+		user.Confirmed = true
+		err = user.Update("confirmed")
 
-			manda para /login?confirm=success na qual além da tela de login mostramos uma mensagem
-			a dizer que o user foi confirmado.
+		if err != nil {
+			return http.StatusInternalServerError, err
+		}
 
-		TODO: @fabio
-	*/
+		link.Used = true
+		err = link.Update("used")
+
+		if err != nil {
+			return http.StatusInternalServerError, err
+		}
+
+		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
+		return http.StatusOK, nil
+	}
 
 	// Gets the referrer user
 	referrer, err := models.GetUserByReferral(r.URL.Query().Get("ref"))
@@ -130,7 +140,7 @@ func RegisterPOST(w http.ResponseWriter, r *http.Request) (int, error) {
 
 	// Sets the current time and expiration time of the confirmation email
 	now := time.Now()
-	expires := now.Add(models.ConfirmExpiration)
+	expires := time.Now().Add(time.Hour * 24 * 20)
 
 	link := &models.Link{
 		Path:    "/register",
