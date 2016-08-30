@@ -14,12 +14,11 @@ func init() {
 }
 
 func setup(c *caddy.Controller) error {
-	// Initializes DB connection information
-	dbUser := "root"
-	dbPass := "root"
-	dbHost := "127.0.0.1"
-	dbPort := "3306"
-	dbName := "upframe"
+	// Initialize our pretty variables
+	var (
+		smtpUser, smtpPass, smtpHost, smtpPort string
+		dbUser, dbPass, dbHost, dbPort, dbName string
+	)
 
 	// Gets the options from the Caddyfile
 	for c.Next() {
@@ -55,9 +54,36 @@ func setup(c *caddy.Controller) error {
 				}
 
 				dbName = c.Val()
+			case "smtp_user":
+				if !c.NextArg() {
+					return c.ArgErr()
+				}
+
+				smtpUser = c.Val()
+			case "smtp_pass":
+				if !c.NextArg() {
+					return c.ArgErr()
+				}
+
+				smtpPass = c.Val()
+			case "smtp_host":
+				if !c.NextArg() {
+					return c.ArgErr()
+				}
+
+				smtpHost = c.Val()
+			case "smtp_port":
+				if !c.NextArg() {
+					return c.ArgErr()
+				}
+
+				smtpPort = c.Val()
 			}
 		}
 	}
+
+	// Configures the email
+	models.InitSMTP(smtpUser, smtpPass, smtpHost, smtpPort)
 
 	// Connects to the database and checks for an error
 	err := models.InitDB(dbUser, dbPass, dbHost, dbPort, dbName)
