@@ -29,15 +29,17 @@ func LoginPOST(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int
 		return http.StatusInternalServerError, err
 	}
 
+	// Obtains the email and the password
 	email := r.FormValue("email")
 	password := r.FormValue("password")
 
+	// Checks if they're blank or not
 	if email == "" || password == "" {
 		return http.StatusBadRequest, nil
 	}
 
+	// Obtains the user and checks for errors
 	user, err := models.GetUserByEmail(email)
-
 	if err == sql.ErrNoRows {
 		return http.StatusNotFound, err
 	}
@@ -46,8 +48,8 @@ func LoginPOST(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int
 		return http.StatusInternalServerError, err
 	}
 
+	// Checks the password and checks for errors
 	ok, err := user.CheckPassword(password)
-
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -56,10 +58,12 @@ func LoginPOST(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int
 		return http.StatusUnauthorized, nil
 	}
 
+	// Sets the session cookie
 	s.Values["logged"] = true
 	s.Values["uid"] = user.ID
 	s.Values["admin"] = user.Admin
 
+	// Saves the cookie and checks for errors
 	err = s.Save(r, w)
 	if err != nil {
 		return http.StatusInternalServerError, err
