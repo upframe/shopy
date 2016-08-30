@@ -20,7 +20,7 @@ function handleRegister() {
   if(form = document.getElementById("regForm")) {
     form.querySelectorAll("button[type=submit]")[0].addEventListener("click", function(e) {
       e.preventDefault();
-      if((form.querySelectorAll("input[type=password]"[0].value))== (form.querySelectorAll("input[type=password]")[1].value)) {
+      if(checkRegisterFields(form)) {
         // passwords match
         firstname = form.querySelectorAll('input[name=first_name]')[0].value;
         lastname = form.querySelectorAll('input[name=last_name]')[0].value;
@@ -38,14 +38,32 @@ function handleRegister() {
           if(request.readyState == 4) {
             if(request.status == 200) {// success
               console.log(request.responseText);
-            } else {
+            } elseif(request.status == 404) {
+              console.log(request.responseText);
+            }else {
               alert(request.status + ":" + request.responseText);
             }
           }
         }
       } else {
         // passwords don't match
+        console.log("passwords don't match or fields are empty")
       }
     });
   }
+}
+
+function checkRegisterFields(form) {
+  // check if all fields are empty
+  for(var x = 0; x < form.children.length - 1; x++) {
+    if(form[x].value == "") {
+      return false;
+    }
+  }
+
+  if(form[3].value != form[4].value || form[2].value.search("@") == -1) {
+    return false;
+  }
+
+  return true;
 }
