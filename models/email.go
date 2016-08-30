@@ -10,14 +10,17 @@ import (
 	"net/smtp"
 )
 
-// TODO: Change this afterwards
+// FromDefaultEmail is the default FROM email
 const FromDefaultEmail = "noreply@bitsn.me"
 
 var (
-	smtpUser string
-	smtpPass string
-	smtpHost string
-	smtpPort string
+	smtpUser       string
+	smtpPass       string
+	smtpHost       string
+	smtpPort       string
+	smtpServerName string
+	smtpAuth       smtp.Auth
+	smtpTLSConfig  *tls.Config
 )
 
 // InitSMTP configures the email variables
@@ -26,6 +29,16 @@ func InitSMTP(user, pass, host, port string) {
 	smtpPass = pass
 	smtpHost = host
 	smtpPort = port
+
+	// Connect to the SMTP Server
+	smtpServerName = smtpHost + ":" + smtpPort
+	smtpAuth = smtp.PlainAuth("", smtpUser, smtpPass, smtpHost)
+
+	// TLS config
+	smtpTLSConfig = &tls.Config{
+		InsecureSkipVerify: true,
+		ServerName:         smtpHost,
+	}
 }
 
 // Email contains the information about email
@@ -91,21 +104,10 @@ func (e Email) Send() error {
 	}
 	message += "\r\n" + e.Body
 
-	// Connect to the SMTP Server
-	servername := smtpHost + ":" + smtpPort
-
-	auth := smtp.PlainAuth("", smtpUser, smtpPass, smtpHost)
-
-	// TLS config
-	tlsconfig := &tls.Config{
-		InsecureSkipVerify: true,
-		ServerName:         smtpHost,
-	}
-
 	// Here is the key, you need to call tls.Dial instead of smtp.Dial
 	// for smtp servers running on 465 that require an ssl connection
 	// from the very beginning (no starttls)
-	conn, err := tls.Dial("tcp", servername, tlsconfig)
+	conn, err := tls.Dial("tcp", smtpServerName, smtpTLSConfig)
 	if err != nil {
 		return err
 	}
@@ -116,7 +118,7 @@ func (e Email) Send() error {
 	}
 
 	// Auth
-	if err = c.Auth(auth); err != nil {
+	if err = c.Auth(smtpAuth); err != nil {
 		return err
 	}
 
