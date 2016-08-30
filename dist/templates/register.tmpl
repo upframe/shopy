@@ -2,7 +2,7 @@
 {{ define "content" }}
 <h1>Register</h1>
 
-<form method="post">
+<form method="post" id="regForm">
     <input type="text" placeholder="First Name" name="first_name" required>
     <input type="text" placeholder="Last Name" name="last_name" required>
     <input type="email" placeholder="Email" name="email" required>
@@ -10,4 +10,6 @@
     <input type="password" placeholder="Confirm Password" required>
     <button type="submit">Register</button>
 </form>
+
+<script src="js/sha.js"></script>
 {{ end }}

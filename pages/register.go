@@ -132,7 +132,8 @@ func RegisterPOST(w http.ResponseWriter, r *http.Request) (int, error) {
 
 	// Redirect to success page as a Temporary Redirect
 	// TODO: JavaScript "popup" to show this information instead of redirect?
-	http.Redirect(w, r, "/register?success=true", http.StatusTemporaryRedirect)
+
+	// working on it
 	return http.StatusCreated, nil
 }
 
