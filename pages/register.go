@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"log"
 	"net/http"
+	"net/mail"
+	"time"
 
 	"github.com/hacdias/upframe/models"
 )
@@ -91,6 +93,11 @@ func RegisterPOST(w http.ResponseWriter, r *http.Request) (int, error) {
 		return http.StatusInternalServerError, err
 	}
 
+	user, err = models.GetUserByEmail(user.Email)
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
 	// Decrement one value from the referrer invites number and updates it in
 	// the database and checks for errors. In this case, if there is an error
 	// we will keep the registration going because it's no user-fault and the
@@ -104,36 +111,52 @@ func RegisterPOST(w http.ResponseWriter, r *http.Request) (int, error) {
 	if err != nil {
 		log.Println("INVITE DECREMENT ERROR: " + err.Error())
 	}
-	/*
-		// TODO: Send confirmation email
-		now := time.Now()
-		expires := now.Add(models.ConfirmExpiration)
 
-		link := &models.Link{
-			Path:    "/register",
-			Hash:    models.UniqueHash(u.Email),
-			User:    u.ID,
-			Used:    false,
-			Time:    &now,
-			Expires: &expires,
-		}
+	// Sets the current time and expiration time of the confirmation email
+	now := time.Now()
+	expires := now.Add(models.ConfirmExpiration)
 
-		err := link.Insert()
-		if err != nil {
-			return err
-		}
+	link := &models.Link{
+		Path:    "/register",
+		Hash:    models.UniqueHash(user.Email),
+		User:    user.ID,
+		Used:    false,
+		Time:    &now,
+		Expires: &expires,
+	}
 
-		data := make(map[string]interface{})
-		data["Name"] = user.FirstName + " " + user.LastName
-		data["Hash"] = link.Hash
-		data["Host"] = r.URL.Scheme + "://" + r.URL.Host */
+	err = link.Insert()
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
 
-	// TODO: Finish
+	data := make(map[string]interface{})
+	data["Name"] = user.FirstName + " " + user.LastName
+	data["Hash"] = link.Hash
+	data["Host"] = BaseAddress
 
-	// Redirect to success page as a Temporary Redirect
-	// TODO: JavaScript "popup" to show this information instead of redirect?
+	email := &models.Email{
+		From: &mail.Address{
+			Name:    "Upframe",
+			Address: models.FromDefaultEmail,
+		},
+		To: &mail.Address{
+			Name:    "",
+			Address: user.Email,
+		},
+		Subject: "Confirm your account",
+	}
 
-	// working on it
+	err = email.UseTemplate("confirmation", data)
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	err = email.Send()
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
 	return http.StatusCreated, nil
 }
 

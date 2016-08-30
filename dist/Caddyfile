@@ -5,7 +5,7 @@ http://localhost {
     upframe {
         db_user root
         db_pass root
-        db_host localhost
+        db_host 127.0.0.1
         db_name upframe
 
         smtp_user noreply@bitsn.me

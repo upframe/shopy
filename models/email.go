@@ -11,7 +11,8 @@ import (
 	"net/smtp"
 )
 
-// NOTE: THIS ARE TESTS ONLY
+// TODO: Change this afterwards
+const FromDefaultEmail = "noreply@bitsn.me"
 
 var (
 	smtpUser string
@@ -44,8 +45,21 @@ func (e *Email) UseTemplate(name string, data interface{}) error {
 		return err
 	}
 
+	funcs := template.FuncMap{
+		"CSS": func(s string) template.CSS {
+			return template.CSS(s)
+		},
+		"HTML": func(s string) template.HTML {
+			return template.HTML(s)
+		},
+		"URL": func(s string) template.URL {
+			return template.URL(s)
+		},
+	}
+
 	// Created the template with the content of the file
-	tpl, err := template.New(name).Parse(string(page))
+	tpl, err := template.New(name).Funcs(funcs).Parse(string(page))
+
 	if err != nil {
 		return err
 	}
@@ -69,6 +83,7 @@ func (e Email) Send() error {
 	headers["From"] = e.From.String()
 	headers["To"] = e.To.String()
 	headers["Subject"] = e.Subject
+	headers["Content-Type"] = "text/html"
 
 	// Setup message
 	message := ""

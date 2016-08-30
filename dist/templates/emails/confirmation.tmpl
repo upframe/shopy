@@ -1,17 +1,14 @@
 <!DOCTYPE html >
 <html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <title>Responsive email</title>
-        <style type="text/css">
-            body{margin: 0; font-family: arial, sans-serif;}
-        </style>
-    </head>
-    <body>
-        <p>
-            <strong>Hello {{ .Name }},</strong>,<br>
-            We're proud of having you in our crowd. There's only one more step: click on <a href="{{ .Host }}/register?confirm={{ .Hash }}">this link</a> to confirm your subscription!
-        </p>
-    </body>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Responsive email</title>
+<style type="text/css">
+    body{margin: 0; font-family: arial, sans-serif;}
+</style>
+</head>
+<body>
+<p><strong>Hello {{ .Name }},</strong><br>We're proud of having you in our crowd. There's only one more step: click on <a target="_blank" href="{{ URL .Host }}/register?confirm={{ URL .Hash }}">this link</a> to confirm your subscription!</p>
+</body>
 </html>

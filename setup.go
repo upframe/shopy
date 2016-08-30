@@ -2,6 +2,7 @@ package upframe
 
 import (
 	"github.com/hacdias/upframe/models"
+	"github.com/hacdias/upframe/pages"
 	"github.com/mholt/caddy"
 	"github.com/mholt/caddy/caddyhttp/httpserver"
 )
@@ -14,11 +15,17 @@ func init() {
 }
 
 func setup(c *caddy.Controller) error {
+	// Gets the base address
+	cfg := httpserver.GetConfig(c)
+	pages.BaseAddress = cfg.Addr.String()
+
 	// Initialize our pretty variables
 	var (
 		smtpUser, smtpPass, smtpHost, smtpPort string
 		dbUser, dbPass, dbHost, dbPort, dbName string
 	)
+
+	dbPort = "3306"
 
 	// Gets the options from the Caddyfile
 	for c.Next() {
