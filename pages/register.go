@@ -10,6 +10,8 @@ import (
 	"github.com/hacdias/upframe/models"
 )
 
+// TODO: add handler with sql.ErrNoRows
+
 // RegisterGET handles the GET request for register page
 func RegisterGET(w http.ResponseWriter, r *http.Request) (int, error) {
 	if r.URL.Query().Get("confirm") != "" {
@@ -49,6 +51,7 @@ func RegisterGET(w http.ResponseWriter, r *http.Request) (int, error) {
 	// If the user doesn't exist show a page telling that registration
 	// is invitation only
 	if err != nil {
+		log.Println(err)
 		return RenderHTML(w, nil, "register-invite")
 	}
 

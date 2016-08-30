@@ -1,14 +1,14 @@
 // Register page JS file
 
 document.addEventListener("DOMContentLoaded", () => {
-    switch (window.location.pathname) {
-        case "/register":
-            // if register form was loaded it means everything is fine
-            // if not, it means register is only available by invitation
-            if (form = document.getElementById("register")) {
-                form.addEventListener("submit", registerHandler);
-            }
-            break;
+    // if register form was loaded it means everything is fine
+    // if not, it means register is only available by invitation
+    if (form = document.getElementById("register")) {
+        form.addEventListener("submit", registerHandler);
+    }
+
+    if (form = document.getElementById("login")) {
+        form.addEventListener("submit", loginHandler);
     }
 });
 
@@ -69,6 +69,35 @@ var registerHandler = function(event) {
         }
     } else {
         alert("passwords don't match or fields are empty")
+    }
+}
+
+var loginHandler = function(event) {
+    event.preventDefault();
+
+    // passwords match. so que let fica condicionado ao if{} e var fica na funcao toda
+    var form = new Object();
+    form.email = this.querySelectorAll("input[name=email]")[0].value.trim();
+    form.password = this.querySelectorAll("input[name=password]")[0].value;
+
+    let pwdHash = new jsSHA("SHA-256", "TEXT");
+    pwdHash.update(form.password);
+    form.password = pwdHash.getHash("HEX");
+
+    var request = new XMLHttpRequest();
+    request.open("POST", window.location, true);
+    request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    request.send(form.serialize());
+    request.onreadystatechange = function() {
+        if (request.readyState == 4) {
+            switch (request.status) {
+                case 200:
+                    console.log("Itworks");
+                    break;
+                default:
+                    alert("Something went wrong.")
+            }
+        }
     }
 }
 

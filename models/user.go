@@ -24,6 +24,7 @@ type User struct {
 	Invites      int            `db:"invites"`
 	Credit       int            `db:"credit"`
 	Confirmed    bool           `db:"confirmed"`
+	Admin        bool           `db:"admin"`
 	Referral     string         `db:"referral"`
 	Referrer     sql.NullInt64  `db:"referrer"`
 	PasswordSalt string         `db:"password_salt"`

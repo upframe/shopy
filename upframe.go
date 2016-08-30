@@ -34,7 +34,14 @@ func (u Upframe) ServeHTTP(w http.ResponseWriter, r *http.Request) (int, error) 
 			return http.StatusNotImplemented, nil
 		case "/login":
 			// if logged in redirect to / or /store
-			return pages.LoginGET(w, r)
+
+			if r.Method == http.MethodGet {
+				return pages.LoginGET(w, r)
+			} else if r.Method == http.MethodPost {
+				return pages.LoginPOST(w, r)
+			}
+
+			return http.StatusNotImplemented, nil
 		case "/settings":
 			// if not logged in redirect to /login
 			return pages.SettingsGET(w, r)
