@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"html/template"
 	"io/ioutil"
-	"net"
 	"net/mail"
 	"net/smtp"
 )
@@ -94,14 +93,13 @@ func (e Email) Send() error {
 
 	// Connect to the SMTP Server
 	servername := smtpHost + ":" + smtpPort
-	host, _, _ := net.SplitHostPort(servername)
 
-	auth := smtp.PlainAuth("", smtpUser, smtpPass, host)
+	auth := smtp.PlainAuth("", smtpUser, smtpPass, smtpHost)
 
 	// TLS config
 	tlsconfig := &tls.Config{
 		InsecureSkipVerify: true,
-		ServerName:         host,
+		ServerName:         smtpHost,
 	}
 
 	// Here is the key, you need to call tls.Dial instead of smtp.Dial
