@@ -57,7 +57,7 @@ func (e *Email) UseTemplate(name string, data interface{}) error {
 		},
 	}
 
-	// Created the template with the content of the file
+	// Create the template with the content of the file
 	tpl, err := template.New(name).Funcs(funcs).Parse(string(page))
 
 	if err != nil {
