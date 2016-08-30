@@ -72,6 +72,18 @@ func (u User) Insert() error {
 	return err
 }
 
+// DeleteByID deletes a user from the database using his id
+func DeleteByID(id int) error {
+	_, err := db.Exec("DELETE FROM users WHERE id=?", id)
+	return err
+}
+
+// DeleteByEmail deletes a user from the database using its email
+func DeleteByEmail(email string) error {
+	_, err := db.Exec("DELETE FROM users WHERE email=?", email)
+	return err
+}
+
 // SetPassword generates the salt and the hash of the user password
 func (u *User) SetPassword(password string) error {
 	// Generates a random salt
@@ -117,12 +129,6 @@ func (u *User) GenerateReferralHash() {
 	}
 
 	u.Referral = UniqueHash(u.Email)
-}
-
-// DeleteUser deletes a user from the database using its email
-func DeleteUser(email string) error {
-	_, err := db.Exec("DELETE FROM users WHERE email=?", email)
-	return err
 }
 
 // GetUserByID retrieves a user from the database using its ID
