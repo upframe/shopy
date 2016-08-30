@@ -57,7 +57,7 @@ func RegisterPOST(w http.ResponseWriter, r *http.Request) (int, error) {
 	// find the user, return a 403 Forbidden status
 	referrer, err := models.GetUserByReferral(r.URL.Query().Get("ref"))
 	if err != nil {
-		return http.StatusForbidden, nil
+		return http.StatusForbidden, err
 	}
 
 	// Checks if the referrer still has invites available! This is important! If
