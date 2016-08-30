@@ -18,7 +18,7 @@ func RegisterGET(w http.ResponseWriter, r *http.Request) (int, error) {
 		link, err := models.GetLinkByHash(r.URL.Query().Get("confirm"))
 
 		if err != nil || link.Used || link.Expires.Unix() < time.Now().Unix() || link.Path != "/register" {
-			return RenderHTML(w, nil, "invalidhash") // create a file for this
+			return RenderHTML(w, nil, "confirmation-expired") // create a file for this
 		}
 
 		user, err := models.GetUserByID(link.User)

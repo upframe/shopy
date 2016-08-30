@@ -2,12 +2,6 @@ package models
 
 import "time"
 
-const (
-	DeleteExpiration  = 60 * 60 * 2       // 2 Hours in seconds
-	ConfirmExpiration = 60 * 60 * 24 * 20 // 20 Days in seconds
-	ResetExpiration   = 60 * 60 * 2       // 2 Hours in seconds
-)
-
 // Link is an object that holds an hash, the corresponding user, an action,
 // the moment it was created and an expiration date.
 //
@@ -54,7 +48,7 @@ func (l Link) IsValid() bool {
 	return l.Expires.Unix() < time.Now().Unix() && !l.Used
 }
 
-// GetLinkByHash returns a link using its hash and an error if your database sucks
+// GetLinkByHash returns a link using its hash and an error if your database sucks or your code sucks
 func GetLinkByHash(hash string) (*Link, error) {
 	link := &Link{}
 	err := db.Get(link, "SELECT * FROM links WHERE hash=?", hash)
