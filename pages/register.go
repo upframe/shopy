@@ -12,10 +12,26 @@ import (
 
 // RegisterGET handles the GET request for register page
 func RegisterGET(w http.ResponseWriter, r *http.Request) (int, error) {
-	// If we're in the success page, show it, LOL
-	if r.URL.Query().Get("success") != "" {
-		return RenderHTML(w, nil, "register-success")
-	}
+	/*	TODO: Handle links with ?confirm= in the url. Use r.URL.Query().Get()
+
+		obter o link da base de dados usando a info obtida. confirmar se o link é valido
+		ou seja, se nao foi ja usado, se existe e se ainda n passou a data de validade
+
+		se nao for valido, mostrear uma pagina a dizer q nao é valido
+
+		se for valido:
+			pega-se no user ID e obtem-se o utilizador
+			mete-se o utilizador confirmado
+			faz-se update ao utilizador
+
+			mete-se o link como usado
+			faz-se update ao link
+
+			manda para /login?confirm=success na qual além da tela de login mostramos uma mensagem
+			a dizer que o user foi confirmado.
+
+		TODO: @fabio
+	*/
 
 	// Gets the referrer user
 	referrer, err := models.GetUserByReferral(r.URL.Query().Get("ref"))
@@ -144,7 +160,7 @@ func RegisterPOST(w http.ResponseWriter, r *http.Request) (int, error) {
 			Name:    "",
 			Address: user.Email,
 		},
-		Subject: "Confirm your account",
+		Subject: "You're almost there",
 	}
 
 	err = email.UseTemplate("confirmation", data)
