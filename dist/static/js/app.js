@@ -22,11 +22,11 @@ function handleRegister() {
       e.preventDefault();
       if(checkRegisterFields(form)) {
         // passwords match
-        firstname = form.querySelectorAll('input[name=first_name]')[0].value;
-        lastname = form.querySelectorAll('input[name=last_name]')[0].value;
-        email = form.querySelectorAll("input[name=email]")[0].value;
-        password = form.querySelectorAll("input[name=password]")[0].value;
-        var pwdHash = new jsSHA("SHA-256", "TEXT");
+        firstname = form.querySelectorAll('input[name=first_name]')[0].value,
+        lastname = form.querySelectorAll('input[name=last_name]')[0].value,
+        email = form.querySelectorAll("input[name=email]")[0].value,
+        password = form.querySelectorAll("input[name=password]")[0].value,
+        pwdHash = new jsSHA("SHA-256", "TEXT");
         pwdHash.update(password);
         pwdHash = pwdHash.getHash("HEX");
 
@@ -36,11 +36,13 @@ function handleRegister() {
         request.send("first_name=" + firstname + "&last_name=" + lastname + "&email=" + email + "&password=" + pwdHash);
         request.onreadystatechange = function() {
           if(request.readyState == 4) {
-            if(request.status == 200) {// success
-              console.log(request.responseText);
+            if(request.status == 200 || request.status == 201) {
+              alert("Registered.");
             } elseif(request.status == 404) {
-              console.log(request.responseText);
-            }else {
+              // not found
+            } elseif(request.status == 403) {
+              // Forbidden
+            } else {
               alert(request.status + ":" + request.responseText);
             }
           }
