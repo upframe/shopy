@@ -56,7 +56,8 @@ func RenderHTML(w http.ResponseWriter, data interface{}, templates ...string) (i
 	return http.StatusOK, nil
 }
 
-func isLoggedIn(s *sessions.Session) bool {
+// IsLoggedIn checks if an user is logged in
+func IsLoggedIn(s *sessions.Session) bool {
 	switch s.Values["logged"].(type) {
 	case bool:
 		return s.Values["logged"].(bool)
@@ -65,7 +66,18 @@ func isLoggedIn(s *sessions.Session) bool {
 	return false
 }
 
-func redirect(w http.ResponseWriter, r *http.Request, path string) (int, error) {
+// IsAdmin checks if an user is admin
+func IsAdmin(s *sessions.Session) bool {
+	switch s.Values["admin"].(type) {
+	case bool:
+		return s.Values["admin"].(bool)
+	}
+
+	return false
+}
+
+// Redirect redirects the user to a page
+func Redirect(w http.ResponseWriter, r *http.Request, path string) (int, error) {
 	http.Redirect(w, r, path, http.StatusTemporaryRedirect)
 	return http.StatusOK, nil
 }

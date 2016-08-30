@@ -13,8 +13,8 @@ import (
 
 // RegisterGET handles the GET request for register page
 func RegisterGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, error) {
-	if isLoggedIn(s) {
-		return redirect(w, r, "/")
+	if IsLoggedIn(s) {
+		return Redirect(w, r, "/")
 	}
 
 	if r.URL.Query().Get("confirm") != "" {
@@ -69,7 +69,7 @@ func RegisterGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (i
 
 // RegisterPOST handles the POST http request in register page
 func RegisterPOST(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, error) {
-	if isLoggedIn(s) {
+	if IsLoggedIn(s) {
 		return http.StatusBadRequest, nil
 	}
 

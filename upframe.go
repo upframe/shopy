@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/gorilla/sessions"
 	"github.com/hacdias/upframe/pages"
@@ -55,6 +56,13 @@ func (u Upframe) ServeHTTP(w http.ResponseWriter, r *http.Request) (int, error) 
 		return pages.CheckoutGET(w, r, s)
 	case r.URL.Path == "/logout":
 		return logout(w, r, s)
+	}
+
+	// Admin router: if the user is an admin and the page starts with /admin
+	if pages.IsAdmin(s) && strings.HasPrefix(r.URL.Path, "/admin") {
+		switch {
+
+		}
 	}
 
 	// If the request doesn't match any route and it isn't a GET request

@@ -10,8 +10,8 @@ import (
 
 // LoginGET handles the GET request for /login page
 func LoginGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, error) {
-	if isLoggedIn(s) {
-		return redirect(w, r, "/")
+	if IsLoggedIn(s) {
+		return Redirect(w, r, "/")
 	}
 
 	return RenderHTML(w, nil, "login")
@@ -19,7 +19,7 @@ func LoginGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int,
 
 // LoginPOST handles the POST request for /login page
 func LoginPOST(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, error) {
-	if isLoggedIn(s) {
+	if IsLoggedIn(s) {
 		return http.StatusBadRequest, nil
 	}
 
