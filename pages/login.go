@@ -58,6 +58,11 @@ func LoginPOST(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int
 		return http.StatusUnauthorized, nil
 	}
 
+	// Checks if the user is confirmed
+	if !user.Confirmed {
+		return http.StatusFailedDependency, nil
+	}
+
 	// Sets the session cookie
 	s.Values["logged"] = true
 	s.Values["uid"] = user.ID

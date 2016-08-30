@@ -62,6 +62,9 @@ var registerHandler = function(event) {
                     case 410:
                         alert("Gone");
                         break;
+                    case 424:
+                        alert("Check your email to confirm.");
+                        break;
                     default:
                         alert("Something went wrong.")
                 }
@@ -92,7 +95,16 @@ var loginHandler = function(event) {
         if (request.readyState == 4) {
             switch (request.status) {
                 case 200:
-                    console.log("Itworks");
+                    window.location = window.location.protocol + window.location.hostname
+                    break;
+                case 400:
+                    alert("You might have left some fields blank!");
+                    break;
+                case 404:
+                    alert("The user doesn't exist.")
+                    break;
+                case 401:
+                    alert("The pass is incorrect")
                     break;
                 default:
                     alert("Something went wrong.")
