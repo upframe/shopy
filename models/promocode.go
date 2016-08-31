@@ -10,3 +10,47 @@ type Promocode struct {
 	Discount    int        `db:"discount"`
 	Deactivated bool       `db:"deactivated"`
 }
+
+// Insert inserts an order into the database
+func (p Promocode) Insert() error {
+	if p.ID != 0 {
+		return nil
+	}
+
+	_, err := db.NamedExec(
+		`INSERT INTO promocodes
+								(id,
+									code,
+									expires,
+									discount,
+									deactivated
+			VALUES 		(:id,
+									:code,
+									:expires,
+									:discount,
+									:deactivated)`, p)
+
+	return err
+}
+
+// Update updates an order from the database
+func (p Promocode) Update(fields ...string) error {
+	_, err := db.NamedExec(updateQuery("promocodes", "id", fields), p)
+	return err
+}
+
+// GetPromocode pulls out an order from the database
+func GetPromocode(id int) (*Promocode, error) {
+	promocode := &Promocode{}
+	err := db.Get(promocode, "SELECT * FROM promocodes WHERE id=?", id)
+
+	return promocode, err
+}
+
+// GetPromocodes does something that I don't actually know
+func GetPromocodes(first, limit int) ([]*Promocode, error) {
+	promocodes := []*Promocode{}
+	err := db.Select(promocodes, "SELECT * FROM promocodes ORDER BY id LIMIT ? OFFSET ?", limit, first)
+
+	return promocodes, err
+}

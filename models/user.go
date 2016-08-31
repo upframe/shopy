@@ -32,12 +32,6 @@ type User struct {
 	Deactivated  bool           `db:"deactivated"`
 }
 
-// Update updates the current User struct into the database
-func (u User) Update(fields ...string) error {
-	_, err := db.NamedExec(updateQuery("users", "id", fields), u)
-	return err
-}
-
 // Insert inserts the current User struct into the database and returns an error
 // if something goes wrong.
 func (u User) Insert() error {
@@ -72,6 +66,12 @@ func (u User) Insert() error {
 		             :password_hash,
 					 :deactivated)`, u)
 
+	return err
+}
+
+// Update updates the current User struct into the database
+func (u User) Update(fields ...string) error {
+	_, err := db.NamedExec(updateQuery("users", "id", fields), u)
 	return err
 }
 
