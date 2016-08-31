@@ -63,6 +63,11 @@ func LoginPOST(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int
 		return http.StatusFailedDependency, nil
 	}
 
+	// Checks if the user is deactivated
+	if user.Deactivated {
+		return http.StatusLocked, nil
+	}
+
 	// Sets the session cookie values
 	s.Values["IsLoggedIn"] = true
 	s.Values["IsAdmin"] = true

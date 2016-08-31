@@ -3,24 +3,27 @@
 <head>
     <title>{{ template "title" }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/normalize.css">
     <link rel="stylesheet" href="/css/main.css">
 </head>
 <body>
-    <h3>Navigation</h3>
-    <ul>
-        <li><a href="/">Home</a></li>
-        <li><a href="/store">Store</a></li>
-        {{ if .IsLoggedIn }}
-        <li><a href="/cart">Cart</a></li>
-        <li><a href="/checkout">Checkout</a></li>
-        <li><a href="/settings">Settings</a></li>
-        <li><a href="/logout">Logout</a></li>
-        {{ end }}
-        {{ if not .IsLoggedIn }}
-        <li><a href="/register">Register</a></li>
-        <li><a href="/login">Login</a></li>
-        {{ end }}
-    </ul>
+    <nav id="site-nav">
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/store">Store</a></li>
+            {{ if .IsLoggedIn }}
+            <li><a href="/cart">Cart</a></li>
+            <li><a href="/checkout">Checkout</a></li>
+            <li><a href="/settings">Settings</a></li>
+            <li><a href="/logout">Logout</a></li>
+            {{ end }}
+            {{ if not .IsLoggedIn }}
+            <li><a href="/register">Register</a></li>
+            <li><a href="/login">Login</a></li>
+            {{ end }}
+        </ul>
+    </nav>
+
     {{ if .IsLoggedIn }}<p>Hi {{ .Session.FirstName }}</p>{{ end }}
 
     {{ template "content" . }}
