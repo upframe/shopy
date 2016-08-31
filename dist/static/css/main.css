@@ -37,7 +37,7 @@ a {
     color: #fff;
     border-radius: 2px;
     height: 0;
-    transition: .2s ease all;
+    transition: .2s ease height;
 }
 
 #form-error.error,
@@ -53,7 +53,7 @@ a {
 
 #form-error.warning {
     background-color: #E3FD31;
-    color: #fff;
+    color: #272727;
 }
 
 form#login,
