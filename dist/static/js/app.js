@@ -119,6 +119,10 @@ var loginHandler = function(event) {
 function formError(message, type) {
     let error = document.getElementById("form-error");
 
+    error.classList.remove("warning");
+    error.classList.remove("success");
+    error.classList.remove("error");
+
     error.classList.add(type);
     error.innerHTML = message;
     error.classList.add("shake");
