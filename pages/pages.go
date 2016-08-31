@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"path/filepath"
 
 	"github.com/gorilla/sessions"
 )
@@ -33,7 +34,7 @@ func RenderHTML(w http.ResponseWriter, s *sessions.Session, data interface{}, te
 	// For each template, add it to the the tpl variable
 	for i := range templates {
 		// Get the template from the assets
-		page, err := ioutil.ReadFile("templates/" + templates[i] + ".tmpl")
+		page, err := ioutil.ReadFile(filepath.Clean("templates/" + templates[i] + ".tmpl"))
 
 		// Check if there is some error. If so, the template doesn't exist
 		if err != nil {

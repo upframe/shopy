@@ -54,8 +54,8 @@ func GetPromocode(id int) (*Promocode, error) {
 }
 
 // GetPromocodes does something that I don't actually know
-func GetPromocodes(first, limit int) ([]*Promocode, error) {
-	promocodes := []*Promocode{}
+func GetPromocodes(first, limit int) (*[]Promocode, error) {
+	promocodes := &[]Promocode{}
 	err := db.Select(promocodes, "SELECT * FROM promocodes ORDER BY id LIMIT ? OFFSET ?", limit, first)
 
 	return promocodes, err

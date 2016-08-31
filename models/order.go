@@ -49,8 +49,8 @@ func GetOrder(id int) (*Order, error) {
 }
 
 // GetOrders does something that I don't actually know
-func GetOrders(first, limit int) ([]*Order, error) {
-	orders := []*Order{}
+func GetOrders(first, limit int) (*[]Order, error) {
+	orders := &[]Order{}
 	err := db.Select(orders, "SELECT * FROM orders ORDER BY id LIMIT ? OFFSET ?", limit, first)
 
 	return orders, err

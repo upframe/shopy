@@ -23,9 +23,6 @@
             {{ end }}
         </ul>
     </nav>
-
-    {{ if .IsLoggedIn }}<p>Hi {{ .Session.FirstName }}</p>{{ end }}
-
     {{ template "content" . }}
     <script src="/js/sha.js"></script>
     <script src="/js/app.js"></script>
