@@ -95,7 +95,7 @@ var loginHandler = function(event) {
         if (request.readyState == 4) {
             switch (request.status) {
                 case 200:
-                    window.location = window.location.protocol + window.location.hostname
+                    window.location = window.location.protocol + "//" + window.location.hostname
                     break;
                 case 400:
                     alert("You might have left some fields blank!");

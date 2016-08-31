@@ -12,5 +12,5 @@ func CheckoutGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (i
 		return Redirect(w, r, "/login")
 	}
 
-	return RenderHTML(w, nil, "checkout")
+	return RenderHTML(w, s, nil, "checkout")
 }

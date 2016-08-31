@@ -27,6 +27,11 @@ func (u Upframe) ServeHTTP(w http.ResponseWriter, r *http.Request) (int, error) 
 	// decrypting it or if it doesn't exist
 	s, _ := store.Get(r, "upframe-auth")
 
+	// If it is a new session, initialize it, setting 'IsLoggedIn' as false
+	if s.IsNew {
+		s.Values["IsLoggedIn"] = false
+	}
+
 	// Saves the session in the cookie and checks for errors. This is useful
 	// to reset the expiration time.
 	err := s.Save(r, w)
@@ -80,8 +85,13 @@ func (u Upframe) ServeHTTP(w http.ResponseWriter, r *http.Request) (int, error) 
 	return http.StatusNotFound, nil
 }
 
+// logout resets the session values and saves the cookie
 func logout(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, error) {
-	s.Values = nil
+	// Reset the session values
+	s.Values = map[interface{}]interface{}{}
+	s.Values["IsLoggedIn"] = false
+
+	// Saves the session and checks for error
 	err := s.Save(r, w)
 	if err != nil {
 		return http.StatusInternalServerError, err

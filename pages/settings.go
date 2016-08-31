@@ -12,5 +12,5 @@ func SettingsGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (i
 		return Redirect(w, r, "/login")
 	}
 
-	return RenderHTML(w, nil, "settings")
+	return RenderHTML(w, s, nil, "settings")
 }

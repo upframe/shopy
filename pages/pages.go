@@ -15,7 +15,7 @@ var BaseAddress = "http://upframe.xyz"
 
 // RenderHTML renders an HTML response and send it to the client based on the
 // choosen templates
-func RenderHTML(w http.ResponseWriter, data interface{}, templates ...string) (int, error) {
+func RenderHTML(w http.ResponseWriter, s *sessions.Session, data interface{}, templates ...string) (int, error) {
 	templates = append(templates, "base")
 	var tpl *template.Template
 
@@ -45,7 +45,7 @@ func RenderHTML(w http.ResponseWriter, data interface{}, templates ...string) (i
 	}
 
 	buf := &bytes.Buffer{}
-	err := tpl.Execute(buf, data)
+	err := tpl.Execute(buf, buildPageData(s, data))
 
 	if err != nil {
 		return http.StatusInternalServerError, err
@@ -58,9 +58,9 @@ func RenderHTML(w http.ResponseWriter, data interface{}, templates ...string) (i
 
 // IsLoggedIn checks if an user is logged in
 func IsLoggedIn(s *sessions.Session) bool {
-	switch s.Values["logged"].(type) {
+	switch s.Values["IsLoggedIn"].(type) {
 	case bool:
-		return s.Values["logged"].(bool)
+		return s.Values["IsLoggedIn"].(bool)
 	}
 
 	return false
@@ -68,9 +68,9 @@ func IsLoggedIn(s *sessions.Session) bool {
 
 // IsAdmin checks if an user is admin
 func IsAdmin(s *sessions.Session) bool {
-	switch s.Values["admin"].(type) {
+	switch s.Values["IsAdmin"].(type) {
 	case bool:
-		return s.Values["admin"].(bool)
+		return s.Values["IsAdmin"].(bool)
 	}
 
 	return false
@@ -80,4 +80,31 @@ func IsAdmin(s *sessions.Session) bool {
 func Redirect(w http.ResponseWriter, r *http.Request, path string) (int, error) {
 	http.Redirect(w, r, path, http.StatusTemporaryRedirect)
 	return http.StatusOK, nil
+}
+
+// page is the type that contains the information that goes into the page
+type page struct {
+	IsLoggedIn bool
+	Data       interface{}
+	Session    struct {
+		FirstName string
+		LastName  string
+		IsAdmin   bool
+	}
+}
+
+// buildPageData builds a page variable based on session and data
+func buildPageData(s *sessions.Session, data interface{}) *page {
+	p := &page{
+		IsLoggedIn: IsLoggedIn(s),
+		Data:       data,
+	}
+
+	if p.IsLoggedIn {
+		p.Session.FirstName = s.Values["FirstName"].(string)
+		p.Session.LastName = s.Values["LastName"].(string)
+		p.Session.IsAdmin = s.Values["IsAdmin"].(bool)
+	}
+
+	return p
 }

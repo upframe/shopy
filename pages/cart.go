@@ -12,5 +12,5 @@ func CartGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, 
 		return Redirect(w, r, "/login")
 	}
 
-	return RenderHTML(w, nil, "cart")
+	return RenderHTML(w, s, nil, "cart")
 }

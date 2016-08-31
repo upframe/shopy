@@ -14,7 +14,7 @@ func LoginGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int,
 		return Redirect(w, r, "/")
 	}
 
-	return RenderHTML(w, nil, "login")
+	return RenderHTML(w, s, nil, "login")
 }
 
 // LoginPOST handles the POST request for /login page
@@ -63,10 +63,12 @@ func LoginPOST(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int
 		return http.StatusFailedDependency, nil
 	}
 
-	// Sets the session cookie
-	s.Values["logged"] = true
-	s.Values["uid"] = user.ID
-	s.Values["admin"] = user.Admin
+	// Sets the session cookie values
+	s.Values["IsLoggedIn"] = true
+	s.Values["IsAdmin"] = true
+	s.Values["UserID"] = user.ID
+	s.Values["FirstName"] = user.FirstName
+	s.Values["LastName"] = user.LastName
 
 	// Saves the cookie and checks for errors
 	err = s.Save(r, w)
