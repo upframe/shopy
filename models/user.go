@@ -57,7 +57,8 @@ func (u User) Insert() error {
 		             referral,
 		             referrer,
 		             password_salt,
-		             password_hash)
+		             password_hash,
+				 	 deactivated)
 		VALUES      (:first_name,
 		             :last_name,
 		             :email,
@@ -68,7 +69,8 @@ func (u User) Insert() error {
 		             :referral,
 		             :referrer,
 		             :password_salt,
-		             :password_hash)`, u)
+		             :password_hash,
+					 :deactivated)`, u)
 
 	return err
 }
