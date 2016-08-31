@@ -106,6 +106,9 @@ var loginHandler = function(event) {
                 case 401:
                     alert("The pass is incorrect")
                     break;
+                case 423:
+                    alert("Your account is deactivated")
+                    break;
                 default:
                     alert("Something went wrong.")
             }
