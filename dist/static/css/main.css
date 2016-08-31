@@ -2,6 +2,10 @@
     box-sizing: border-box;
 }
 
+a {
+    color: inherit;
+}
+
 #site-nav {
     border-bottom: 1px solid rgba(0, 0, 0, 0.075);
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
@@ -29,9 +33,27 @@
 #form-error {
     background-color: #FF3855;
     margin-bottom: 1em;
-    padding: .4em;
+    padding: 0;
     color: #fff;
     border-radius: 2px;
+    height: 0;
+    transition: .2s ease all;
+}
+
+#form-error.error,
+#form-error.success,
+#form-error.warning {
+    height: auto;
+    padding: .4em;
+}
+
+#form-error.success {
+    background-color: #00E5D4;
+}
+
+#form-error.warning {
+    background-color: #E3FD31;
+    color: #fff;
 }
 
 form#login,
@@ -69,4 +91,28 @@ form#register button {
     border: 0;
     margin: 0 auto;
     padding: 1em;
+}
+
+.shake {
+    animation: shake 0.82s cubic-bezier(.36, .07, .19, .97) both;
+}
+
+@keyframes shake {
+    10%,
+    90% {
+        transform: translate3d(-1px, 0, 0);
+    }
+    20%,
+    80% {
+        transform: translate3d(2px, 0, 0);
+    }
+    30%,
+    50%,
+    70% {
+        transform: translate3d(-4px, 0, 0);
+    }
+    40%,
+    60% {
+        transform: translate3d(4px, 0, 0);
+    }
 }

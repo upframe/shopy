@@ -15,9 +15,9 @@ document.addEventListener("DOMContentLoaded", () => {
 Object.prototype.serialize = function() {
     var str = [];
     for (var p in this) {
-            if (this.hasOwnProperty(p)) {
-                str.push(encodeURIComponent(p) + "=" + encodeURIComponent(this[p]));
-            }
+        if (this.hasOwnProperty(p)) {
+            str.push(encodeURIComponent(p) + "=" + encodeURIComponent(this[p]));
+        }
     }
 
     return str.join("&");
@@ -48,30 +48,27 @@ var registerHandler = function(event) {
                 switch (request.status) {
                     case 200:
                     case 201:
-                        formError("Registered. Check your email, bitch.");
+                        formError("You're now registered. Check your email to confirm.", "success");
                         break;
                     case 400:
-                        formError("Bad request");
+                        formError("Some fields are empty or invalid.", "error");
                         break;
                     case 403:
-                        formError("Forbidden");
+                        formError("The reffer link is invalid.", "error");
                         break;
                     case 409:
-                        formError("Conflict");
+                        formError("Your email is already registered. Please <a href='/login'>login</a>.", "error");
                         break;
                     case 410:
-                        formError("Gone");
-                        break;
-                    case 424:
-                        formError("Check your email to confirm.");
+                        formError("It seems that in the meanwhile the person that invited you ran out of invites.", "error");
                         break;
                     default:
-                        formError("Something went wrong.")
+                        formError("Something went wrong and we are unable to explain it right now.", "error")
                 }
             }
         }
     } else {
-        alert("passwords don't match or fields are empty")
+        formError("Passwords doesn't match or some fields are empty.", "error")
     }
 }
 
@@ -98,26 +95,37 @@ var loginHandler = function(event) {
                     window.location = window.location.protocol + "//" + window.location.hostname
                     break;
                 case 400:
-                    alert("You might have left some fields blank!");
+                    formError("You might have left some fields blank!", "error");
                     break;
                 case 404:
-                    alert("The user doesn't exist.")
+                    formError("We can't find you in our database. <a href='/register'>Register</a> first.", "error")
                     break;
                 case 401:
-                    alert("The pass is incorrect")
+                    formError("Incorrect password.", "error")
                     break;
                 case 423:
-                    alert("Your account is deactivated")
+                    formError("Your account is deactivated.", "error")
+                    break;
+                case 424:
+                    formError("Check your email to confirm your account first.", "warning")
                     break;
                 default:
-                    alert("Something went wrong.")
+                    formError("Something went wrong and we are unable to explain it right now.", "error")
             }
         }
     }
 }
 
-function formError(message) {
-    document.getElementById("form-error").innerHTML = message;
+function formError(message, type) {
+    let error = document.getElementById("form-error");
+
+    error.classList.add(type);
+    error.innerHTML = message;
+    error.classList.add("shake");
+
+    setTimeout(() => {
+        error.classList.remove("shake");
+    }, 830);
 }
 
 function checkRegisterFields(form) {
