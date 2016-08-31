@@ -39,6 +39,12 @@ func (p Promocode) Update(fields ...string) error {
 	return err
 }
 
+// Deactivate deactivates a promocode
+func (p *Promocode) Deactivate() error {
+	p.Deactivated = true
+	return p.Update("deactivated")
+}
+
 // GetPromocode pulls out an order from the database
 func GetPromocode(id int) (*Promocode, error) {
 	promocode := &Promocode{}

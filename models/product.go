@@ -40,7 +40,13 @@ func (p Product) Update(fields ...string) error {
 	return err
 }
 
-// GetProducts pulls out an order from the database
+// Deactivate deactivates a product (changes its visibility)
+func (p Product) Deactivate() error {
+	p.Deactivated = true
+	return p.Update("deactivated")
+}
+
+// GetProduct pulls out an order from the database
 func GetProduct(id int) (*Product, error) {
 	product := &Product{}
 	err := db.Get(product, "SELECT * FROM products WHERE id=?", id)
