@@ -1,5 +1,28 @@
 {{ define "title" }}Promocodes | Upframe{{ end }}
 {{ define "content" }}
+<div class="container">
+<h1>Promocodes</h1>
 
+<table>
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Code</th>
+            <th>Expiration Date</th>
+            <th>Deactivated</th>
+            <th></th>
+        </tr>
+    </thead>
 
+    {{range $promocode := .Data}}
+    <tr>
+        <td>{{ $promocode.ID }}</td>
+        <td>{{ $promocode.Code }}</td>
+        <td>{{ $promocode.Expires.Format "02 Jan 06 15:04 MST" }}</td>
+        <td><input type="checkbox" disabled value="second_checkbox" {{ if $promocode.Deactivated }}checked{{ end }}></td>
+        <td><button>Edit</button></td>
+    </tr>
+    {{ end }}
+</table>
+</div>
 {{ end }}

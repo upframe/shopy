@@ -36,7 +36,7 @@ func AdminPromocodesGET(w http.ResponseWriter, r *http.Request, s *sessions.Sess
 
 	// Checks if there are any promocodes. If we're in the first page, show
 	// it anyway so we're able to create new promocodes
-	if err == sql.ErrNoRows && page != 1 {
+	if err == sql.ErrNoRows && page != 1 && len(promocodes) == 0 {
 		return http.StatusNotFound, err
 	}
 
