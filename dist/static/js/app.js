@@ -48,25 +48,25 @@ var registerHandler = function(event) {
                 switch (request.status) {
                     case 200:
                     case 201:
-                        alert("Registered. Check your email, bitch.");
+                        formError("Registered. Check your email, bitch.");
                         break;
                     case 400:
-                        alert("Bad request");
+                        formError("Bad request");
                         break;
                     case 403:
-                        alert("Forbidden");
+                        formError("Forbidden");
                         break;
                     case 409:
-                        alert("Conflict");
+                        formError("Conflict");
                         break;
                     case 410:
-                        alert("Gone");
+                        formError("Gone");
                         break;
                     case 424:
-                        alert("Check your email to confirm.");
+                        formError("Check your email to confirm.");
                         break;
                     default:
-                        alert("Something went wrong.")
+                        formError("Something went wrong.")
                 }
             }
         }
@@ -116,15 +116,25 @@ var loginHandler = function(event) {
     }
 }
 
+function formError(message) {
+    document.getElementById("form-error").innerHTML = message;
+}
+
 function checkRegisterFields(form) {
-    // check if all fields are empty
-    for (var x = 0; x < form.children.length - 1; x++) {
-        if (form[x].value == "") {
+    let inputs = form.querySelectorAll("input");
+
+    for (let i = 0; i < inputs.length; i++) {
+        if (inputs[i].value == "") {
+            console.log(input[i])
             return false;
         }
     }
 
-    if (form[3].value != form[4].value || form[2].value.search("@") == -1) {
+    if (form.querySelector('input[name="password"]').value != form.querySelector('input[name="password_conf"]').value) {
+        return false;
+    }
+
+    if (form.querySelector('input[name="email"]').value.search("@") == -1) {
         return false;
     }
 
