@@ -75,16 +75,10 @@ func (u User) Insert() error {
 	return err
 }
 
-// DeleteByID deletes a user from the database using his id
-func DeleteByID(id int) error {
-	_, err := db.Exec("DELETE FROM users WHERE id=?", id)
-	return err
-}
-
-// DeleteByEmail deletes a user from the database using its email
-func DeleteByEmail(email string) error {
-	_, err := db.Exec("DELETE FROM users WHERE email=?", email)
-	return err
+// Deactivate deletes a user from the database using his id
+func (u *User) Deactivate() error {
+	u.Deactivated = true
+	return u.Update("deactivated")
 }
 
 // SetPassword generates the salt and the hash of the user password
