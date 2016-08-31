@@ -29,6 +29,7 @@ type User struct {
 	Referrer     sql.NullInt64  `db:"referrer"`
 	PasswordSalt string         `db:"password_salt"`
 	PasswordHash string         `db:"password_hash"`
+	Deactivated  bool           `db:"deactivated"`
 }
 
 // Update updates the current User struct into the database

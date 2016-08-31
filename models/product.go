@@ -7,4 +7,5 @@ type Product struct {
 	Description string `db:"description"`
 	Price       int    `db:"price"`
 	Picture     string `db:"picture"`
+	Deactivated bool   `db:"deactivated"`
 }
