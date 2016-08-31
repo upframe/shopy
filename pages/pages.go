@@ -13,6 +13,17 @@ import (
 // BaseAddress is the base URL of the website
 var BaseAddress = "http://upframe.xyz"
 
+// page is the type that contains the information that goes into the page
+type page struct {
+	IsLoggedIn bool
+	Data       interface{}
+	Session    struct {
+		FirstName string
+		LastName  string
+		IsAdmin   bool
+	}
+}
+
 // RenderHTML renders an HTML response and send it to the client based on the
 // choosen templates
 func RenderHTML(w http.ResponseWriter, s *sessions.Session, data interface{}, templates ...string) (int, error) {
@@ -44,8 +55,19 @@ func RenderHTML(w http.ResponseWriter, s *sessions.Session, data interface{}, te
 		}
 	}
 
+	p := &page{
+		IsLoggedIn: IsLoggedIn(s),
+		Data:       data,
+	}
+
+	if p.IsLoggedIn {
+		p.Session.FirstName = s.Values["FirstName"].(string)
+		p.Session.LastName = s.Values["LastName"].(string)
+		p.Session.IsAdmin = s.Values["IsAdmin"].(bool)
+	}
+
 	buf := &bytes.Buffer{}
-	err := tpl.Execute(buf, buildPageData(s, data))
+	err := tpl.Execute(buf, p)
 
 	if err != nil {
 		return http.StatusInternalServerError, err
@@ -80,31 +102,4 @@ func IsAdmin(s *sessions.Session) bool {
 func Redirect(w http.ResponseWriter, r *http.Request, path string) (int, error) {
 	http.Redirect(w, r, path, http.StatusTemporaryRedirect)
 	return http.StatusOK, nil
-}
-
-// page is the type that contains the information that goes into the page
-type page struct {
-	IsLoggedIn bool
-	Data       interface{}
-	Session    struct {
-		FirstName string
-		LastName  string
-		IsAdmin   bool
-	}
-}
-
-// buildPageData builds a page variable based on session and data
-func buildPageData(s *sessions.Session, data interface{}) *page {
-	p := &page{
-		IsLoggedIn: IsLoggedIn(s),
-		Data:       data,
-	}
-
-	if p.IsLoggedIn {
-		p.Session.FirstName = s.Values["FirstName"].(string)
-		p.Session.LastName = s.Values["LastName"].(string)
-		p.Session.IsAdmin = s.Values["IsAdmin"].(bool)
-	}
-
-	return p
 }
