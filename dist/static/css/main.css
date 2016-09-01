@@ -57,6 +57,7 @@ a {
     color: #272727;
 }
 
+#single-form,
 div#register-message,
 form#login,
 form#register {
@@ -69,6 +70,7 @@ form#register {
     background: #fff;
 }
 
+#single-form h1,
 div#register-message h1,
 form#login h1,
 form#register h1 {
@@ -76,6 +78,7 @@ form#register h1 {
     text-align: center;
 }
 
+#single-form input,
 form#login input,
 form#register input {
     width: 100%;
@@ -86,15 +89,16 @@ form#register input {
     border-radius: 2px;
 }
 
+#single-form button,
 form#login button,
 form#register button {
     display: block;
-    background-color: #121952;
+    background-color: #4e4e4e;
     color: #fff;
     border-radius: 2px;
     border: 0;
     margin: 0 auto;
-    padding: 1em;
+    padding: .7em 2em;
 }
 
 .shake {
@@ -136,13 +140,17 @@ form#register button {
     padding: 0;
     margin: 0;
     border-collapse: collapse;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
     background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.075);
 }
 
-.container thead tr {
+.container thead tr:first-child {
     font-weight: 900;
-    background: #e8e8e8 !important;
+    background: #EEEEEE;
+}
+
+.container thead tr:last-child {
+    background: #fff;
 }
 
 .container tr {}
@@ -156,3 +164,49 @@ form#register button {
     padding: 1em .5em;
     text-align: left;
 }
+
+.container td:first-child,
+.container th:first-child {
+    max-width: 60px;
+}
+
+#editable-row td {
+    padding: 0;
+}
+
+#editable-row input {
+    padding: 1em .5em;
+    display: block;
+    width: 100%;
+    margin: 0;
+    border: 0;
+    background-color: transparent;
+}
+
+#editable-row input[type="checkbox"] {
+    width: auto;
+}
+
+#single-form {
+    background-color: #fff;
+    margin: 0;
+    transition: .5s ease-in-out all;
+    position: fixed;
+    right: 1em;
+    bottom: 0;
+    padding: 0;
+}
+
+#single-form h1 {
+    padding: .67em;
+    background-color: #FF3855;
+    color: #fff;
+    margin: 0;
+    font-size: 1.25em;
+}
+
+#single-form div {
+    padding: 2em;
+}
+
+#single-form button {}

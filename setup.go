@@ -1,10 +1,6 @@
 package upframe
 
 import (
-	"crypto/rand"
-	"io"
-	"log"
-
 	"github.com/gorilla/sessions"
 	"github.com/hacdias/upframe/models"
 	"github.com/hacdias/upframe/pages"
@@ -18,7 +14,7 @@ func init() {
 	// Generates 5 random key pairs to secure the cookies
 	// NOTE: generating this at startup will automatically log out the
 	// users when the server is rebooted
-	keyPairs := [][]byte{}
+	/* keyPairs := [][]byte{}
 
 	for i := 0; i < 5; i++ {
 		keyPairs = append(keyPairs, make([]byte, 32))
@@ -26,10 +22,10 @@ func init() {
 		if err != nil {
 			log.Fatal(err)
 		}
-	}
+	} */
 
-	// Creates the new cookie session
-	store = sessions.NewCookieStore(keyPairs...)
+	// Creates the new cookie session; TODO: change this in production
+	store = sessions.NewCookieStore([]byte("HEY"))
 	store.Options = &sessions.Options{
 		Path:     "/",
 		MaxAge:   3600 * 3, // 3 hours

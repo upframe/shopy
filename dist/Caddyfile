@@ -1,4 +1,5 @@
-http://localhost {
+http://localhost,
+http://8df5v1s98d51vcxa4815scdx.dynip.sapo.pt {
     gzip
     root static/
 
