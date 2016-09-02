@@ -46,7 +46,7 @@ func (p *Promocode) Deactivate() error {
 }
 
 // GetPromocode pulls out an order from the database
-func GetPromocode(id int) (*Promocode, error) {
+func GetPromocode(id int) (Generic, error) {
 	promocode := &Promocode{}
 	err := db.Get(promocode, "SELECT * FROM promocodes WHERE id=?", id)
 
@@ -54,9 +54,13 @@ func GetPromocode(id int) (*Promocode, error) {
 }
 
 // GetPromocodes does something that I don't actually know
-func GetPromocodes(first, limit int) (*[]Promocode, error) {
-	promocodes := &[]Promocode{}
-	err := db.Select(promocodes, "SELECT * FROM promocodes ORDER BY id LIMIT ? OFFSET ?", limit, first)
-
-	return promocodes, err
+func GetPromocodes(first, limit int) ([]Generic, error) {
+	promocodes := []Promocode{}
+	err := db.Select(&promocodes, "SELECT * FROM promocodes ORDER BY id LIMIT ? OFFSET ?", limit, first)
+	//fmt.Println(promocodes)
+	generics := make([]Generic, len(promocodes))
+	for i := range promocodes {
+		generics[i] = &promocodes[i]
+	}
+	return generics, err
 }
