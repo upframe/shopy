@@ -16,8 +16,21 @@ type Link struct {
 	Expires *time.Time `db:"expires"`
 }
 
+var linkColumns = []string{
+	"hash",
+	"user_id",
+	"path",
+	"used",
+	"time",
+	"expires",
+}
+
 // Update updates the current link object in the database
 func (l Link) Update(fields ...string) error {
+	if fields[0] == UpdateAll {
+		fields = linkColumns
+	}
+
 	_, err := db.NamedExec(updateQuery("links", "hash", fields), l)
 	return err
 }
@@ -25,21 +38,7 @@ func (l Link) Update(fields ...string) error {
 // Insert inserts the current Link struct into the database and returns an error
 // if something goes wrong.
 func (l Link) Insert() error {
-	_, err := db.NamedExec(
-		`INSERT INTO links
-		            (hash,
-		             user_id,
-		             path,
-		             used,
-		             time,
-		             expires)
-		VALUES      (:hash,
-                     :user_id,
-                     :path,
-                     :used,
-                     :time,
-                     :expires)`, l)
-
+	_, err := db.NamedExec(insertQuery("links", linkColumns), l)
 	return err
 }
 

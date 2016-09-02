@@ -11,30 +11,25 @@ type Promocode struct {
 	Deactivated bool       `db:"deactivated"`
 }
 
+var promocodeColumns = []string{"id", "code", "expires", "discount", "deactivated"}
+
 // Insert inserts an order into the database
 func (p Promocode) Insert() error {
 	if p.ID != 0 {
 		return nil
 	}
 
-	_, err := db.NamedExec(
-		`INSERT INTO promocodes
-								(id,
-									code,
-									expires,
-									discount,
-									deactivated
-			VALUES 		(:id,
-									:code,
-									:expires,
-									:discount,
-									:deactivated)`, p)
+	_, err := db.NamedExec(insertQuery("promocodes", promocodeColumns), p)
 
 	return err
 }
 
 // Update updates an order from the database
 func (p Promocode) Update(fields ...string) error {
+	if fields[0] == UpdateAll {
+		fields = promocodeColumns
+	}
+
 	_, err := db.NamedExec(updateQuery("promocodes", "id", fields), p)
 	return err
 }

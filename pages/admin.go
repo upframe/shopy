@@ -26,7 +26,7 @@ func AdminPromocodesDELETE(w http.ResponseWriter, r *http.Request) (int, error) 
 
 // AdminPromocodesPUT changes a promocode
 func AdminPromocodesPUT(w http.ResponseWriter, r *http.Request) (int, error) {
-	return AdminGenericPUT(w, r, new(models.Promocode), "id", "code", "expires", "discount", "deactivated")
+	return AdminGenericPUT(w, r, new(models.Promocode), models.UpdateAll)
 }
 
 // ORDERS

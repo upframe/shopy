@@ -12,30 +12,31 @@ type Order struct {
 	Status      int           `db:"status"`
 }
 
+var orderColumns = []string{
+	"id",
+	"user_id",
+	"product_id",
+	"promocode_id",
+	"value",
+}
+
 // Insert inserts an order into the database
 func (o Order) Insert() error {
 	if o.ID != 0 {
 		return nil
 	}
 
-	_, err := db.NamedExec(
-		`INSERT INTO orders
-								(id,
-									user_id,
-									product_id,
-									promocode_id
-									value)
-			VALUES 		(:id,
-									:user_id,
-									:product_id,
-									:promocode_id
-									:value)`, o)
+	_, err := db.NamedExec(insertQuery("orders", orderColumns), o)
 
 	return err
 }
 
 // Update updates an order from the database
 func (o Order) Update(fields ...string) error {
+	if fields[0] == UpdateAll {
+		fields = orderColumns
+	}
+
 	_, err := db.NamedExec(updateQuery("orders", "id", fields), o)
 	return err
 }

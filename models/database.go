@@ -6,6 +6,8 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+const UpdateAll = "#update#"
+
 var db *sqlx.DB
 
 // InitDB establishes a connection with the database
@@ -45,5 +47,27 @@ func updateQuery(table, where string, fields []string) string {
 
 	// Finish the query adding the 'where' filter
 	query += " WHERE " + where + "=:" + where
+	return query
+}
+
+func insertQuery(table string, fields []string) string {
+	query := "INSERT INTO " + table
+	values := " VALUES ("
+	vars := "("
+
+	for i := range fields {
+		if i == len(fields)-1 {
+			vars += fields[i]
+			values += ":" + fields[i]
+		} else {
+			vars += fields[i] + ", "
+			values += ":" + fields[i] + ", "
+		}
+	}
+
+	values += ")"
+	vars += ")"
+	query += " " + vars + values
+
 	return query
 }

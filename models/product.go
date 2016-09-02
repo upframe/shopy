@@ -10,32 +10,31 @@ type Product struct {
 	Deactivated bool   `db:"deactivated"`
 }
 
+var productColumns = []string{
+	"id",
+	"name",
+	"description",
+	"price",
+	"picture",
+	"deactivated",
+}
+
 // Insert inserts a product into the database
 func (p Product) Insert() error {
 	if p.ID != 0 {
 		return nil
 	}
 
-	_, err := db.NamedExec(
-		`INSERT INTO products
-								(id,
-									name,
-									description,
-									price,
-									picture,
-									deactivated)
-			VALUES 		(:id,
-									:name,
-									:description,
-									:price,
-									:picture,
-									:deactivated)`, p)
-
+	_, err := db.NamedExec(insertQuery("products", productColumns), p)
 	return err
 }
 
 // Update updates a product from the database
 func (p Product) Update(fields ...string) error {
+	if fields[0] == UpdateAll {
+		fields = productColumns
+	}
+
 	_, err := db.NamedExec(updateQuery("products", "id", fields), p)
 	return err
 }

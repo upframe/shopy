@@ -32,6 +32,23 @@ type User struct {
 	Deactivated  bool           `db:"deactivated"`
 }
 
+var userColumns = []string{
+	"id",
+	"first_name",
+	"last_name",
+	"email",
+	"address",
+	"invites",
+	"credit",
+	"confirmed",
+	"admin",
+	"referral",
+	"referrer",
+	"password_salt",
+	"password_hash",
+	"deactivated",
+}
+
 // Insert inserts the current User struct into the database and returns an error
 // if something goes wrong.
 func (u User) Insert() error {
@@ -39,38 +56,16 @@ func (u User) Insert() error {
 		return nil
 	}
 
-	_, err := db.NamedExec(
-		`INSERT INTO users
-		            (first_name,
-		             last_name,
-		             email,
-		             address,
-		             invites,
-		             credit,
-		             confirmed,
-		             referral,
-		             referrer,
-		             password_salt,
-		             password_hash,
-				 	 deactivated)
-		VALUES      (:first_name,
-		             :last_name,
-		             :email,
-		             :address,
-		             :invites,
-		             :credit,
-		             :confirmed,
-		             :referral,
-		             :referrer,
-		             :password_salt,
-		             :password_hash,
-					 :deactivated)`, u)
-
+	_, err := db.NamedExec(insertQuery("users", userColumns), u)
 	return err
 }
 
 // Update updates the current User struct into the database
 func (u User) Update(fields ...string) error {
+	if fields[0] == UpdateAll {
+		fields = userColumns
+	}
+
 	_, err := db.NamedExec(updateQuery("users", "id", fields), u)
 	return err
 }
