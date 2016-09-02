@@ -129,7 +129,7 @@ func (u *User) GenerateReferralHash() {
 }
 
 // GetUserByID retrieves a user from the database using its ID
-func GetUserByID(id int) (*User, error) {
+func GetUserByID(id int) (Generic, error) {
 	user := User{}
 	err := db.Get(&user, "SELECT * FROM users WHERE id=?", id)
 	return &user, err
@@ -147,4 +147,16 @@ func GetUserByReferral(referral string) (*User, error) {
 	user := User{}
 	err := db.Get(&user, "SELECT * FROM users WHERE referral=?", referral)
 	return &user, err
+}
+
+// GetUsers retrieves more than one user from the databse
+func GetUsers(first, limit int, order string) ([]Generic, error) {
+	users := []User{}
+	err := db.Get(&users, "SELECT * FROM users ORDER BY ? LIMIT=? OFFSET=?", order, limit, first)
+
+	generics := make([]Generic, len(users))
+	for i := range users {
+		generics[i] = &users[i]
+	}
+	return generics, err
 }

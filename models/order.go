@@ -40,6 +40,11 @@ func (o Order) Update(fields ...string) error {
 	return err
 }
 
+// Deactivate deactivates an order
+func (o Order) Deactivate() error {
+	return nil
+}
+
 // GetOrder pulls out an order from the database
 func GetOrder(id int) (*Order, error) {
 	order := &Order{}
@@ -49,9 +54,14 @@ func GetOrder(id int) (*Order, error) {
 }
 
 // GetOrders does something that I don't actually know
-func GetOrders(first, limit int) (*[]Order, error) {
-	orders := &[]Order{}
-	err := db.Select(orders, "SELECT * FROM orders ORDER BY id LIMIT ? OFFSET ?", limit, first)
+func GetOrders(first, limit int, order string) ([]Generic, error) {
+	orders := []Order{}
+	err := db.Select(&orders, "SELECT * FROM orders ORDER BY ? LIMIT ? OFFSET ?", order, limit, first)
 
-	return orders, err
+	generics := make([]Generic, len(orders))
+	for i := range orders {
+		generics[i] = &orders[i]
+	}
+
+	return generics, err
 }

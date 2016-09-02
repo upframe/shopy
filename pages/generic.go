@@ -47,7 +47,7 @@ func AdminGenericGET(w http.ResponseWriter, r *http.Request, s *sessions.Session
 
 	// Calculates the offset and gets the item.
 	offset := (page - 1) * itemsPerPage
-	items, err := fn(offset, itemsPerPage)
+	items, err := fn(offset, itemsPerPage, "id")
 
 	// Checks if there are any item. If we're in the first page, show
 	// it anyway so we're able to create new item.

@@ -54,9 +54,9 @@ func GetPromocode(id int) (Generic, error) {
 }
 
 // GetPromocodes does something that I don't actually know
-func GetPromocodes(first, limit int) ([]Generic, error) {
+func GetPromocodes(first, limit int, order string) ([]Generic, error) {
 	promocodes := []Promocode{}
-	err := db.Select(&promocodes, "SELECT * FROM promocodes ORDER BY id LIMIT ? OFFSET ?", limit, first)
+	err := db.Select(&promocodes, "SELECT * FROM promocodes ORDER BY ? LIMIT ? OFFSET ?", order, limit, first)
 	//fmt.Println(promocodes)
 	generics := make([]Generic, len(promocodes))
 	for i := range promocodes {

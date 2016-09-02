@@ -24,12 +24,13 @@ func RegisterGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (i
 			return RenderHTML(w, s, nil, "confirmation-expired") // create a file for this
 		}
 
-		user, err := models.GetUserByID(link.User)
+		g, err := models.GetUserByID(link.User)
 
 		if err != nil {
 			return http.StatusInternalServerError, err
 		}
 
+		user := g.(*models.User)
 		user.Confirmed = true
 		err = user.Update("confirmed")
 

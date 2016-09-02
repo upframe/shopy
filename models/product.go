@@ -10,7 +10,7 @@ type Product struct {
 	Deactivated bool   `db:"deactivated"`
 }
 
-// Insert inserts an order into the database
+// Insert inserts a product into the database
 func (p Product) Insert() error {
 	if p.ID != 0 {
 		return nil
@@ -34,7 +34,7 @@ func (p Product) Insert() error {
 	return err
 }
 
-// Update updates an order from the database
+// Update updates a product from the database
 func (p Product) Update(fields ...string) error {
 	_, err := db.NamedExec(updateQuery("products", "id", fields), p)
 	return err
@@ -46,18 +46,23 @@ func (p Product) Deactivate() error {
 	return p.Update("deactivated")
 }
 
-// GetProduct pulls out an order from the database
-func GetProduct(id int) (*Product, error) {
+// GetProduct retrieves a product from the database
+func GetProduct(id int) (Generic, error) {
 	product := &Product{}
 	err := db.Get(product, "SELECT * FROM products WHERE id=?", id)
 
 	return product, err
 }
 
-// GetProducts does something that I don't actually know
-func GetProducts(first, limit int) (*[]Product, error) {
-	products := &[]Product{}
-	err := db.Select(products, "SELECT * FROM products ORDER BY id LIMIT ? OFFSET ?", limit, first)
+// GetProducts retrives products from the database
+func GetProducts(first, limit int, order string) ([]Generic, error) {
+	products := []Product{}
+	err := db.Select(&products, "SELECT * FROM products ORDER BY ? LIMIT ? OFFSET ?", order, limit, first)
 
-	return products, err
+	generics := make([]Generic, len(products))
+	for i := range products {
+		generics[i] = &products[i]
+	}
+
+	return generics, err
 }

@@ -8,4 +8,4 @@ type Generic interface {
 }
 
 type GetGeneric func(int) (Generic, error)
-type GetGenerics func(int, int) ([]Generic, error)
+type GetGenerics func(int, int, string) ([]Generic, error)
