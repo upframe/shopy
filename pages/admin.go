@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/sessions"
-	"github.com/hacdias/upframe/models"
+	"github.com/upframe/middleware/models"
 )
 
 const itemsPerPage = 50

@@ -2,8 +2,8 @@ package upframe
 
 import (
 	"github.com/gorilla/sessions"
-	"github.com/hacdias/upframe/models"
-	"github.com/hacdias/upframe/pages"
+	"github.com/upframe/middleware/models"
+	"github.com/upframe/middleware/pages"
 	"github.com/mholt/caddy"
 	"github.com/mholt/caddy/caddyhttp/httpserver"
 )

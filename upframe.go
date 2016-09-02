@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/gorilla/sessions"
-	"github.com/hacdias/upframe/pages"
+	"github.com/upframe/middleware/pages"
 	"github.com/mholt/caddy/caddyhttp/httpserver"
 )
 

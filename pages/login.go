@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/sessions"
-	"github.com/hacdias/upframe/models"
+	"github.com/upframe/middleware/models"
 )
 
 // LoginGET handles the GET request for /login page
