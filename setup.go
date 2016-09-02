@@ -2,10 +2,10 @@ package upframe
 
 import (
 	"github.com/gorilla/sessions"
-	"github.com/upframe/middleware/models"
-	"github.com/upframe/middleware/pages"
 	"github.com/mholt/caddy"
 	"github.com/mholt/caddy/caddyhttp/httpserver"
+	"github.com/upframe/fest/models"
+	"github.com/upframe/fest/pages"
 )
 
 var store *sessions.CookieStore
@@ -34,7 +34,7 @@ func init() {
 	}
 
 	// Regists the caddy middleware
-	caddy.RegisterPlugin("upframe", caddy.Plugin{
+	caddy.RegisterPlugin("fest", caddy.Plugin{
 		ServerType: "http",
 		Action:     setup,
 	})

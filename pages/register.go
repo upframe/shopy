@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/gorilla/sessions"
-	"github.com/upframe/middleware/models"
+	"github.com/upframe/fest/models"
 )
 
 // RegisterGET handles the GET request for register page

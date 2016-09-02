@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/gorilla/sessions"
-	"github.com/upframe/middleware/models"
+	"github.com/upframe/fest/models"
 )
 
 // AdminGenericGET handles the three types of GET requests
