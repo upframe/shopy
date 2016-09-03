@@ -7,19 +7,20 @@ import (
 	"strings"
 
 	"github.com/gorilla/sessions"
-	"github.com/upframe/fest/pages"
 	"github.com/mholt/caddy/caddyhttp/httpserver"
+	"github.com/upframe/fest/pages"
 )
 
 // Upframe is the startup struct
 type Upframe struct {
 	Next httpserver.Handler
+	Root string
 }
 
 func (u Upframe) ServeHTTP(w http.ResponseWriter, r *http.Request) (int, error) {
 	// Checks if a static file (not directory) exists for this path. If it doesn't, we
 	// handle the request.
-	if info, err := os.Stat("static" + r.URL.Path); !(os.IsNotExist(err) || info.IsDir()) {
+	if info, err := os.Stat(u.Root + r.URL.Path); !(os.IsNotExist(err) || info.IsDir()) {
 		return u.Next.ServeHTTP(w, r)
 	}
 

@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/mail"
 	"net/smtp"
+	"path/filepath"
 )
 
 // FromDefaultEmail is the default FROM email
@@ -21,6 +22,9 @@ var (
 	smtpServerName string
 	smtpAuth       smtp.Auth
 	smtpTLSConfig  *tls.Config
+
+	// TemplatesPath is where are the emails templates placed
+	TemplatesPath string
 )
 
 // InitSMTP configures the email variables
@@ -52,7 +56,7 @@ type Email struct {
 // UseTemplate adds  the tempalte to the email and renders it to the Body field
 func (e *Email) UseTemplate(name string, data interface{}) error {
 	// Opens the template file and checks if there is any error
-	page, err := ioutil.ReadFile("templates/emails/" + name + ".tmpl")
+	page, err := ioutil.ReadFile(filepath.Clean(TemplatesPath + name + ".tmpl"))
 	if err != nil {
 		return err
 	}

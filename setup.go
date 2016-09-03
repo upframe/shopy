@@ -1,6 +1,8 @@
 package upframe
 
 import (
+	"path/filepath"
+
 	"github.com/gorilla/sessions"
 	"github.com/mholt/caddy"
 	"github.com/mholt/caddy/caddyhttp/httpserver"
@@ -44,6 +46,8 @@ func setup(c *caddy.Controller) error {
 	// Gets the base address
 	cfg := httpserver.GetConfig(c)
 	pages.BaseAddress = cfg.Addr.String()
+	pages.TemplatesPath = filepath.Clean(cfg.Root+"/templates/") + "/"
+	models.TemplatesPath = filepath.Clean(cfg.Root+"/templates/emails/") + "/"
 	store.Options.Domain = cfg.Host()
 
 	// Initialize our pretty variables
@@ -129,6 +133,7 @@ func setup(c *caddy.Controller) error {
 	mid := func(next httpserver.Handler) httpserver.Handler {
 		return Upframe{
 			Next: next,
+			Root: cfg.Root,
 		}
 	}
 
