@@ -1,6 +1,9 @@
 package upframe
 
 import (
+	"crypto/rand"
+	"io"
+	"log"
 	"path/filepath"
 
 	"github.com/gorilla/sessions"
@@ -10,6 +13,9 @@ import (
 	"github.com/upframe/fest/models"
 	"github.com/upframe/fest/pages"
 )
+
+// TODO: CHANGE THIS IN PRODUCTION
+const development = true
 
 var (
 	// Store stores the session cookies and help us to handle them
@@ -23,27 +29,30 @@ var (
 )
 
 func init() {
-	// Generates 5 random key pairs to secure the cookies
-	// NOTE: generating this at startup will automatically log out the
-	// users when the server is rebooted
-	/* keyPairs := [][]byte{}
-	   for i := 0; i < 5; i++ {
-	       keyPairs = append(keyPairs, make([]byte, 32))
-	       _, err := io.ReadFull(rand.Reader, keyPairs[i])
-	       if err != nil {
-	           log.Fatal(err)
-	       }
-	   } */
+	var keyPairs [][]byte
 
-	// TODO: Comment this in production
-	keyPairs := [][]byte{[]byte("HEY")}
+	if !development {
+		// Generates 5 random key pairs to secure the cookies
+		// NOTE: generating this at startup will automatically log out the
+		// users when the server is rebooted
+		keyPairs = [][]byte{}
+		for i := 0; i < 5; i++ {
+			keyPairs = append(keyPairs, make([]byte, 32))
+			_, err := io.ReadFull(rand.Reader, keyPairs[i])
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+	} else {
+		keyPairs = [][]byte{[]byte("HEY")}
+	}
 
 	// Creates the new cookie session;
 	store = sessions.NewCookieStore(keyPairs...)
 	store.Options = &sessions.Options{
 		Path:     "/",
-		MaxAge:   3600 * 3, // 3 hours
-		Secure:   false,    // TODO: Change this to secure in production
+		MaxAge:   3600 * 3,
+		Secure:   !development,
 		HttpOnly: true,
 	}
 
