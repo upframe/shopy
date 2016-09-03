@@ -11,7 +11,13 @@ type Promocode struct {
 	Deactivated bool       `db:"deactivated"`
 }
 
-var promocodeColumns = []string{"id", "code", "expires", "discount", "deactivated"}
+var promocodeColumns = []string{
+	"id",
+	"code",
+	"expires",
+	"discount",
+	"deactivated",
+}
 
 // Insert inserts an order into the database
 func (p Promocode) Insert() error {

@@ -7,5 +7,8 @@ type Generic interface {
 	Deactivate() error
 }
 
+// GetGeneric is the type for GetX functions
 type GetGeneric func(int) (Generic, error)
+
+// GetGenerics is the type for GetXs functions
 type GetGenerics func(int, int, string) ([]Generic, error)

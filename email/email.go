@@ -1,4 +1,4 @@
-package models
+package email
 
 import (
 	"bytes"
@@ -9,41 +9,9 @@ import (
 	"net/mail"
 	"net/smtp"
 	"path/filepath"
+
+	"github.com/upframe/fest/config"
 )
-
-// FromDefaultEmail is the default FROM email
-const FromDefaultEmail = "noreply@bitsn.me"
-
-var (
-	smtpUser       string
-	smtpPass       string
-	smtpHost       string
-	smtpPort       string
-	smtpServerName string
-	smtpAuth       smtp.Auth
-	smtpTLSConfig  *tls.Config
-
-	// TemplatesPath is where are the emails templates placed
-	TemplatesPath string
-)
-
-// InitSMTP configures the email variables
-func InitSMTP(user, pass, host, port string) {
-	smtpUser = user
-	smtpPass = pass
-	smtpHost = host
-	smtpPort = port
-
-	// Connect to the SMTP Server
-	smtpServerName = smtpHost + ":" + smtpPort
-	smtpAuth = smtp.PlainAuth("", smtpUser, smtpPass, smtpHost)
-
-	// TLS config
-	smtpTLSConfig = &tls.Config{
-		InsecureSkipVerify: true,
-		ServerName:         smtpHost,
-	}
-}
 
 // Email contains the information about email
 type Email struct {
@@ -56,7 +24,7 @@ type Email struct {
 // UseTemplate adds  the tempalte to the email and renders it to the Body field
 func (e *Email) UseTemplate(name string, data interface{}) error {
 	// Opens the template file and checks if there is any error
-	page, err := ioutil.ReadFile(filepath.Clean(TemplatesPath + name + ".tmpl"))
+	page, err := ioutil.ReadFile(filepath.Clean(config.TemplatesPath + "email/" + name + ".tmpl"))
 	if err != nil {
 		return err
 	}
@@ -111,18 +79,18 @@ func (e Email) Send() error {
 	// Here is the key, you need to call tls.Dial instead of smtp.Dial
 	// for smtp servers running on 465 that require an ssl connection
 	// from the very beginning (no starttls)
-	conn, err := tls.Dial("tcp", smtpServerName, smtpTLSConfig)
+	conn, err := tls.Dial("tcp", config.SMTPServerName, config.SMTPTLSConfig)
 	if err != nil {
 		return err
 	}
 
-	c, err := smtp.NewClient(conn, smtpHost)
+	c, err := smtp.NewClient(conn, config.SMTPHost)
 	if err != nil {
 		return err
 	}
 
 	// Auth
-	if err = c.Auth(smtpAuth); err != nil {
+	if err = c.Auth(config.SMTPAuth); err != nil {
 		return err
 	}
 

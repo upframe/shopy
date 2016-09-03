@@ -9,13 +9,7 @@ import (
 	"path/filepath"
 
 	"github.com/gorilla/sessions"
-)
-
-var (
-	// BaseAddress is the base URL of the website
-	BaseAddress = "http://upframe.xyz"
-	// TemplatesPath is the root path of the website
-	TemplatesPath string
+	"github.com/upframe/fest/config"
 )
 
 // page is the type that contains the information that goes into the page
@@ -38,7 +32,7 @@ func RenderHTML(w http.ResponseWriter, s *sessions.Session, data interface{}, te
 	// For each template, add it to the the tpl variable
 	for i := range templates {
 		// Get the template from the assets
-		page, err := ioutil.ReadFile(filepath.Clean(TemplatesPath + templates[i] + ".tmpl"))
+		page, err := ioutil.ReadFile(filepath.Clean(config.TemplatesPath + templates[i] + ".tmpl"))
 
 		// Check if there is some error. If so, the template doesn't exist
 		if err != nil {

@@ -1,8 +1,10 @@
 package models
 
 import (
-	// Calls the mysql driver
-	_ "github.com/go-sql-driver/mysql"
+	"crypto/sha256"
+	"encoding/hex"
+	"time"
+
 	"github.com/jmoiron/sqlx"
 )
 
@@ -11,22 +13,8 @@ const UpdateAll = "#update#"
 var db *sqlx.DB
 
 // InitDB establishes a connection with the database
-func InitDB(username, password, address, port, dbname string) error {
-	var err error
-
-	// Prepares the connection with the database
-	db, err = sqlx.Open("mysql", username+":"+password+"@tcp("+address+":"+port+")/"+dbname+"?parseTime=true")
-	if err != nil {
-		return err
-	}
-
-	// Pings the database to check if the connection is OK
-	err = db.Ping()
-	if err != nil {
-		return err
-	}
-
-	return nil
+func InitDB(database *sqlx.DB) {
+	db = database
 }
 
 // updateQuery buils an update query string based on the table, the 'where' filter,
@@ -70,4 +58,12 @@ func insertQuery(table string, fields []string) string {
 	query += " " + vars + values
 
 	return query
+}
+
+// UniqueHash returns a SHA256 hash based on the string and on the
+// current time
+func UniqueHash(phrase string) string {
+	data := phrase + time.Now().Format(time.ANSIC)
+	hash := sha256.Sum256([]byte(data))
+	return hex.EncodeToString(hash[:])
 }
