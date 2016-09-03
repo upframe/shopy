@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/gorilla/sessions"
-	"github.com/upframe/fest/config"
 	"github.com/upframe/fest/email"
 	"github.com/upframe/fest/models"
 )
@@ -172,12 +171,12 @@ func RegisterPOST(w http.ResponseWriter, r *http.Request, s *sessions.Session) (
 	data := make(map[string]interface{})
 	data["Name"] = user.FirstName + " " + user.LastName
 	data["Hash"] = link.Hash
-	data["Host"] = config.BaseAddress
+	data["Host"] = BaseAddress
 
 	email := &email.Email{
 		From: &mail.Address{
 			Name:    "Upframe",
-			Address: config.FromDefaultEmail,
+			Address: email.FromDefaultEmail,
 		},
 		To: &mail.Address{
 			Name:    "",

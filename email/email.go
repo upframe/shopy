@@ -9,8 +9,6 @@ import (
 	"net/mail"
 	"net/smtp"
 	"path/filepath"
-
-	"github.com/upframe/fest/config"
 )
 
 // Email contains the information about email
@@ -24,7 +22,7 @@ type Email struct {
 // UseTemplate adds  the tempalte to the email and renders it to the Body field
 func (e *Email) UseTemplate(name string, data interface{}) error {
 	// Opens the template file and checks if there is any error
-	page, err := ioutil.ReadFile(filepath.Clean(config.TemplatesPath + "email/" + name + ".tmpl"))
+	page, err := ioutil.ReadFile(filepath.Clean(Templates + "email/" + name + ".tmpl"))
 	if err != nil {
 		return err
 	}
@@ -79,18 +77,18 @@ func (e Email) Send() error {
 	// Here is the key, you need to call tls.Dial instead of smtp.Dial
 	// for smtp servers running on 465 that require an ssl connection
 	// from the very beginning (no starttls)
-	conn, err := tls.Dial("tcp", config.SMTPServerName, config.SMTPTLSConfig)
+	conn, err := tls.Dial("tcp", smtpServerName, smtpTLSConfig)
 	if err != nil {
 		return err
 	}
 
-	c, err := smtp.NewClient(conn, config.SMTPHost)
+	c, err := smtp.NewClient(conn, smtpHost)
 	if err != nil {
 		return err
 	}
 
 	// Auth
-	if err = c.Auth(config.SMTPAuth); err != nil {
+	if err = c.Auth(smtpAuth); err != nil {
 		return err
 	}
 

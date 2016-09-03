@@ -8,25 +8,25 @@ import (
 
 	"github.com/gorilla/sessions"
 	"github.com/mholt/caddy/caddyhttp/httpserver"
-	"github.com/upframe/fest/config"
 	"github.com/upframe/fest/pages"
 )
 
 // Upframe is the startup struct
 type Upframe struct {
 	Next httpserver.Handler
+	Root string
 }
 
 func (u Upframe) ServeHTTP(w http.ResponseWriter, r *http.Request) (int, error) {
 	// Checks if a static file (not directory) exists for this path. If it doesn't, we
 	// handle the request.
-	if info, err := os.Stat(config.RootPath + r.URL.Path); !(os.IsNotExist(err) || info.IsDir()) {
+	if info, err := os.Stat(u.Root + r.URL.Path); !(os.IsNotExist(err) || info.IsDir()) {
 		return u.Next.ServeHTTP(w, r)
 	}
 
 	// Gets the current session or creates a new one if there is some error
 	// decrypting it or if it doesn't exist
-	s, _ := config.Store.Get(r, "upframe-auth")
+	s, _ := store.Get(r, "upframe-auth")
 
 	// If it is a new session, initialize it, setting 'IsLoggedIn' as false
 	if s.IsNew {
