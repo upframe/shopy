@@ -66,6 +66,10 @@ func (u Upframe) ServeHTTP(w http.ResponseWriter, r *http.Request) (int, error) 
 
 	// Admin router: if the user is an admin and the page starts with /admin
 	if pages.IsAdmin(s) && strings.HasPrefix(r.URL.Path, "/admin") {
+		if r.URL.Path == "/admin" && r.Method == http.MethodGet {
+			return pages.RenderHTML(w, s, nil, "admin/home")
+		}
+
 		if strings.HasPrefix(r.URL.Path, "/admin/promocodes") {
 			switch r.Method {
 			case http.MethodGet:

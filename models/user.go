@@ -147,7 +147,7 @@ func GetUserByReferral(referral string) (*User, error) {
 // GetUsers retrieves more than one user from the databse
 func GetUsers(first, limit int, order string) ([]Generic, error) {
 	users := []User{}
-	err := db.Get(&users, "SELECT * FROM users ORDER BY ? LIMIT ? OFFSET ?", order, limit, first)
+	err := db.Select(&users, "SELECT * FROM users ORDER BY ? LIMIT ? OFFSET ?", order, limit, first)
 
 	generics := make([]Generic, len(users))
 	for i := range users {
