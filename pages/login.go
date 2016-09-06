@@ -74,6 +74,7 @@ func LoginPOST(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int
 	s.Values["UserID"] = user.ID
 	s.Values["FirstName"] = user.FirstName
 	s.Values["LastName"] = user.LastName
+	s.Values["Email"] = user.Email
 
 	// Saves the cookie and checks for errors
 	err = s.Save(r, w)

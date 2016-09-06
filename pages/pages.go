@@ -27,6 +27,7 @@ type page struct {
 	Session    struct {
 		FirstName string
 		LastName  string
+		Email     string
 		IsAdmin   bool
 	}
 }
@@ -78,6 +79,7 @@ func RenderHTML(w http.ResponseWriter, s *sessions.Session, data interface{}, te
 	if p.IsLoggedIn {
 		p.Session.FirstName = s.Values["FirstName"].(string)
 		p.Session.LastName = s.Values["LastName"].(string)
+		p.Session.Email = s.Values["Email"].(string)
 		p.Session.IsAdmin = s.Values["IsAdmin"].(bool)
 	}
 
