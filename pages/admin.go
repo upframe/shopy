@@ -29,53 +29,73 @@ func AdminPromocodesPUT(w http.ResponseWriter, r *http.Request) (int, error) {
 	return AdminGenericPUT(w, r, new(models.Promocode), models.UpdateAll)
 }
 
-// ORDERS
+// AdminOrdersGET is
 func AdminOrdersGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, error) {
-	return http.StatusNotImplemented, nil
+	return AdminGenericGET(w, r, s, "orders", models.GetOrders)
 }
 
+// AdminOrdersPOST is
 func AdminOrdersPOST(w http.ResponseWriter, r *http.Request) (int, error) {
-	return http.StatusNotImplemented, nil
+	return AdminGenericPOST(w, r, new(models.Order))
 }
 
+// AdminOrdersDELETE is
 func AdminOrdersDELETE(w http.ResponseWriter, r *http.Request) (int, error) {
-	return http.StatusNotImplemented, nil
+	return AdminGenericDELETE(w, r, "orders", models.GetOrder)
 }
 
+// AdminOrdersPUT is
 func AdminOrdersPUT(w http.ResponseWriter, r *http.Request) (int, error) {
-	return http.StatusNotImplemented, nil
+	return AdminGenericPUT(w, r, new(models.Order), models.UpdateAll)
 }
 
-// USERS
+// AdminUsersGET is
 func AdminUsersGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, error) {
-	return http.StatusNotImplemented, nil
+	return AdminGenericGET(w, r, s, "users", models.GetUsers)
 }
 
+// AdminUsersPOST is
 func AdminUsersPOST(w http.ResponseWriter, r *http.Request) (int, error) {
-	return http.StatusNotImplemented, nil
+	return AdminGenericPOST(w, r, new(models.User))
 }
 
+// AdminUsersDELETE is
 func AdminUsersDELETE(w http.ResponseWriter, r *http.Request) (int, error) {
-	return http.StatusNotImplemented, nil
+	return AdminGenericDELETE(w, r, "users", models.GetUserByID)
 }
 
+// AdminUsersPUT is
 func AdminUsersPUT(w http.ResponseWriter, r *http.Request) (int, error) {
-	return http.StatusNotImplemented, nil
+	// In Users, we do not update: password_hash, password_salt, referral,
+	// nor referrer
+	return AdminGenericPUT(w, r, new(models.User), "id",
+		"first_name",
+		"last_name",
+		"email",
+		"address",
+		"invites",
+		"credit",
+		"confirmed",
+		"admin",
+		"deactivated")
 }
 
-// PRODUCTS
+// AdminProductsGET is
 func AdminProductsGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, error) {
-	return http.StatusNotImplemented, nil
+	return AdminGenericGET(w, r, s, "products", models.GetProducts)
 }
 
+// AdminProductsPOST is
 func AdminProductsPOST(w http.ResponseWriter, r *http.Request) (int, error) {
-	return http.StatusNotImplemented, nil
+	return AdminGenericPOST(w, r, new(models.Product))
 }
 
+// AdminProductsDELETE is
 func AdminProductsDELETE(w http.ResponseWriter, r *http.Request) (int, error) {
-	return http.StatusNotImplemented, nil
+	return AdminGenericDELETE(w, r, "products", models.GetProduct)
 }
 
+// AdminProductsPUT is
 func AdminProductsPUT(w http.ResponseWriter, r *http.Request) (int, error) {
-	return http.StatusNotImplemented, nil
+	return AdminGenericPUT(w, r, new(models.Product), models.UpdateAll)
 }

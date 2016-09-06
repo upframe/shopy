@@ -47,7 +47,7 @@ func (o Order) Deactivate() error {
 }
 
 // GetOrder pulls out an order from the database
-func GetOrder(id int) (*Order, error) {
+func GetOrder(id int) (Generic, error) {
 	order := &Order{}
 	err := db.Get(order, "SELECT * FROM orders WHERE id=?", id)
 

@@ -12,7 +12,10 @@ import (
 )
 
 var (
-	BaseAddress, Templates string
+	// BaseAddress is the base URL of the website
+	BaseAddress string
+	// Templates is the path to the tempaltes folder
+	Templates string
 )
 
 // page is the type that contains the information that goes into the page
