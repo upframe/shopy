@@ -2,6 +2,8 @@ package pages
 
 import (
 	"bytes"
+	"crypto/md5"
+	"encoding/hex"
 	"html/template"
 	"io/ioutil"
 	"log"
@@ -35,6 +37,14 @@ func RenderHTML(w http.ResponseWriter, s *sessions.Session, data interface{}, te
 	templates = append(templates, "base")
 	var tpl *template.Template
 
+	funcs := template.FuncMap{
+		"MD5": func(s string) string {
+			hasher := md5.New()
+			hasher.Write([]byte(s))
+			return hex.EncodeToString(hasher.Sum(nil))
+		},
+	}
+
 	// For each template, add it to the the tpl variable
 	for i := range templates {
 		// Get the template from the assets
@@ -49,7 +59,7 @@ func RenderHTML(w http.ResponseWriter, s *sessions.Session, data interface{}, te
 		// If it's the first iteration, creates a new template and add the
 		// functions map
 		if i == 0 {
-			tpl, err = template.New(templates[i]).Parse(string(page))
+			tpl, err = template.New(templates[i]).Funcs(funcs).Parse(string(page))
 		} else {
 			tpl, err = tpl.Parse(string(page))
 		}
