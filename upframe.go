@@ -78,6 +78,45 @@ func (u Upframe) ServeHTTP(w http.ResponseWriter, r *http.Request) (int, error) 
 				return pages.AdminPromocodesPUT(w, r)
 			}
 		}
+
+		if strings.HasPrefix(r.URL.Path, "/admin/orders") {
+			switch r.Method {
+			case http.MethodGet:
+				return pages.AdminOrdersGET(w, r, s)
+			case http.MethodPost:
+				return pages.AdminOrdersPOST(w, r)
+			case http.MethodDelete:
+				return pages.AdminOrdersDELETE(w, r)
+			case http.MethodPut:
+				return pages.AdminOrdersPUT(w, r)
+			}
+		}
+
+		if strings.HasPrefix(r.URL.Path, "/admin/users") {
+			switch r.Method {
+			case http.MethodGet:
+				return pages.AdminUsersGET(w, r, s)
+			case http.MethodPost:
+				return pages.AdminUsersPOST(w, r)
+			case http.MethodDelete:
+				return pages.AdminUsersDELETE(w, r)
+			case http.MethodPut:
+				return pages.AdminUsersPUT(w, r)
+			}
+		}
+
+		if strings.HasPrefix(r.URL.Path, "/admin/products") {
+			switch r.Method {
+			case http.MethodGet:
+				return pages.AdminProductsGET(w, r, s)
+			case http.MethodPost:
+				return pages.AdminProductsPOST(w, r)
+			case http.MethodDelete:
+				return pages.AdminProductsDELETE(w, r)
+			case http.MethodPut:
+				return pages.AdminProductsPUT(w, r)
+			}
+		}
 	}
 
 	// If the request doesn't match any route and it isn't a GET request
