@@ -56,7 +56,32 @@ func GetProduct(id int) (Generic, error) {
 // GetProducts retrives products from the database
 func GetProducts(first, limit int, order string) ([]Generic, error) {
 	products := []Product{}
-	err := db.Select(&products, "SELECT * FROM products ORDER BY ? LIMIT ? OFFSET ?", order, limit, first)
+	var err error
+
+	if limit == 0 {
+		err = db.Select(&products, "SELECT * FROM products ORDER BY ?", order)
+	} else {
+		err = db.Select(&products, "SELECT * FROM products ORDER BY ? LIMIT ? OFFSET ?", order, limit, first)
+	}
+
+	generics := make([]Generic, len(products))
+	for i := range products {
+		generics[i] = &products[i]
+	}
+
+	return generics, err
+}
+
+// GetProductsWhere retrives products from the database
+func GetProductsWhere(first, limit int, order string, where string, sth string) ([]Generic, error) {
+	products := []Product{}
+	var err error
+
+	if limit == 0 {
+		err = db.Select(&products, "SELECT * FROM products WHERE "+where+"=? ORDER BY ?", sth, order)
+	} else {
+		err = db.Select(&products, "SELECT * FROM products WHERE "+where+"=? ORDER BY ? LIMIT ? OFFSET ?", sth, order, limit, first)
+	}
 
 	generics := make([]Generic, len(products))
 	for i := range products {
