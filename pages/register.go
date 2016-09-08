@@ -150,6 +150,11 @@ func RegisterPOST(w http.ResponseWriter, r *http.Request, s *sessions.Session) (
 		log.Println("INVITE DECREMENT ERROR: " + err.Error())
 	}
 
+	// Send the confirmation email
+	return confirmationEmail(user)
+}
+
+func confirmationEmail(user *models.User) (int, error) {
 	// Sets the current time and expiration time of the confirmation email
 	now := time.Now()
 	expires := time.Now().Add(time.Hour * 24 * 20)
@@ -163,7 +168,7 @@ func RegisterPOST(w http.ResponseWriter, r *http.Request, s *sessions.Session) (
 		Expires: &expires,
 	}
 
-	err = link.Insert()
+	err := link.Insert()
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -195,7 +200,7 @@ func RegisterPOST(w http.ResponseWriter, r *http.Request, s *sessions.Session) (
 		return http.StatusInternalServerError, err
 	}
 
-	return http.StatusCreated, nil
+	return http.StatusOK, nil
 }
 
 // isExistentUser checks if there is an user with the specified email

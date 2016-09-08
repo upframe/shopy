@@ -69,7 +69,8 @@ func setup(c *caddy.Controller) error {
 	store.Options.Domain = cfg.Host()
 
 	pages.BaseAddress = cfg.Addr.String()
-	pages.Templates = filepath.Clean(cfg.Root+"/templates/") + "/"
+	pages.Templates = filepath.Clean(cfg.Root+"/templates/") + string(filepath.Separator)
+	email.Templates = pages.Templates + "email" + string(filepath.Separator)
 
 	var (
 		smtpUser, smtpPass, smtpHost, smtpPort string

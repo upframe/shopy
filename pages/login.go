@@ -23,6 +23,20 @@ func LoginPOST(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int
 		return http.StatusBadRequest, nil
 	}
 
+	if r.Header.Get("Resend") == "true" {
+		// Obtains the user and checks for errors
+		user, err := models.GetUserByEmail(r.Header.Get("Email"))
+		if err == sql.ErrNoRows {
+			return http.StatusNotFound, err
+		}
+
+		if err != nil {
+			return http.StatusInternalServerError, err
+		}
+
+		return confirmationEmail(user)
+	}
+
 	// Parses the form and checks for errors
 	err := r.ParseForm()
 	if err != nil {
