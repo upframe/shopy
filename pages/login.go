@@ -2,10 +2,16 @@ package pages
 
 import (
 	"database/sql"
+	"errors"
 	"net/http"
 
 	"github.com/gorilla/sessions"
 	"github.com/upframe/fest/models"
+)
+
+var (
+	errAlreadyLoggedIn = errors.New("The user is already logged in.")
+	errNotLoggedIn     = errors.New("The user is not logged in.")
 )
 
 // LoginGET handles the GET request for /login page
@@ -20,7 +26,7 @@ func LoginGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int,
 // LoginPOST handles the POST request for /login page
 func LoginPOST(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, error) {
 	if IsLoggedIn(s) {
-		return http.StatusBadRequest, nil
+		return http.StatusBadRequest, errAlreadyLoggedIn
 	}
 
 	if r.Header.Get("Resend") == "true" {

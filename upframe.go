@@ -54,6 +54,10 @@ func (u Upframe) ServeHTTP(w http.ResponseWriter, r *http.Request) (int, error) 
 		return pages.LoginPOST(w, r, s)
 	case r.URL.Path == "/settings" && r.Method == http.MethodGet:
 		return pages.SettingsGET(w, r, s)
+	case r.URL.Path == "/settings/deactivate" && r.Method == http.MethodGet:
+		return pages.DeactivateGET(w, r, s)
+	case r.URL.Path == "/settings/deactivate" && r.Method == http.MethodPost:
+		return pages.DeactivatePOST(w, r, s)
 	case r.URL.Path == "/store" && r.Method == http.MethodGet:
 		return pages.StoreGET(w, r, s)
 	case r.URL.Path == "/cart" && r.Method == http.MethodGet:
