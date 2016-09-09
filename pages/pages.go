@@ -107,6 +107,10 @@ func IsLoggedIn(s *sessions.Session) bool {
 
 // IsAdmin checks if an user is admin
 func IsAdmin(s *sessions.Session) bool {
+	if !IsLoggedIn(s) {
+		return false
+	}
+
 	switch s.Values["IsAdmin"].(type) {
 	case bool:
 		return s.Values["IsAdmin"].(bool)
