@@ -15,7 +15,7 @@ import (
 func DeactivateGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, error) {
 	// Checks if the hash is indicated in the URL
 	if r.URL.Query().Get("deactivate") == "" {
-		return Redirect(w, r, "/settings")
+		return http.StatusNotFound, nil
 	}
 
 	// Fetches the link from the database
