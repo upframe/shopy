@@ -2,7 +2,7 @@ package models
 
 // Generic that is used to simplify code instead of having functions for Promocodes, Orders and Products
 type Generic interface {
-	Insert() error
+	Insert() (int64, error)
 	Update(fields ...string) error
 	Deactivate() error
 }

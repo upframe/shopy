@@ -20,13 +20,17 @@ var productColumns = []string{
 }
 
 // Insert inserts a product into the database
-func (p Product) Insert() error {
+func (p Product) Insert() (int64, error) {
 	if p.ID != 0 {
-		return nil
+		return 0, nil
 	}
 
-	_, err := db.NamedExec(insertQuery("products", productColumns), p)
-	return err
+	res, err := db.NamedExec(insertQuery("products", productColumns), p)
+	if err != nil {
+		return 0, err
+	}
+
+	return res.LastInsertId()
 }
 
 // Update updates a product from the database

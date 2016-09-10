@@ -20,14 +20,17 @@ var promocodeColumns = []string{
 }
 
 // Insert inserts an order into the database
-func (p Promocode) Insert() error {
+func (p Promocode) Insert() (int64, error) {
 	if p.ID != 0 {
-		return nil
+		return 0, nil
 	}
 
-	_, err := db.NamedExec(insertQuery("promocodes", promocodeColumns), p)
+	res, err := db.NamedExec(insertQuery("promocodes", promocodeColumns), p)
+	if err != nil {
+		return 0, err
+	}
 
-	return err
+	return res.LastInsertId()
 }
 
 // Update updates an order from the database

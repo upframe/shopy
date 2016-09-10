@@ -51,13 +51,17 @@ var userColumns = []string{
 
 // Insert inserts the current User struct into the database and returns an error
 // if something goes wrong.
-func (u User) Insert() error {
+func (u User) Insert() (int64, error) {
 	if u.ID != 0 {
-		return nil
+		return 0, nil
 	}
 
-	_, err := db.NamedExec(insertQuery("users", userColumns), u)
-	return err
+	res, err := db.NamedExec(insertQuery("users", userColumns), u)
+	if err != nil {
+		return 0, err
+	}
+
+	return res.LastInsertId()
 }
 
 // Update updates the current User struct into the database

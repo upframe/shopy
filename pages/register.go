@@ -126,7 +126,7 @@ func RegisterPOST(w http.ResponseWriter, r *http.Request, s *sessions.Session) (
 	}
 
 	// Inserts the user into the database
-	err = user.Insert()
+	_, err = user.Insert()
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}

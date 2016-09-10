@@ -21,14 +21,17 @@ var orderColumns = []string{
 }
 
 // Insert inserts an order into the database
-func (o Order) Insert() error {
+func (o Order) Insert() (int64, error) {
 	if o.ID != 0 {
-		return nil
+		return 0, nil
 	}
 
-	_, err := db.NamedExec(insertQuery("orders", orderColumns), o)
+	res, err := db.NamedExec(insertQuery("orders", orderColumns), o)
+	if err != nil {
+		return 0, err
+	}
 
-	return err
+	return res.LastInsertId()
 }
 
 // Update updates an order from the database

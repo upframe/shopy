@@ -76,11 +76,12 @@ func AdminGenericPOST(w http.ResponseWriter, r *http.Request, item models.Generi
 	}
 
 	// Inserts the promocode into the database and checks for errors
-	err = item.Insert()
+	id, err := item.Insert()
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
 
+	w.Write([]byte(strconv.Itoa(int(id))))
 	return http.StatusOK, nil
 }
 
