@@ -44,7 +44,7 @@ func updateQuery(table, where string, fields []string) string {
 		if i == len(fields)-1 {
 			query += fields[i] + "=:" + fields[i]
 		} else {
-			query += fields[i] + ":" + fields[i] + ", "
+			query += fields[i] + "=:" + fields[i] + ", "
 		}
 	}
 
