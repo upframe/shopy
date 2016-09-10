@@ -2,6 +2,7 @@ package pages
 
 import (
 	"bytes"
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -16,7 +17,16 @@ func SettingsGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (i
 		return Redirect(w, r, "/login")
 	}
 
-	return RenderHTML(w, s, nil, "settings")
+	user, err := models.GetUserByID(s.Values["UserID"].(int))
+	if err == sql.ErrNoRows {
+		return http.StatusNotFound, err
+	}
+
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	return RenderHTML(w, s, user, "settings")
 }
 
 // SettingsPUT handles the PUT request for /settings page which is the method
