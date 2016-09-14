@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"path/filepath"
+	"strconv"
 
 	"github.com/gorilla/sessions"
 	"github.com/mholt/caddy"
@@ -75,6 +76,7 @@ func setup(c *caddy.Controller) error {
 	var (
 		smtpUser, smtpPass, smtpHost, smtpPort string
 		dbUser, dbPass, dbHost, dbPort, dbName string
+		err                                    error
 	)
 
 	dbPort = "3306"
@@ -137,6 +139,15 @@ func setup(c *caddy.Controller) error {
 				}
 
 				smtpPort = c.Val()
+			case "base_invites":
+				if !c.NextArg() {
+					return c.ArgErr()
+				}
+
+				pages.BaseInvites, err = strconv.Atoi(c.Val())
+				if err != nil {
+					return err
+				}
 			}
 		}
 	}
@@ -145,7 +156,7 @@ func setup(c *caddy.Controller) error {
 	email.InitSMTP(smtpUser, smtpPass, smtpHost, smtpPort)
 
 	// Connects to the database and checks for an error
-	err := models.InitDB(dbUser, dbPass, dbHost, dbPort, dbName)
+	err = models.InitDB(dbUser, dbPass, dbHost, dbPort, dbName)
 	if err != nil {
 		return err
 	}

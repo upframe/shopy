@@ -12,6 +12,9 @@ import (
 	"github.com/upframe/fest/models"
 )
 
+// BaseInvites is the number of invitations the user has when creating the account
+var BaseInvites = 0
+
 // RegisterGET handles the GET request for register page
 func RegisterGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, error) {
 	if IsLoggedIn(s) {
@@ -99,7 +102,7 @@ func RegisterPOST(w http.ResponseWriter, r *http.Request, s *sessions.Session) (
 		FirstName: r.FormValue("first_name"),
 		LastName:  r.FormValue("last_name"),
 		Email:     r.FormValue("email"),
-		Invites:   0,
+		Invites:   BaseInvites,
 		Credit:    0,
 		Confirmed: false,
 		Referrer:  sql.NullInt64{Int64: int64(referrer.ID), Valid: true},
