@@ -90,7 +90,7 @@ func LoginPOST(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int
 
 	// Sets the session cookie values
 	s.Values["IsLoggedIn"] = true
-	s.Values["IsAdmin"] = true
+	s.Values["IsAdmin"] = user.Admin
 	s.Values["UserID"] = user.ID
 	s.Values["FirstName"] = user.FirstName
 	s.Values["LastName"] = user.LastName
