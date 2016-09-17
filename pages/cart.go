@@ -17,13 +17,35 @@ func CartGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, 
 		return Redirect(w, r, "/login")
 	}
 
-	return RenderHTML(w, s, nil, "cart")
+	data := map[string]interface{}{}
+	data["Products"] = []*models.Product{}
+	data["Total"] = 0
+
+	for i := range s.Values["Cart"].([]int) {
+		generic, err := models.GetProduct(i)
+		if err == sql.ErrNoRows {
+			continue
+		}
+		if err != nil {
+			return http.StatusInternalServerError, err
+		}
+
+		product := generic.(*models.Product)
+		if product.Deactivated {
+			continue
+		}
+
+		data["Products"] = append(data["Products"].([]*models.Product), product)
+		data["Total"] = data["Total"].(int) + product.Price
+	}
+
+	return RenderHTML(w, s, data, "cart")
 }
 
 // CartPOST adds a product to the cart
 func CartPOST(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, error) {
 	if !IsLoggedIn(s) {
-		return Redirect(w, r, "/login")
+		return http.StatusUnauthorized, nil
 	}
 
 	id, err := strconv.Atoi(strings.Replace(r.URL.Path, "/cart/", "", -1))
