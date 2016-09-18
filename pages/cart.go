@@ -24,8 +24,8 @@ func CartGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, 
 
 	data := &cart{}
 
-	for i := range s.Values["Cart"].([]int) {
-		generic, err := models.GetProduct(i)
+	for _, id := range s.Values["Cart"].([]int) {
+		generic, err := models.GetProduct(id)
 		if err == sql.ErrNoRows {
 			continue
 		}
