@@ -19,7 +19,7 @@ func DeactivateGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) 
 	}
 
 	// Fetches the link from the database
-	link, err := models.GetLinkByHash(r.URL.Query().Get("confirm"))
+	link, err := models.GetLinkByHash(r.URL.Query().Get("hash"))
 
 	// If the error is no rows, or the link is used, or it's expired or the path
 	// is incorrect, show a 404 Not Found page.
@@ -67,7 +67,7 @@ func DeactivatePOST(w http.ResponseWriter, r *http.Request, s *sessions.Session)
 	expires := time.Now().Add(time.Hour * 2)
 
 	link := &models.Link{
-		Path:    "/register",
+		Path:    "/settings/deactivate",
 		Hash:    models.UniqueHash(s.Values["Email"].(string)),
 		User:    s.Values["UserID"].(int),
 		Used:    false,
