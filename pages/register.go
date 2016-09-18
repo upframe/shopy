@@ -105,7 +105,7 @@ func RegisterPOST(w http.ResponseWriter, r *http.Request, s *sessions.Session) (
 		Invites:   BaseInvites,
 		Credit:    0,
 		Confirmed: false,
-		Referrer:  sql.NullInt64{Int64: int64(referrer.ID), Valid: true},
+		Referrer:  models.NullInt64JSON{NullInt64: sql.NullInt64{Int64: int64(referrer.ID), Valid: true}},
 	}
 
 	// Checks if any of the fields is empty, if so, return a 400 Bad Request error

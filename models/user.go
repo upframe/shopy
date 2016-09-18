@@ -2,7 +2,6 @@ package models
 
 import (
 	"crypto/rand"
-	"database/sql"
 	"encoding/hex"
 	"io"
 
@@ -20,13 +19,13 @@ type User struct {
 	FirstName    string         `db:"first_name"`
 	LastName     string         `db:"last_name"`
 	Email        string         `db:"email"`
-	Address      sql.NullString `db:"address"`
+	Address      NullStringJSON `db:"address"`
 	Invites      int            `db:"invites"`
 	Credit       int            `db:"credit"`
 	Confirmed    bool           `db:"confirmed"`
 	Admin        bool           `db:"admin"`
 	Referral     string         `db:"referral"`
-	Referrer     sql.NullInt64  `db:"referrer"`
+	Referrer     NullInt64JSON  `db:"referrer"`
 	PasswordSalt string         `db:"password_salt"`
 	PasswordHash string         `db:"password_hash"`
 	Deactivated  bool           `db:"deactivated"`
