@@ -11,6 +11,11 @@ import (
 	"github.com/upframe/fest/models"
 )
 
+type settings struct {
+	User    *models.User
+	BaseURL string
+}
+
 // SettingsGET handles the GET request for /settings page
 func SettingsGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, error) {
 	if !IsLoggedIn(s) {
@@ -26,7 +31,10 @@ func SettingsGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (i
 		return http.StatusInternalServerError, err
 	}
 
-	return RenderHTML(w, s, user, "settings")
+	return RenderHTML(w, s, settings{
+		User:    user.(*models.User),
+		BaseURL: BaseAddress,
+	}, "settings")
 }
 
 // SettingsPUT handles the PUT request for /settings page which is the method
