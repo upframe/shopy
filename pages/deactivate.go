@@ -14,7 +14,7 @@ import (
 // DeactivateGET creates a new deactivation link
 func DeactivateGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, error) {
 	// Checks if the hash is indicated in the URL
-	if r.URL.Query().Get("deactivate") == "" {
+	if r.URL.Query().Get("hash") == "" {
 		return http.StatusNotFound, nil
 	}
 
