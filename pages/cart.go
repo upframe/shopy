@@ -11,8 +11,13 @@ import (
 	"github.com/upframe/fest/models"
 )
 
+type cartItem struct {
+	*models.Product
+	Quantity int
+}
+
 type cart struct {
-	Products []*models.Product
+	Products map[int]*cartItem
 	Total    int
 }
 
@@ -22,9 +27,13 @@ func CartGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, 
 		return Redirect(w, r, "/login")
 	}
 
-	data := &cart{}
+	// Initialize our data variable and the map of products.
+	data := &cart{
+		Products: map[int]*cartItem{},
+	}
 
 	for _, id := range s.Values["Cart"].([]int) {
+		// Gets the product, checks if it exists and checks for errors.
 		generic, err := models.GetProduct(id)
 		if err == sql.ErrNoRows {
 			continue
@@ -38,7 +47,20 @@ func CartGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, 
 			continue
 		}
 
-		data.Products = append(data.Products, product)
+		if val, ok := data.Products[id]; ok {
+			// If the Product is already in the cart, increment the quantity
+			// Notice that in order for this to work, we have to use pointers
+			// (check line 20) and not "normal" values
+			val.Quantity++
+		} else {
+			// Otherwise, we just create a new Cart item, with the product
+			data.Products[id] = &cartItem{
+				Product:  product,
+				Quantity: 1,
+			}
+		}
+
+		// Increments the total
 		data.Total += product.Price
 	}
 
