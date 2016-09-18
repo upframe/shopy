@@ -2,7 +2,6 @@ package pages
 
 import (
 	"encoding/gob"
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -100,7 +99,22 @@ func CartDELETE(w http.ResponseWriter, r *http.Request, s *sessions.Session) (in
 		return http.StatusInternalServerError, err
 	}
 
-	fmt.Println(id)
+	cart := s.Values["Cart"].(cart)
+
+	if val, ok := cart.Products[id]; ok {
+		cart.Total -= val.Price
+		if val.Quantity-1 == 0 {
+			delete(cart.Products, id)
+		} else {
+			val.Quantity--
+		}
+	}
+	s.Values["Cart"] = cart
+
+	err = s.Save(r, w)
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
 
 	return http.StatusOK, nil
 }
