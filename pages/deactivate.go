@@ -52,7 +52,7 @@ func DeactivateGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) 
 		return http.StatusInternalServerError, err
 	}
 
-	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+	http.Redirect(w, r, "/logout", http.StatusTemporaryRedirect)
 	return http.StatusOK, nil
 }
 
