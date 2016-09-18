@@ -95,6 +95,9 @@ func LoginPOST(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int
 	s.Values["FirstName"] = user.FirstName
 	s.Values["LastName"] = user.LastName
 	s.Values["Email"] = user.Email
+	s.Values["Credit"] = user.Credit
+	s.Values["Invites"] = user.Invites
+	s.Values["Referral"] = user.Referral
 
 	// Initialize cart
 	s.Values["Cart"] = &cart{

@@ -22,13 +22,17 @@ var (
 
 // page is the type that contains the information that goes into the page
 type page struct {
-	IsLoggedIn bool
-	Data       interface{}
-	Session    struct {
+	IsLoggedIn  bool
+	BaseAddress string
+	Data        interface{}
+	Session     struct {
 		FirstName string
 		LastName  string
 		Email     string
 		IsAdmin   bool
+		Invites   int
+		Credit    int
+		Referral  string
 	}
 }
 
@@ -72,15 +76,19 @@ func RenderHTML(w http.ResponseWriter, s *sessions.Session, data interface{}, te
 	}
 
 	p := &page{
-		IsLoggedIn: IsLoggedIn(s),
-		Data:       data,
+		IsLoggedIn:  IsLoggedIn(s),
+		Data:        data,
+		BaseAddress: BaseAddress,
 	}
 
 	if p.IsLoggedIn {
 		p.Session.FirstName = s.Values["FirstName"].(string)
 		p.Session.LastName = s.Values["LastName"].(string)
 		p.Session.Email = s.Values["Email"].(string)
+		p.Session.Referral = s.Values["Referral"].(string)
 		p.Session.IsAdmin = s.Values["IsAdmin"].(bool)
+		p.Session.Credit = s.Values["Credit"].(int)
+		p.Session.Invites = s.Values["Invites"].(int)
 	}
 
 	buf := &bytes.Buffer{}
