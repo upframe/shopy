@@ -16,7 +16,7 @@ var (
 	// Templates is the base path for the templates
 	Templates string
 	// FromDefaultEmail is the default 'From' email address
-	FromDefaultEmail string
+	FromDefaultEmail = "noreply@upframe.xyz"
 )
 
 // InitSMTP configures the email variables
