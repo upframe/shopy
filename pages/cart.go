@@ -11,15 +11,18 @@ import (
 	"github.com/upframe/fest/models"
 )
 
+type cart struct {
+	Products []*models.Product
+	Total    int
+}
+
 // CartGET returns the list of items in the cart
 func CartGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, error) {
 	if !IsLoggedIn(s) {
 		return Redirect(w, r, "/login")
 	}
 
-	data := map[string]interface{}{}
-	data["Products"] = []*models.Product{}
-	data["Total"] = 0
+	data := &cart{}
 
 	for i := range s.Values["Cart"].([]int) {
 		generic, err := models.GetProduct(i)
@@ -35,8 +38,8 @@ func CartGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, 
 			continue
 		}
 
-		data["Products"] = append(data["Products"].([]*models.Product), product)
-		data["Total"] = data["Total"].(int) + product.Price
+		data.Products = append(data.Products, product)
+		data.Total += product.Price
 	}
 
 	return RenderHTML(w, s, data, "cart")
