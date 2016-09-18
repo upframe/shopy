@@ -97,3 +97,17 @@ func CartPOST(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int,
 
 	return http.StatusOK, nil
 }
+
+// CartDELETE removes a product from the cart
+func CartDELETE(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, error) {
+	if !IsLoggedIn(s) {
+		return http.StatusUnauthorized, nil
+	}
+
+	id, err := strconv.Atoi(strings.Replace(r.URL.Path, "/cart/", "", 1))
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	return http.StatusOK, nil
+}
