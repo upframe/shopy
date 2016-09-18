@@ -8,6 +8,7 @@ import (
 
 	"github.com/gorilla/sessions"
 	"github.com/mholt/caddy/caddyhttp/httpserver"
+	"github.com/upframe/fest/models"
 	"github.com/upframe/fest/pages"
 )
 
@@ -31,6 +32,22 @@ func (u Upframe) ServeHTTP(w http.ResponseWriter, r *http.Request) (int, error) 
 	// If it is a new session, initialize it, setting 'IsLoggedIn' as false
 	if s.IsNew {
 		s.Values["IsLoggedIn"] = false
+	}
+
+	// Refresh user information
+	if pages.IsLoggedIn(s) {
+		generic, err := models.GetUserByID(s.Values["UserID"].(int))
+		if err != nil {
+			return http.StatusInternalServerError, err
+		}
+
+		user := generic.(*models.User)
+		s.Values["IsAdmin"] = user.Admin
+		s.Values["FirstName"] = user.FirstName
+		s.Values["LastName"] = user.LastName
+		s.Values["Email"] = user.Email
+		s.Values["Credit"] = user.Credit
+		s.Values["Invites"] = user.Invites
 	}
 
 	// Saves the session in the cookie and checks for errors. This is useful
