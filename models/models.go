@@ -3,6 +3,7 @@ package models
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"net/http"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -81,4 +82,23 @@ func UniqueHash(phrase string) string {
 	data := phrase + time.Now().Format(time.ANSIC)
 	hash := sha256.Sum256([]byte(data))
 	return hex.EncodeToString(hash[:])
+}
+
+// GetTableRecords gets the number of records in a table
+func GetTableRecords(table string) (int, error) {
+	rows, err := db.Query("SELECT COUNT(*) FROM " + table)
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	count := 0
+
+	for rows.Next() {
+		err := rows.Scan(&count)
+		if err != nil {
+			return http.StatusInternalServerError, err
+		}
+	}
+
+	return count, nil
 }

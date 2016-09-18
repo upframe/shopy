@@ -13,6 +13,14 @@ import (
 	"github.com/upframe/fest/models"
 )
 
+type adminTable struct {
+	Items        []models.Generic
+	HasPrevious  bool
+	LinkPrevious string
+	HasNext      bool
+	LinkNext     string
+}
+
 // AdminGenericGET handles the three types of GET requests
 func AdminGenericGET(w http.ResponseWriter, r *http.Request, s *sessions.Session, kind string, fn models.GetGenerics) (int, error) {
 	// Redirects the user to the first page if he's on /admin/item.
@@ -45,13 +53,14 @@ func AdminGenericGET(w http.ResponseWriter, r *http.Request, s *sessions.Session
 		return http.StatusInternalServerError, err
 	}
 
+	data := &adminTable{}
 	// Calculates the offset and gets the item.
 	offset := (page - 1) * itemsPerPage
-	items, err := fn(offset, itemsPerPage, "id")
+	data.Items, err = fn(offset, itemsPerPage, "id")
 
 	// Checks if there are any item. If we're in the first page, show
 	// it anyway so we're able to create new item.
-	if page != 1 && len(items) == 0 {
+	if page != 1 && len(data.Items) == 0 {
 		return http.StatusNotFound, err
 	}
 
@@ -59,8 +68,12 @@ func AdminGenericGET(w http.ResponseWriter, r *http.Request, s *sessions.Session
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
+
+	data.HasPrevious = page != 1
+	data.LinkPrevious = "/admin/" + kind + "/page/" + (strconv.Itoa(page - 1))
+
 	// Show the page with the table.
-	return RenderHTML(w, s, items, "admin/"+kind)
+	return RenderHTML(w, s, data, "admin/"+kind)
 }
 
 // AdminGenericPOST creates a new item
