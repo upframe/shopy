@@ -1,6 +1,7 @@
 package pages
 
 import (
+	"encoding/gob"
 	"net/http"
 	"strconv"
 	"strings"
@@ -19,6 +20,11 @@ type cartItem struct {
 type cart struct {
 	Products map[int]*cartItem
 	Total    int
+}
+
+func init() {
+	gob.Register(cartItem{})
+	gob.Register(cart{})
 }
 
 // CartGET returns the list of items in the cart

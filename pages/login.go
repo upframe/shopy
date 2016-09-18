@@ -97,7 +97,9 @@ func LoginPOST(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int
 	s.Values["Email"] = user.Email
 
 	// Initialize cart
-	s.Values["Cart"] = []int{}
+	s.Values["Cart"] = &cart{
+		Products: map[int]*cartItem{},
+	}
 
 	// Saves the cookie and checks for errors
 	err = s.Save(r, w)
