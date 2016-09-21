@@ -72,6 +72,14 @@ func AdminGenericGET(w http.ResponseWriter, r *http.Request, s *sessions.Session
 	data.HasPrevious = page != 1
 	data.LinkPrevious = "/admin/" + kind + "/page/" + (strconv.Itoa(page - 1))
 
+	total, err := (models.GetTableRecords(kind))
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	data.HasNext = total > (itemsPerPage * page)
+	data.LinkNext = "/admin/" + kind + "/page/" + strconv.Itoa(page+1)
+
 	// Show the page with the table.
 	return RenderHTML(w, s, data, "admin/"+kind)
 }
