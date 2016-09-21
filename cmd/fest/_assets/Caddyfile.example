@@ -1,18 +1,6 @@
-http://localhost {
-    gzip
-    root ./main/
-    internal /includes
-    templates
-    ext .html
-    errors {
-        log errors.log
-        404 404.html
-    }
-}
-
 http://fest.localhost {
     gzip
-    root ./fest/
+    root ./site/
     internal /templates
 
     fest {
