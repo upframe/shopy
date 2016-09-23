@@ -55,6 +55,10 @@ document.addEventListener("DOMContentLoaded", () => {
         thing.addEventListener("click", copyReferral);
     }
 
+    if (thing = document.getElementById("reset")) {
+        thing.addEventListener("submit", resetEmailForm);
+    }
+
     if (thing = document.getElementById("reset-form")) {
         thing.addEventListener("submit", resetForm);
     }
@@ -219,6 +223,51 @@ var loginMessages = {
     'default': "Something went wrong and we are unable to explain it right now."
 }
 
+function loginHandler(event) {
+    event.preventDefault();
+
+    let form = copyFormToObject(this),
+        hash = new jsSHA("SHA-256", "TEXT"),
+        request = new XMLHttpRequest();
+
+    hash.update(form.password);
+    form.password = hash.getHash("HEX");
+
+    request.open("POST", window.location, true);
+    request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    request.send(form.serialize());
+    request.onreadystatechange = function() {
+        if (request.readyState == 4) {
+            if (request.status == 200) {
+                window.location = window.location.protocol + "//" + window.location.hostname;
+                return;
+            }
+
+            printMessage(request.status, loginMessages)
+        }
+    }
+}
+
+var resetEmailStatus = {
+    200: 'Please, check your inbox to continue.',
+    'default': "Something went wrong and we are unable to explain it right now."
+}
+
+function resetEmailForm(event) {
+    event.preventDefault();
+
+    let form = copyFormToObject(this),
+        request = new XMLHttpRequest();
+
+    request.open("POST", window.location, true);
+    request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    request.send(form.serialize());
+    request.onreadystatechange = function() {
+        if (request.readyState == 4) {
+            printMessage(request.status, resetEmailStatus)
+        }
+    }
+}
 
 function resetForm(event) {
     event.preventDefault();
@@ -249,30 +298,6 @@ function resetForm(event) {
     }
 }
 
-function loginHandler(event) {
-    event.preventDefault();
-
-    let form = copyFormToObject(this),
-        hash = new jsSHA("SHA-256", "TEXT"),
-        request = new XMLHttpRequest();
-
-    hash.update(form.password);
-    form.password = hash.getHash("HEX");
-
-    request.open("POST", window.location, true);
-    request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    request.send(form.serialize());
-    request.onreadystatechange = function() {
-        if (request.readyState == 4) {
-            if (request.status == 200) {
-                window.location = window.location.protocol + "//" + window.location.hostname;
-                return;
-            }
-
-            printMessage(request.status, loginMessages)
-        }
-    }
-}
 
 var resendMessages = {
     200: "Check your email!",
