@@ -1,0 +1,13 @@
+{{ define "title" }}Reset &bull; Upframe{{ end }}
+{{ define "content" }}
+<main role="main" class="covered">
+    <form method="post" id="reset-form" class="floating-box covered">
+        <h1>Reset password</h1>
+        <div id="form-error"></div>
+        <input type="number" id="ID" value="{{ .Data }}">
+        <input type="password" placeholder="Password" name="password" required>
+        <input type="password" placeholder="Confirm password" name="confirmpassword" required>
+        <button type="submit">Reset</button>
+    </form>
+</main>
+{{ end }}

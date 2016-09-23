@@ -1,0 +1,11 @@
+{{ define "title" }}Reset &bull; Upframe{{ end }}
+{{ define "content" }}
+<main role="main" class="covered">
+    <form method="post" id="reset" class="floating-box covered">
+        <h1>Reset password</h1>
+        <div id="form-error"></div>
+        <input type="email" placeholder="Email" name="email" required>
+        <button type="submit">Reset</button>
+    </form>
+</main>
+{{ end }}

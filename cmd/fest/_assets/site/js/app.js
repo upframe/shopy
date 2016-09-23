@@ -54,6 +54,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (thing = document.getElementById("copy-ref")) {
         thing.addEventListener("click", copyReferral);
     }
+
+    if (thing = document.getElementById("reset-form")) {
+        thing.addEventListener("submit", resetForm);
+    }
 });
 
 function copyReferral(event) {
@@ -213,6 +217,36 @@ var loginMessages = {
     423: "Your account is deactivated.",
     424: "Check your email to confirm your account first. <a href='#' onclick='resendConfirmation();'>Resend confirmation.</a>",
     'default': "Something went wrong and we are unable to explain it right now."
+}
+
+
+function resetForm(event) {
+    event.preventDefault();
+
+    let form = copyFormToObject(this),
+        hash = new jsSHA("SHA-256", "TEXT"),
+        request = new XMLHttpRequest();
+
+    if (form.password != form.confirmpassword) {
+        return formError("The passwords don't match.", "error")
+    }
+
+    hash.update(form.password);
+    form.password = hash.getHash("HEX");
+
+    request.open("POST", window.location, true);
+    request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    request.send(form.serialize());
+    request.onreadystatechange = function() {
+        if (request.readyState == 4) {
+            if (request.status == 200) {
+                window.location = window.location.protocol + "//" + window.location.hostname + "/login";
+                return;
+            }
+
+            printMessage(request.status, loginMessages)
+        }
+    }
 }
 
 function loginHandler(event) {
