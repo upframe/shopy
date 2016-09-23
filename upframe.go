@@ -87,6 +87,10 @@ func (u Upframe) ServeHTTP(w http.ResponseWriter, r *http.Request) (int, error) 
 		return pages.CartDELETE(w, r, s)
 	case r.URL.Path == "/checkout" && r.Method == http.MethodGet:
 		return pages.CheckoutGET(w, r, s)
+	case r.URL.Path == "/reset" && r.Method == http.MethodGet:
+		return pages.ResetGET(w, r, s)
+	case r.URL.Path == "/reset" && r.Method == http.MethodPost:
+		return pages.ResetPOST(w, r, s)
 	case r.URL.Path == "/logout":
 		return logout(w, r, s)
 	}
