@@ -62,6 +62,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (thing = document.getElementById("reset-form")) {
         thing.addEventListener("submit", resetForm);
     }
+
+    if ((thing = document.getElementById("input-coupon")) != undefined) {
+        thing.addEventListener("keyup", validateCoupon);
+    }
 });
 
 function copyReferral(event) {
@@ -74,6 +78,26 @@ function copyReferral(event) {
     input.select();
     document.execCommand('Copy');
     input.remove();
+}
+
+function validateCoupon(e) {
+    if(e.keyCode == 13) {
+        let request = new XMLHttpRequest();
+        request.open("POST", "/coupon/validate", true);
+        request.send(this.value);
+        request.onreadystatechange = function() {
+            if (request.readyState == 4) {
+                switch(request.status) {
+                    case 200:
+                        // working;
+                        break;
+                    case 404:
+                        // coupon not found
+                        break;
+                }
+            }
+        }
+    }
 }
 
 function initializeStore() {
@@ -109,7 +133,7 @@ function cartRequest(method, link, data, itemID) {
                         let price = document.querySelector("#price");
 
                         item.children[3].innerHTML--;
-                        price.innerHTML -= item.children[2].innerHTML;
+                        price.innerHTML = "Total: " + (price.innerHTML.substr(7) - item.children[2].innerHTML);
                         if (item.children[3].innerHTML == 0) {
                             item.parentElement.removeChild(item);
                         }
