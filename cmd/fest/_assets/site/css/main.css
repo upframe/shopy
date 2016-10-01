@@ -357,8 +357,13 @@ body>nav li>ul>li:last-child a {
 
 #checkout-box {
     margin-top: 2em;
-    float: right;
     text-align: left;
+    display: flex;
+    flex-direction: column;
+}
+#checkout-box * {
+    margin-left: auto;
+    max-width: 12em;
 }
 
 #checkout-box>#input-coupon {

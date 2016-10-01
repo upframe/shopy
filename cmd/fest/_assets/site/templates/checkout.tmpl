@@ -1,6 +1,29 @@
 {{ define "title" }}Checkout &bull; Upframe{{ end }}
 {{ define "content" }}
+{{ with .Data }}
 <main role="main">
     <h1>Checkout</h1>
+
+    <table id="cart">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Price</th>
+                <th>Quantity</th>
+            </tr>
+        </thead>
+        {{ range $product := .Products }}
+        <tr data-id="{{ $product.ID }}">
+            <td data-name="Name">{{ $product.Name }}</td>
+            <td data-name="Price">{{ $product.Price }}</td>
+            <td data-name="Quantity">{{ $product.Quantity }}</td>
+        </tr>
+        {{ end }}
+    </table>
+    <div id="checkout-box">
+        <input id="input-coupon" placeholder="Coupon code">
+        <span id="price">Total: {{ .Total }}€</span>
+    </div>
 </main>
+{{ end }}
 {{ end }}
