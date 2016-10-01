@@ -71,6 +71,7 @@ func ResetPOST(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int
 		if err != nil {
 			return http.StatusInternalServerError, err
 		}
+
 		err = user.Update("password_hash", "password_salt")
 		if err != nil {
 			return http.StatusInternalServerError, err
