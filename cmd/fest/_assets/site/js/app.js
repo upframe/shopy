@@ -89,15 +89,20 @@ function validateCoupon(e) {
             if (request.readyState == 4) {
                 switch(request.status) {
                     case 200:
-                        // working;
+                        useCoupon(request.responseText);
+                        formError("Promocode used", "success");
                         break;
                     case 404:
-                        // coupon not found
+                        formError("Invalid promocode", "error")
                         break;
                 }
             }
         }
     }
+}
+
+function useCoupon(discount) {
+    document.getElementById("price").innerHTML = "Total: " + (document.getElementById("price").innerHTML.substr(7) * (1 - (discount / 100)));
 }
 
 function initializeStore() {

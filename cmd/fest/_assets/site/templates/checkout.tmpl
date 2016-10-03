@@ -21,8 +21,9 @@
         {{ end }}
     </table>
     <div id="checkout-box">
+        <div id="form-error"></div>
         <input id="input-coupon" placeholder="Coupon code">
-        <span id="price">Total: {{ .Total }}€</span>
+        <span id="price">Total: {{ .Total }}</span><span id="currency">€</span>
     </div>
 </main>
 {{ end }}
