@@ -57,6 +57,14 @@ func GetPromocode(id int) (Generic, error) {
 	return promocode, err
 }
 
+// GetPromocodeByCode gets a promocode from the database using the code
+func GetPromocodeByCode(code string) (Generic, error) {
+	promocode := &Promocode{}
+	err := db.Get(promocode, "SELECT * FROM promocodes WHERE code=?", code)
+
+	return promocode, err
+}
+
 // GetPromocodes does something that I don't actually know
 func GetPromocodes(first, limit int, order string) ([]Generic, error) {
 	promocodes := []Promocode{}
