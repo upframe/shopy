@@ -6,13 +6,12 @@ import (
 	"net/mail"
 	"time"
 
-	"github.com/gorilla/sessions"
 	"github.com/upframe/fest/email"
 	"github.com/upframe/fest/models"
 )
 
 // DeactivateGET creates a new deactivation link
-func DeactivateGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, error) {
+func DeactivateGET(w http.ResponseWriter, r *http.Request, s *models.Session) (int, error) {
 	// Checks if the hash is indicated in the URL
 	if r.URL.Query().Get("hash") == "" {
 		return http.StatusNotFound, nil
@@ -57,8 +56,8 @@ func DeactivateGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) 
 }
 
 // DeactivatePOST creates the deactivation email and sends it to the user
-func DeactivatePOST(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, error) {
-	if !IsLoggedIn(s) {
+func DeactivatePOST(w http.ResponseWriter, r *http.Request, s *models.Session) (int, error) {
+	if !s.IsLoggedIn() {
 		return http.StatusBadRequest, errNotLoggedIn
 	}
 
@@ -81,7 +80,7 @@ func DeactivatePOST(w http.ResponseWriter, r *http.Request, s *sessions.Session)
 	}
 
 	data := make(map[string]interface{})
-	data["Name"] = s.Values["FirstName"].(string) + " " + s.Values["LastName"].(string)
+	data["Name"] = s.User.FirstName + " " + s.User.LastName
 	data["Hash"] = link.Hash
 	data["Host"] = BaseAddress
 
@@ -92,7 +91,7 @@ func DeactivatePOST(w http.ResponseWriter, r *http.Request, s *sessions.Session)
 		},
 		To: &mail.Address{
 			Name:    data["Name"].(string),
-			Address: s.Values["Email"].(string),
+			Address: s.User.Email,
 		},
 		Subject: "Deactivate your account",
 	}

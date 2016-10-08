@@ -6,13 +6,12 @@ import (
 	"net/mail"
 	"time"
 
-	"github.com/gorilla/sessions"
 	"github.com/upframe/fest/email"
 	"github.com/upframe/fest/models"
 )
 
 // ResetGET handles GET request to display the reset password page
-func ResetGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, error) {
+func ResetGET(w http.ResponseWriter, r *http.Request, s *models.Session) (int, error) {
 	if hash := r.URL.Query().Get("hash"); hash != "" {
 		// Fetches the link from the database
 		link, err := models.GetLinkByHash(hash)
@@ -34,7 +33,7 @@ func ResetGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int,
 }
 
 // ResetPOST sends an email to the user Email
-func ResetPOST(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, error) {
+func ResetPOST(w http.ResponseWriter, r *http.Request, s *models.Session) (int, error) {
 	err := r.ParseForm()
 	if err != nil {
 		return http.StatusInternalServerError, err
@@ -42,7 +41,8 @@ func ResetPOST(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int
 
 	if hash := r.URL.Query().Get("hash"); hash != "" {
 		// Fetches the link from the database
-		link, err := models.GetLinkByHash(hash)
+		var link *models.Link
+		link, err = models.GetLinkByHash(hash)
 
 		// If the error is no rows, or the link is used, or it's expired or the path
 		// is incorrect, show a 404 Not Found page.
@@ -61,7 +61,8 @@ func ResetPOST(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int
 		}
 
 		// SET USER PASSWORD AND UPDATE PWD HASH AND PWD SALT
-		g, err := models.GetUserByID(link.User)
+		var g models.Generic
+		g, err = models.GetUserByID(link.User)
 		if err != nil {
 			return http.StatusInternalServerError, err
 		}

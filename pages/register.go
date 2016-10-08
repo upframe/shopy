@@ -7,7 +7,6 @@ import (
 	"net/mail"
 	"time"
 
-	"github.com/gorilla/sessions"
 	"github.com/upframe/fest/email"
 	"github.com/upframe/fest/models"
 )
@@ -16,8 +15,8 @@ import (
 var BaseInvites = 0
 
 // RegisterGET handles the GET request for register page
-func RegisterGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, error) {
-	if IsLoggedIn(s) {
+func RegisterGET(w http.ResponseWriter, r *http.Request, s *models.Session) (int, error) {
+	if s.IsLoggedIn() {
 		return Redirect(w, r, "/")
 	}
 
@@ -73,8 +72,8 @@ func RegisterGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (i
 }
 
 // RegisterPOST handles the POST http request in register page
-func RegisterPOST(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, error) {
-	if IsLoggedIn(s) {
+func RegisterPOST(w http.ResponseWriter, r *http.Request, s *models.Session) (int, error) {
+	if s.IsLoggedIn() {
 		return http.StatusBadRequest, nil
 	}
 

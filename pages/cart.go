@@ -8,7 +8,6 @@ import (
 
 	"database/sql"
 
-	"github.com/gorilla/sessions"
 	"github.com/upframe/fest/models"
 )
 
@@ -28,8 +27,8 @@ func init() {
 }
 
 // CartGET returns the list of items in the cart
-func CartGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, error) {
-	if !IsLoggedIn(s) {
+func CartGET(w http.ResponseWriter, r *http.Request, s *models.Session) (int, error) {
+	if !s.IsLoggedIn() {
 		return Redirect(w, r, "/login")
 	}
 
@@ -37,8 +36,8 @@ func CartGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, 
 }
 
 // CartPOST adds a product to the cart
-func CartPOST(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, error) {
-	if !IsLoggedIn(s) {
+func CartPOST(w http.ResponseWriter, r *http.Request, s *models.Session) (int, error) {
+	if !s.IsLoggedIn() {
 		return http.StatusUnauthorized, nil
 	}
 
@@ -89,8 +88,8 @@ func CartPOST(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int,
 }
 
 // CartDELETE removes a product from the cart
-func CartDELETE(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, error) {
-	if !IsLoggedIn(s) {
+func CartDELETE(w http.ResponseWriter, r *http.Request, s *models.Session) (int, error) {
+	if !s.IsLoggedIn() {
 		return http.StatusUnauthorized, nil
 	}
 

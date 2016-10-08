@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/gorilla/sessions"
 	"github.com/mholt/caddy/caddyhttp/httpserver"
 	"github.com/upframe/fest/models"
 	"github.com/upframe/fest/pages"
@@ -25,29 +24,27 @@ func (u Upframe) ServeHTTP(w http.ResponseWriter, r *http.Request) (int, error) 
 		return u.Next.ServeHTTP(w, r)
 	}
 
+	// Create the session
+	s := &models.Session{}
+
 	// Gets the current session or creates a new one if there is some error
 	// decrypting it or if it doesn't exist
-	s, _ := store.Get(r, "upframe-auth")
+	s.Session, _ = store.Get(r, "upframe-auth")
 
 	// If it is a new session, initialize it, setting 'IsLoggedIn' as false
 	if s.IsNew {
 		s.Values["IsLoggedIn"] = false
 	}
 
-	// Refresh user information
-	if pages.IsLoggedIn(s) {
+	// Get the user info from the database and add it to the session data
+	if s.IsLoggedIn() {
 		generic, err := models.GetUserByID(s.Values["UserID"].(int))
 		if err != nil {
 			return http.StatusInternalServerError, err
 		}
 
 		user := generic.(*models.User)
-		s.Values["IsAdmin"] = user.Admin
-		s.Values["FirstName"] = user.FirstName
-		s.Values["LastName"] = user.LastName
-		s.Values["Email"] = user.Email
-		s.Values["Credit"] = user.Credit
-		s.Values["Invites"] = user.Invites
+		s.User = user
 	}
 
 	// Saves the session in the cookie and checks for errors. This is useful
@@ -100,7 +97,7 @@ func (u Upframe) ServeHTTP(w http.ResponseWriter, r *http.Request) (int, error) 
 	}
 
 	// Admin router: if the user is an admin and the page starts with /admin
-	if pages.IsAdmin(s) && strings.HasPrefix(r.URL.Path, "/admin") {
+	if s.IsAdmin() && strings.HasPrefix(r.URL.Path, "/admin") {
 		if r.URL.Path == "/admin" && r.Method == http.MethodGet {
 			return pages.RenderHTML(w, s, nil, "admin/home")
 		}
@@ -174,7 +171,7 @@ func (u Upframe) ServeHTTP(w http.ResponseWriter, r *http.Request) (int, error) 
 }
 
 // logout resets the session values and saves the cookie
-func logout(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, error) {
+func logout(w http.ResponseWriter, r *http.Request, s *models.Session) (int, error) {
 	// Reset the session values
 	s.Values = map[interface{}]interface{}{}
 	s.Values["IsLoggedIn"] = false

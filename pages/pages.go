@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"path/filepath"
 
-	"github.com/gorilla/sessions"
+	"github.com/upframe/fest/models"
 )
 
 var (
@@ -38,7 +38,7 @@ type page struct {
 
 // RenderHTML renders an HTML response and send it to the client based on the
 // choosen templates
-func RenderHTML(w http.ResponseWriter, s *sessions.Session, data interface{}, templates ...string) (int, error) {
+func RenderHTML(w http.ResponseWriter, s *models.Session, data interface{}, templates ...string) (int, error) {
 	templates = append(templates, "base")
 	var tpl *template.Template
 
@@ -76,19 +76,20 @@ func RenderHTML(w http.ResponseWriter, s *sessions.Session, data interface{}, te
 	}
 
 	p := &page{
-		IsLoggedIn:  IsLoggedIn(s),
+		IsLoggedIn:  s.IsLoggedIn(),
 		Data:        data,
 		BaseAddress: BaseAddress,
 	}
 
+	// Refresh user information
 	if p.IsLoggedIn {
-		p.Session.FirstName = s.Values["FirstName"].(string)
-		p.Session.LastName = s.Values["LastName"].(string)
-		p.Session.Email = s.Values["Email"].(string)
-		p.Session.Referral = s.Values["Referral"].(string)
-		p.Session.IsAdmin = s.Values["IsAdmin"].(bool)
-		p.Session.Credit = s.Values["Credit"].(int)
-		p.Session.Invites = s.Values["Invites"].(int)
+		p.Session.FirstName = s.User.FirstName
+		p.Session.LastName = s.User.LastName
+		p.Session.Email = s.User.Email
+		p.Session.Referral = s.User.Referral
+		p.Session.IsAdmin = s.User.Admin
+		p.Session.Credit = s.User.Credit
+		p.Session.Invites = s.User.Invites
 	}
 
 	buf := &bytes.Buffer{}
@@ -101,30 +102,6 @@ func RenderHTML(w http.ResponseWriter, s *sessions.Session, data interface{}, te
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	_, err = buf.WriteTo(w)
 	return http.StatusOK, nil
-}
-
-// IsLoggedIn checks if an user is logged in
-func IsLoggedIn(s *sessions.Session) bool {
-	switch s.Values["IsLoggedIn"].(type) {
-	case bool:
-		return s.Values["IsLoggedIn"].(bool)
-	}
-
-	return false
-}
-
-// IsAdmin checks if an user is admin
-func IsAdmin(s *sessions.Session) bool {
-	if !IsLoggedIn(s) {
-		return false
-	}
-
-	switch s.Values["IsAdmin"].(type) {
-	case bool:
-		return s.Values["IsAdmin"].(bool)
-	}
-
-	return false
 }
 
 // Redirect redirects the user to a page

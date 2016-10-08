@@ -9,7 +9,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/gorilla/sessions"
 	"github.com/upframe/fest/models"
 )
 
@@ -22,7 +21,7 @@ type adminTable struct {
 }
 
 // AdminGenericGET handles the three types of GET requests
-func AdminGenericGET(w http.ResponseWriter, r *http.Request, s *sessions.Session, kind string, fn models.GetGenerics) (int, error) {
+func AdminGenericGET(w http.ResponseWriter, r *http.Request, s *models.Session, kind string, fn models.GetGenerics) (int, error) {
 	// Redirects the user to the first page if he's on /admin/item.
 	if r.URL.Path == "/admin/"+kind {
 		return Redirect(w, r, "/admin/"+kind+"/page/1")

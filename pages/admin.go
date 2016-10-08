@@ -3,14 +3,13 @@ package pages
 import (
 	"net/http"
 
-	"github.com/gorilla/sessions"
 	"github.com/upframe/fest/models"
 )
 
 const itemsPerPage = 50
 
 // AdminPromocodesGET handles the GET request for every /admin/promocodes/... URLs
-func AdminPromocodesGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, error) {
+func AdminPromocodesGET(w http.ResponseWriter, r *http.Request, s *models.Session) (int, error) {
 	return AdminGenericGET(w, r, s, "promocodes", models.GetPromocodes)
 }
 
@@ -30,7 +29,7 @@ func AdminPromocodesPUT(w http.ResponseWriter, r *http.Request) (int, error) {
 }
 
 // AdminOrdersGET is
-func AdminOrdersGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, error) {
+func AdminOrdersGET(w http.ResponseWriter, r *http.Request, s *models.Session) (int, error) {
 	return AdminGenericGET(w, r, s, "orders", models.GetOrders)
 }
 
@@ -50,7 +49,7 @@ func AdminOrdersPUT(w http.ResponseWriter, r *http.Request) (int, error) {
 }
 
 // AdminUsersGET is
-func AdminUsersGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, error) {
+func AdminUsersGET(w http.ResponseWriter, r *http.Request, s *models.Session) (int, error) {
 	return AdminGenericGET(w, r, s, "users", models.GetUsers)
 }
 
@@ -81,7 +80,7 @@ func AdminUsersPUT(w http.ResponseWriter, r *http.Request) (int, error) {
 }
 
 // AdminProductsGET is
-func AdminProductsGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, error) {
+func AdminProductsGET(w http.ResponseWriter, r *http.Request, s *models.Session) (int, error) {
 	return AdminGenericGET(w, r, s, "products", models.GetProducts)
 }
 

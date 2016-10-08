@@ -8,7 +8,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/gorilla/sessions"
 	"github.com/upframe/fest/models"
 )
 
@@ -25,8 +24,8 @@ func init() {
 }
 
 // CheckoutGET handles the GET request for /checkout page
-func CheckoutGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, error) {
-	if !IsLoggedIn(s) {
+func CheckoutGET(w http.ResponseWriter, r *http.Request, s *models.Session) (int, error) {
+	if !s.IsLoggedIn() {
 		return Redirect(w, r, "/login")
 	}
 
@@ -36,8 +35,20 @@ func CheckoutGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (i
 
 	switch strings.Replace(r.URL.Path, "/checkout/", "", -1) {
 	case "discounts":
+		// Checks if there are any products in the cart. If there aren't any
+		// products, redirect to the cart.
+		if len(s.Values["Cart"].(cart).Products) == 0 {
+			return Redirect(w, r, "/cart")
+		}
+
 		return RenderHTML(w, s, s.Values["Cart"], "checkout-discounts")
 	case "pay":
+		// Checks if there are any products in the order. If there aren't any
+		// products, redirect to the cart.
+		if len(s.Values["Order"].(order).Cart.Products) == 0 {
+			return Redirect(w, r, "/cart")
+		}
+
 		return RenderHTML(w, s, s.Values["Order"], "checkout-pay")
 	default:
 		return http.StatusNotFound, nil
@@ -45,13 +56,9 @@ func CheckoutGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (i
 }
 
 // CheckoutPOST handles the POST request for /checkout page
-func CheckoutPOST(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, error) {
-	if !IsLoggedIn(s) {
+func CheckoutPOST(w http.ResponseWriter, r *http.Request, s *models.Session) (int, error) {
+	if !s.IsLoggedIn() {
 		return http.StatusUnauthorized, nil
-	}
-
-	if r.URL.Path == "/checkout" {
-		return Redirect(w, r, "/checkout/discounts")
 	}
 
 	// Parses the form and checks for errors
@@ -76,7 +83,8 @@ func CheckoutPOST(w http.ResponseWriter, r *http.Request, s *sessions.Session) (
 
 		if promocode != "" {
 			// Gets the promocode and checks for errors
-			generic, err := models.GetPromocodeByCode(r.FormValue("promocode"))
+			var generic models.Generic
+			generic, err = models.GetPromocodeByCode(r.FormValue("promocode"))
 			if err == sql.ErrNoRows {
 				return http.StatusNotFound, nil
 			}
@@ -89,7 +97,7 @@ func CheckoutPOST(w http.ResponseWriter, r *http.Request, s *sessions.Session) (
 		}
 
 		// Checks if the user has the requested amount of credits
-		if s.Values["Credit"].(int) < o.Credits {
+		if s.User.Credit < o.Credits {
 			return http.StatusInternalServerError, err
 		}
 
@@ -117,17 +125,38 @@ func CheckoutPOST(w http.ResponseWriter, r *http.Request, s *sessions.Session) (
 
 		return http.StatusOK, nil
 	case "pay":
-		// TODO
+
 		return http.StatusOK, nil
 	default:
 		return http.StatusNotFound, nil
 	}
 }
 
-// ValidatePromocode validates a promocode
-func ValidatePromocode(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, error) {
-	if !IsLoggedIn(s) {
-		return Redirect(w, r, "/login")
+func (o order) creditCardPayment(token string) error {
+
+	/* stripe.Key = "sk_test_GQnowjvTXpLIOMMgceunDKwZ"
+
+	chargeParams := &stripe.ChargeParams{
+	  Amount: 2000,
+	  Currency: "eur",
+	  Desc: "Charge for abigail.thomas@example.com",
+	}
+	chargeParams.SetSource("tok_192KnBBGLkCZY8NfjR9aCUmE")
+	ch, err := charge.New(chargeParams)
+	*/
+
+	return nil
+}
+
+func (o order) payPalPayment(token string) error {
+	return nil
+}
+
+// ValidatePromocode validates a promocode and returns the discount amount
+// if it exists.
+func ValidatePromocode(w http.ResponseWriter, r *http.Request, s *models.Session) (int, error) {
+	if !s.IsLoggedIn() {
+		return http.StatusUnauthorized, nil
 	}
 
 	code := new(bytes.Buffer)
@@ -143,6 +172,5 @@ func ValidatePromocode(w http.ResponseWriter, r *http.Request, s *sessions.Sessi
 	}
 
 	w.Write([]byte(strconv.Itoa(promocode.Discount)))
-
 	return http.StatusOK, nil
 }

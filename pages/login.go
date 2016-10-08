@@ -5,7 +5,6 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/gorilla/sessions"
 	"github.com/upframe/fest/models"
 )
 
@@ -15,8 +14,8 @@ var (
 )
 
 // LoginGET handles the GET request for /login page
-func LoginGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, error) {
-	if IsLoggedIn(s) {
+func LoginGET(w http.ResponseWriter, r *http.Request, s *models.Session) (int, error) {
+	if s.IsLoggedIn() {
 		return Redirect(w, r, "/")
 	}
 
@@ -24,8 +23,8 @@ func LoginGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int,
 }
 
 // LoginPOST handles the POST request for /login page
-func LoginPOST(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, error) {
-	if IsLoggedIn(s) {
+func LoginPOST(w http.ResponseWriter, r *http.Request, s *models.Session) (int, error) {
+	if s.IsLoggedIn() {
 		return http.StatusBadRequest, errAlreadyLoggedIn
 	}
 
@@ -90,14 +89,9 @@ func LoginPOST(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int
 
 	// Sets the session cookie values
 	s.Values["IsLoggedIn"] = true
-	s.Values["IsAdmin"] = user.Admin
 	s.Values["UserID"] = user.ID
-	s.Values["FirstName"] = user.FirstName
-	s.Values["LastName"] = user.LastName
-	s.Values["Email"] = user.Email
-	s.Values["Credit"] = user.Credit
-	s.Values["Invites"] = user.Invites
-	s.Values["Referral"] = user.Referral
+
+	// Other cookie values. TODO: review this
 	s.Values["Order"] = &order{}
 
 	// Initialize cart

@@ -7,7 +7,6 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/gorilla/sessions"
 	"github.com/upframe/fest/models"
 )
 
@@ -17,8 +16,8 @@ type settings struct {
 }
 
 // SettingsGET handles the GET request for /settings page
-func SettingsGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, error) {
-	if !IsLoggedIn(s) {
+func SettingsGET(w http.ResponseWriter, r *http.Request, s *models.Session) (int, error) {
+	if !s.IsLoggedIn() {
 		return Redirect(w, r, "/login")
 	}
 
@@ -39,8 +38,8 @@ func SettingsGET(w http.ResponseWriter, r *http.Request, s *sessions.Session) (i
 
 // SettingsPUT handles the PUT request for /settings page which is the method
 // for updating the user information
-func SettingsPUT(w http.ResponseWriter, r *http.Request, s *sessions.Session) (int, error) {
-	if !IsLoggedIn(s) {
+func SettingsPUT(w http.ResponseWriter, r *http.Request, s *models.Session) (int, error) {
+	if !s.IsLoggedIn() {
 		return http.StatusBadRequest, errNotLoggedIn
 	}
 
