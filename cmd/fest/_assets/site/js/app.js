@@ -102,7 +102,7 @@ function validateCoupon(e) {
 }
 
 function useCoupon(discount) {
-    document.getElementById("price").innerHTML = "Total: " + (document.getElementById("price").innerHTML.substr(7) * (1 - (discount / 100)));
+    document.getElementById("price").innerHTML = "Total: € " + (document.getElementById("price").innerHTML.substr(7) * (1 - (discount / 100)));
 }
 
 function initializeStore() {
@@ -135,11 +135,11 @@ function cartRequest(method, link, data, itemID) {
                 case 200:
                     if (method == "DELETE") {
                         let item = document.querySelector('tr[data-id="' + itemID + '"]');
-                        let price = document.querySelector("#price");
+                        let price = document.querySelector("#value");
 
-                        item.children[3].innerHTML--;
-                        price.innerHTML = "Total: " + (price.innerHTML.substr(7) - item.children[2].innerHTML);
-                        if (item.children[3].innerHTML == 0) {
+                        item.children[0].innerHTML--;
+                        price.innerHTML = price.innerHTML - item.children[2].innerHTML;
+                        if (item.children[0].innerHTML == 0) {
                             item.parentElement.removeChild(item);
                         }
                     }

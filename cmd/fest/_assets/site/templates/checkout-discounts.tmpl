@@ -1,30 +1,40 @@
 {{ define "title" }}Checkout &bull; Upframe{{ end }}
 {{ define "content" }}
+
+{{ $credit := .Session.Credit }}
 {{ with .Data }}
-<main role="main">
+<main role="main" class="floating-box checkout">
     <h1>Checkout</h1>
 
-    <table id="cart">
+    <table id="summary">
         <thead>
             <tr>
-                <th>Nome</th>
+                <th>Qty</th>
+                <th>Name</th>
                 <th>Price</th>
-                <th>Quantity</th>
+
             </tr>
         </thead>
         {{ range $product := .Products }}
         <tr data-id="{{ $product.ID }}">
+            <td data-name="Quantity">{{ $product.Quantity }}x</td>
             <td data-name="Name">{{ $product.Name }}</td>
             <td data-name="Price">{{ $product.Price }}</td>
-            <td data-name="Quantity">{{ $product.Quantity }}</td>
         </tr>
         {{ end }}
     </table>
+
+    <span id="subtotal">Subtotal: € {{ .Total }}</span>
+
     <div id="checkout-box">
         <div id="form-error"></div>
         <input id="input-coupon" placeholder="Coupon code">
+        <input id="credits" type="number" placeholder="Credits" min="0" max="{{ $credit }}">
         <span id="price">Total: {{ .Total }}</span><span id="currency">€</span>
     </div>
+
+
+    </form>
 </main>
 {{ end }}
 {{ end }}
