@@ -94,7 +94,7 @@ function validateCoupon(e) {
     request.send(this.value);
     request.onreadystatechange = function() {
         if (request.readyState == 4) {
-            switch(request.status) {
+            switch (request.status) {
                 case 200:
                     //useCoupon(request.responseText);
                     el.classList.add("works");
@@ -114,23 +114,32 @@ function useCoupon(discount) {
 } */
 
 function initializeStore() {
+    let request = function() {
+        cartRequest(
+            "POST",
+            window.location.origin + "/cart/" + this.parentElement.dataset.id,
+            ""
+        );
+    }
+
     Array.from(document.querySelectorAll(".btnBuy")).forEach((btn) => {
-        btn.addEventListener("click", addToCart);
+        btn.addEventListener("click", request);
     });
 }
 
 function initializeCart() {
+    let request = function() {
+        cartRequest(
+            "DELETE",
+            window.location.origin + "/cart/" + this.parentElement.parentElement.dataset.id,
+            "",
+            this.parentElement.parentElement.dataset.id
+        );
+    }
+
     Array.from(document.querySelectorAll(".btnRemove")).forEach((btn) => {
-        btn.addEventListener("click", removeFromCart);
+        btn.addEventListener("click", request);
     });
-}
-
-function addToCart() {
-    cartRequest("POST", window.location.origin + "/cart/" + this.parentElement.dataset.id, "");
-}
-
-function removeFromCart() {
-    cartRequest("DELETE", window.location.origin + "/cart/" + this.parentElement.parentElement.dataset.id, "", this.parentElement.parentElement.dataset.id);
 }
 
 function cartRequest(method, link, data, itemID) {
@@ -334,7 +343,6 @@ function resetForm(event) {
         }
     }
 }
-
 
 var resendMessages = {
     200: "Check your email!",
