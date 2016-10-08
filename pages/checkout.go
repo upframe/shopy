@@ -62,25 +62,30 @@ func CheckoutPOST(w http.ResponseWriter, r *http.Request, s *sessions.Session) (
 
 	switch strings.Replace(r.URL.Path, "/checkout/", "", -1) {
 	case "discounts":
-		// Gets the promocode and checks for errors
-		generic, err := models.GetPromocodeByCode(r.FormValue("promocode"))
-		if err == sql.ErrNoRows {
-			return http.StatusNotFound, nil
-		}
-
-		if err != nil {
-			return http.StatusInternalServerError, err
-		}
-
 		// Creates a new order, adds the Cart of the session, the Promocode,
 		// and the credits
 		o := order{}
 		o.Cart = s.Values["Cart"].(cart)
 		o.Total = float32(o.Cart.Total)
-		o.Promocode = generic.(*models.Promocode)
 		o.Credits, err = strconv.Atoi(r.FormValue("credits"))
 		if err != nil {
 			return http.StatusInternalServerError, err
+		}
+
+		promocode := r.FormValue("promocode")
+
+		if promocode != "" {
+			// Gets the promocode and checks for errors
+			generic, err := models.GetPromocodeByCode(r.FormValue("promocode"))
+			if err == sql.ErrNoRows {
+				return http.StatusNotFound, nil
+			}
+
+			if err != nil {
+				return http.StatusInternalServerError, err
+			}
+
+			o.Promocode = generic.(*models.Promocode)
 		}
 
 		// Checks if the user has the requested amount of credits
