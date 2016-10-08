@@ -3,8 +3,10 @@
 
 {{ $credit := .Session.Credit }}
 {{ with .Data }}
-<main role="main" class="floating-box checkout">
+<form role="main" class="floating-box checkout" method="POST">
     <h1>Checkout</h1>
+
+    <div id="form-error"></div>
 
     <table id="summary">
         <thead>
@@ -24,17 +26,20 @@
         {{ end }}
     </table>
 
-    <span id="subtotal">Subtotal: € {{ .Total }}</span>
-
-    <div id="checkout-box">
-        <div id="form-error"></div>
-        <input id="input-coupon" placeholder="Coupon code">
-        <input id="credits" type="number" placeholder="Credits" min="0" max="{{ $credit }}">
-        <span id="price">Total: {{ .Total }}</span><span id="currency">€</span>
+    <div class="information">
+        <div>
+            <span>Subtotal</span>
+            <span>€ {{ .Total }}</span>
+        </div>
     </div>
 
+    <h2>Do you want to use a promocode?</h2>
+    <input id="promocode" name="promocode" placeholder="Coupon code">
 
-    </form>
-</main>
+    <h2>Want to use some of your credits?</h2>
+    <input id="credits" name="credits" type="number" placeholder="Credits" min="0" max="{{ $credit }}">
+
+    <input type="Submit">
+</form>
 {{ end }}
 {{ end }}

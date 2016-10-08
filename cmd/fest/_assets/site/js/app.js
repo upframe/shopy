@@ -63,8 +63,8 @@ document.addEventListener("DOMContentLoaded", () => {
         thing.addEventListener("submit", resetForm);
     }
 
-    if ((thing = document.getElementById("input-coupon")) != undefined) {
-        thing.addEventListener("keyup", validateCoupon);
+    if (window.location.pathname === "/checkout/discounts") {
+        document.getElementById("promocode").addEventListener("keyup", validateCoupon)
     }
 });
 
@@ -81,29 +81,37 @@ function copyReferral(event) {
 }
 
 function validateCoupon(e) {
-    if(e.keyCode == 13) {
-        let request = new XMLHttpRequest();
-        request.open("POST", "/coupon/validate", true);
-        request.send(this.value);
-        request.onreadystatechange = function() {
-            if (request.readyState == 4) {
-                switch(request.status) {
-                    case 200:
-                        useCoupon(request.responseText);
-                        formError("Promocode used", "success");
-                        break;
-                    case 404:
-                        formError("Invalid promocode", "error")
-                        break;
-                }
+    let el = document.getElementById("promocode");
+
+    if (this.value == "") {
+        el.classList.remove("error");
+        el.classList.remove("works");
+        return;
+    }
+
+    let request = new XMLHttpRequest();
+    request.open("POST", "/coupon/validate", true);
+    request.send(this.value);
+    request.onreadystatechange = function() {
+        if (request.readyState == 4) {
+            switch(request.status) {
+                case 200:
+                    //useCoupon(request.responseText);
+                    el.classList.add("works");
+                    el.classList.remove("error");
+                    break;
+                case 404:
+                    el.classList.remove("works");
+                    el.classList.add("error");
+                    break;
             }
         }
     }
 }
-
+/*
 function useCoupon(discount) {
     document.getElementById("price").innerHTML = "Total: € " + (document.getElementById("price").innerHTML.substr(7) * (1 - (discount / 100)));
-}
+} */
 
 function initializeStore() {
     Array.from(document.querySelectorAll(".btnBuy")).forEach((btn) => {

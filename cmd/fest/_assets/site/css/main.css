@@ -49,6 +49,14 @@ textarea {
     border-radius: 2px;
 }
 
+input.works {
+    border-color: green;
+}
+
+input.error {
+    border-color: red;
+}
+
 button {
     display: block;
     background-color: #4e4e4e;
@@ -361,6 +369,7 @@ body>nav li>ul>li:last-child a {
     display: flex;
     flex-direction: column;
 }
+
 #checkout-box * {
     margin-left: auto;
     max-width: 12em;
@@ -503,6 +512,7 @@ table th:first-child {
     max-width: 60px;
 }
 
+
 /* NAVIGATION BUTTONS */
 
 .navigation {
@@ -519,7 +529,9 @@ table th:first-child {
     opacity: .5;
 }
 
+
 /* CHECKOUT */
+
 .checkout {
     max-width: 50em;
 }
@@ -533,10 +545,40 @@ table th:first-child {
 }
 
 .checkout th:last-of-type,
-.checkout td:last-of-type  {
-   text-align: right;
+.checkout td:last-of-type {
+    text-align: right;
 }
 
+.information {
+    display: flex;
+    flex-direction: column;
+}
+
+.information div {
+    display: flex;
+    justify-content: space-between;
+}
+
+.information div span:first-of-type:after {
+    content: ':'
+}
+
+.information div span:first-of-type {
+    margin-right: 1em;
+    font-weight: bold;
+    text-align: right;
+    flex-basis: 85%;
+}
+
+.information div span:last-of-type {
+    padding-left: .3em;
+}
+
+.information input {
+    padding: 0;
+    border: 0;
+    display: inline;
+}
 
 
 /* SINGLE FORM */

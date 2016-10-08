@@ -24,9 +24,9 @@
         {{ end }}
     </table>
 
-    <span id="subtotal">Subtotal: € {{ .Cart.Total }}</span>
-    <span id="subtotal">Promocode: € {{ .Total }}</span>
-    <span id="subtotal">Credits: € {{ .Total }}</span>
+    <span id="subtotal">Subtotal: € {{ .Cart.Total }}</span><br>
+    <span id="subtotal">Promocode: € -{{ .Promocode.Discount }}</span><br>
+    <span id="subtotal">Credits: € -{{ .Credits }}</span><br>
     <span id="subtotal">Total: € {{ .Total }}</span>
 
     <input type="radio" name="payment" value="male" checked><label>Credit Card</label>
