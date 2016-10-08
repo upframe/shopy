@@ -85,8 +85,10 @@ func (u Upframe) ServeHTTP(w http.ResponseWriter, r *http.Request) (int, error) 
 		return pages.CartPOST(w, r, s)
 	case strings.HasPrefix(r.URL.Path, "/cart") && r.Method == http.MethodDelete:
 		return pages.CartDELETE(w, r, s)
-	case r.URL.Path == "/checkout" && r.Method == http.MethodGet:
+	case strings.HasPrefix(r.URL.Path, "/checkout") && r.Method == http.MethodGet:
 		return pages.CheckoutGET(w, r, s)
+	case strings.HasPrefix(r.URL.Path, "/checkout") && r.Method == http.MethodPost:
+		return pages.CheckoutPOST(w, r, s)
 	case r.URL.Path == "/coupon/validate" && r.Method == http.MethodPost:
 		return pages.ValidatePromocode(w, r, s)
 	case r.URL.Path == "/reset" && r.Method == http.MethodGet:
