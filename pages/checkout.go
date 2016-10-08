@@ -115,7 +115,7 @@ func CheckoutPOST(w http.ResponseWriter, r *http.Request, s *sessions.Session) (
 			return http.StatusInternalServerError, err
 		}
 
-		return Redirect(w, r, "/checkout/pay")
+		return http.StatusOK, nil
 	case "pay":
 		// TODO
 		return http.StatusOK, nil
