@@ -29,8 +29,8 @@
     <span id="subtotal">Credits: € -{{ .Credits }}</span><br>
     <span id="subtotal">Total: € {{ .Total }}</span>
 
-    <input type="radio" name="payment" value="male" checked><label>Credit Card</label>
-    <input type="radio" name="payment" value="female"><label>PayPal</label>
+    <input type="radio" name="payment" value="cc" checked><label>Credit Card</label>
+    <input type="radio" name="payment" value="paypal"><label>PayPal</label>
 
     <form action="/your-charge-code" method="POST" id="payment-form">
       <span class="payment-errors"></span>

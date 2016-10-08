@@ -6,6 +6,7 @@
 <main role="main" class="floating-box checkout">
     <h1>Cart</h1>
 
+    {{ if .Products }}
     <table id="cart">
         <thead>
             <tr>
@@ -30,6 +31,9 @@
     </div>
 
     <a href="/checkout/discounts"><button>Continue &rarr;</button></a>
+    {{ else }}
+    <p>The car is empty. Head to the <a href="/store">store</a> and start adding some items!</p>
+    {{ end }}
 </main>
 {{ end }}
 {{ end }}
