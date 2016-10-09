@@ -152,10 +152,14 @@ function cartRequest(method, link, data, itemID) {
                 case 200:
                     if (method == "DELETE") {
                         let item = document.querySelector('tr[data-id="' + itemID + '"]');
-                        let price = document.querySelector("#value");
-
                         item.children[0].innerHTML--;
-                        price.innerHTML = price.innerHTML - item.children[2].innerHTML;
+
+                        let price = item.querySelector('td[data-name="Price"]');
+                        price.innerHTML -= item.dataset.price;
+
+                        let total = document.querySelector("#total");
+                        total.innerHTML -= item.dataset.price;
+
                         if (item.children[0].innerHTML == 0) {
                             item.parentElement.removeChild(item);
                         }

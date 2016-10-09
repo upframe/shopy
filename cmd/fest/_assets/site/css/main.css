@@ -360,30 +360,6 @@ body>nav li>ul>li:last-child a {
     background: #1EBE39;
 }
 
-
-/* CART / CHECKOUT PAGE */
-
-#checkout-box {
-    margin-top: 2em;
-    text-align: left;
-    display: flex;
-    flex-direction: column;
-}
-
-#checkout-box * {
-    margin-left: auto;
-    max-width: 12em;
-}
-
-#checkout-box>#input-coupon {
-    margin-bottom: 1em;
-}
-
-#checkout-box span {
-    float: right;
-}
-
-
 /* footer */
 
 body>footer p {
@@ -559,18 +535,18 @@ table th:first-child {
     justify-content: space-between;
 }
 
-.information div span:first-of-type:after {
+.information div>span:first-of-type:after {
     content: ':'
 }
 
-.information div span:first-of-type {
+.information div>span:first-of-type {
     margin-right: 1em;
     font-weight: bold;
     text-align: right;
     flex-basis: 85%;
 }
 
-.information div span:last-of-type {
+.information div>span:last-of-type {
     padding-left: .3em;
 }
 

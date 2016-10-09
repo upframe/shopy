@@ -17,17 +17,20 @@
             </tr>
         </thead>
         {{ range $product := .Products }}
-        <tr data-id="{{ $product.ID }}">
+        <tr data-id="{{ $product.ID }}" data-price="{{ $product.Price }}">
             <td data-name="Quantity">{{ $product.Quantity }}</td>
             <td data-name="Name">{{ $product.Name }}</td>
-            <td data-name="Price">{{ $product.Price }}</td>
+            <td data-name="Price">{{ $product.GetPrice }}</td>
             <td><button class="btnRemove">&#215;</button></td>
         </tr>
         {{ end }}
     </table>
 
-    <div id="checkout-box">
-        <span id="price">Total: € <span id="value">{{ .Total }}</span></span>
+    <div class="information">
+        <div>
+            <span>Total</span>
+            <span>€ <span id="total">{{ .GetTotal }}</span></span>
+        </div>
     </div>
 
     <a href="/checkout/discounts"><button>Continue &rarr;</button></a>
