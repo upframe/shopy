@@ -17,10 +17,10 @@
             </tr>
         </thead>
         {{ range $product := .Products }}
-        <tr data-id="{{ $product.ID }}" data-price="{{ $product.Price }}">
+        <tr data-id="{{ $product.ID }}" data-price="{{ DisplayCents $product.Price }}">
             <td data-name="Quantity">{{ $product.Quantity }}</td>
             <td data-name="Name">{{ $product.Name }}</td>
-            <td data-name="Price">{{ $product.GetPrice }}</td>
+            <td data-name="Price">{{ DisplayCents $product.GetPrice }}</td>
             <td><button class="btnRemove">&#215;</button></td>
         </tr>
         {{ end }}
@@ -29,7 +29,7 @@
     <div class="information">
         <div>
             <span>Total</span>
-            <span>€ <span id="total">{{ .GetTotal }}</span></span>
+            <span>€ <span id="total">{{ DisplayCents .GetTotal }}</span></span>
         </div>
     </div>
 

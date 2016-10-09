@@ -10,7 +10,7 @@
         <button class="btnBuy">Add to cart</button>
         <img src="{{ $product.Picture }}">
         <p>{{ $product.Description }}</p>
-        <p>{{ $product.Price }}€</p>
+        <p>{{ DisplayCents $product.Price }}€</p>
     </article>
     {{ end }}
 </div>
