@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"path/filepath"
+	"strconv"
 
 	"github.com/upframe/fest/models"
 )
@@ -47,6 +48,18 @@ func RenderHTML(w http.ResponseWriter, s *models.Session, data interface{}, temp
 			hasher := md5.New()
 			hasher.Write([]byte(s))
 			return hex.EncodeToString(hasher.Sum(nil))
+		},
+		"DisplayCents": func(cents int) string {
+			price := strconv.Itoa(cents)
+
+			if len(price) == 2 {
+				price = "0." + price
+			} else {
+				cents := price[len(price)-2:]
+				price = price[0:len(price)-2] + "." + cents
+			}
+
+			return price
 		},
 	}
 

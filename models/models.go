@@ -10,11 +10,12 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+// UpdateAll is used as a placeholder to update all of the fields
 const UpdateAll = "#update#"
 
 var db *sqlx.DB
 
-// initDB establishes a connection with the database
+// InitDB establishes a connection with the database
 func InitDB(user, pass, host, port, name string) error {
 	var err error
 
