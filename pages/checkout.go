@@ -74,7 +74,7 @@ func CheckoutPOST(w http.ResponseWriter, r *http.Request, s *models.Session) (in
 		// Creates a new order, adds the Cart of the session, the Promocode,
 		// and the credits
 		o := order{}
-		o.Cart = s.GetCart()
+		o.Cart = models.Cart{}
 		o.Total = float32(o.Cart.GetTotal())
 		o.Credits, err = strconv.Atoi(r.FormValue("credits"))
 		if err != nil {
