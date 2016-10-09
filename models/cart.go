@@ -11,6 +11,7 @@ func (i CartItem) GetPrice() int {
 
 type Cart struct {
 	Products []*CartItem
+	Locked   bool
 }
 
 func (c Cart) GetTotal() int {

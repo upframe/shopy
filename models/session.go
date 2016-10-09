@@ -19,13 +19,13 @@ type Session struct {
 func (s Session) GetCart() (*Cart, error) {
 	ids := "("
 
-	c := s.Values["Cart"].(map[int]int)
+	c := s.Values["Cart"].(CartCookie)
 
-	if len(c) == 0 {
+	if len(c.Products) == 0 {
 		return &Cart{}, nil
 	}
 
-	for k := range c {
+	for k := range c.Products {
 		ids += strconv.Itoa(k) + ", "
 	}
 
@@ -38,10 +38,11 @@ func (s Session) GetCart() (*Cart, error) {
 	}
 
 	cart := &Cart{}
+	cart.Locked = c.Locked
 
 	for k := range products {
 		cart.Products = append(cart.Products, &CartItem{
-			Quantity: c[products[k].ID],
+			Quantity: c.Products[products[k].ID],
 			Product:  &products[k],
 		})
 	}

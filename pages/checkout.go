@@ -3,27 +3,12 @@ package pages
 import (
 	"bytes"
 	"database/sql"
-	"encoding/gob"
 	"net/http"
 	"strconv"
 	"strings"
 
 	"github.com/upframe/fest/models"
 )
-
-// TODO: REVIEW THIS FILE TO WORK WITH NEW CHANGES
-
-type order struct {
-	Cart      models.Cart
-	Promocode *models.Promocode
-	Credits   int
-	Total     float32
-}
-
-func init() {
-	gob.Register(order{})
-	gob.Register(models.Promocode{})
-}
 
 // CheckoutGET handles the GET request for /checkout page
 func CheckoutGET(w http.ResponseWriter, r *http.Request, s *models.Session) (int, error) {
@@ -37,20 +22,14 @@ func CheckoutGET(w http.ResponseWriter, r *http.Request, s *models.Session) (int
 
 	switch strings.Replace(r.URL.Path, "/checkout/", "", -1) {
 	case "discounts":
-		// Checks if there are any products in the cart. If there aren't any
-		// products, redirect to the cart.
-		if len(s.Values["Cart"].(models.Cart).Products) == 0 {
-			return Redirect(w, r, "/cart")
+		cart, err := s.GetCart()
+		if err != nil {
+			return http.StatusInternalServerError, err
 		}
 
-		return RenderHTML(w, s, s.Values["Cart"], "checkout-discounts")
+		return RenderHTML(w, s, cart, "checkout-discounts")
 	case "pay":
-		// Checks if there are any products in the order. If there aren't any
-		// products, redirect to the cart.
-		if len(s.Values["Order"].(order).Cart.Products) == 0 {
-			return Redirect(w, r, "/cart")
-		}
-
+		// TODO: Get the cart, promocode, cookie, everything to show on your summary page
 		return RenderHTML(w, s, s.Values["Order"], "checkout-pay")
 	default:
 		return http.StatusNotFound, nil
@@ -71,16 +50,36 @@ func CheckoutPOST(w http.ResponseWriter, r *http.Request, s *models.Session) (in
 
 	switch strings.Replace(r.URL.Path, "/checkout/", "", -1) {
 	case "discounts":
-		// Creates a new order, adds the Cart of the session, the Promocode,
-		// and the credits
-		o := order{}
-		o.Cart = models.Cart{}
-		o.Total = float32(o.Cart.GetTotal())
-		o.Credits, err = strconv.Atoi(r.FormValue("credits"))
+		cart, err := s.GetCart()
 		if err != nil {
 			return http.StatusInternalServerError, err
 		}
 
+		// Lock the cart
+		cartCookie := s.Values["Cart"].(models.CartCookie)
+		cartCookie.Locked = true
+
+		order := models.OrderCookie{}
+		order.Total = cart.GetTotal()
+
+		// Obtain the credits and discount them
+		credits := r.FormValue("credits")
+		if len(credits) == 0 {
+			credits = "0"
+		}
+
+		order.Credits, err = strconv.Atoi(credits)
+		if err != nil {
+			return http.StatusInternalServerError, err
+		}
+
+		if s.User.Credit < order.Credits || order.Credits > order.Total {
+			return http.StatusBadRequest, nil
+		}
+
+		order.Total -= order.Credits
+
+		// Gets the promocode
 		promocode := r.FormValue("promocode")
 
 		if promocode != "" {
@@ -95,31 +94,22 @@ func CheckoutPOST(w http.ResponseWriter, r *http.Request, s *models.Session) (in
 				return http.StatusInternalServerError, err
 			}
 
-			o.Promocode = generic.(*models.Promocode)
-		}
+			promo := generic.(*models.Promocode)
+			order.Promocode.Code = promo.Code
 
-		// Checks if the user has the requested amount of credits
-		if s.User.Credit < o.Credits {
-			return http.StatusInternalServerError, err
-		}
+			if promo.Percentage {
+				order.Promocode.DiscountAmount = (promo.Discount * order.Total) / 100
+				order.Promocode.DiscountAmount = order.Total - order.Promocode.DiscountAmount
+			} else {
+				order.Promocode.DiscountAmount = promo.Discount
+			}
 
-		// Makes the discount
-		switch {
-		case o.Promocode.Discount >= 1:
-			o.Total -= float32(o.Promocode.Discount)
-		case o.Promocode.Discount > 0 && o.Promocode.Discount < 1:
-			o.Total *= float32(o.Promocode.Discount)
-		}
-
-		// Discounts the credits
-		o.Total -= float32(o.Credits)
-
-		if o.Total < 0 {
-			o.Total = 0
+			order.Total -= order.Promocode.DiscountAmount
 		}
 
 		// Saves the cookie
-		s.Values["Order"] = o
+		s.Values["Cart"] = cartCookie
+		s.Values["Order"] = order
 		err = s.Save(r, w)
 		if err != nil {
 			return http.StatusInternalServerError, err
@@ -127,31 +117,11 @@ func CheckoutPOST(w http.ResponseWriter, r *http.Request, s *models.Session) (in
 
 		return http.StatusOK, nil
 	case "pay":
-
-		return http.StatusOK, nil
+		// TODO
+		return http.StatusNotImplemented, nil
 	default:
 		return http.StatusNotFound, nil
 	}
-}
-
-func (o order) creditCardPayment(token string) error {
-
-	/* stripe.Key = "sk_test_GQnowjvTXpLIOMMgceunDKwZ"
-
-	chargeParams := &stripe.ChargeParams{
-	  Amount: 2000,
-	  Currency: "eur",
-	  Desc: "Charge for abigail.thomas@example.com",
-	}
-	chargeParams.SetSource("tok_192KnBBGLkCZY8NfjR9aCUmE")
-	ch, err := charge.New(chargeParams)
-	*/
-
-	return nil
-}
-
-func (o order) payPalPayment(token string) error {
-	return nil
 }
 
 // ValidatePromocode validates a promocode and returns the discount amount

@@ -90,10 +90,8 @@ func LoginPOST(w http.ResponseWriter, r *http.Request, s *models.Session) (int, 
 	// Sets the session cookie values
 	s.Values["IsLoggedIn"] = true
 	s.Values["UserID"] = user.ID
-	s.Values["Cart"] = map[int]int{}
-
-	// Other cookie values. TODO: review this
-	s.Values["Order"] = &order{}
+	s.Values["Cart"] = &models.CartCookie{Products: map[int]int{}, Locked: false}
+	s.Values["Order"] = &models.OrderCookie{}
 
 	// Saves the cookie and checks for errors
 	err = s.Save(r, w)

@@ -48,16 +48,16 @@ func CartPOST(w http.ResponseWriter, r *http.Request, s *models.Session) (int, e
 		return http.StatusNotFound, err
 	}
 
-	cart := s.Values["Cart"].(map[int]int)
+	cart := s.Values["Cart"].(models.CartCookie)
 
-	if _, ok := cart[id]; ok {
+	if _, ok := cart.Products[id]; ok {
 		// If the Product is already in the cart, increment the quantity
 		// Notice that in order for this to work, we have to use pointers
 		// (check line 20) and not "normal" values
-		cart[id]++
+		cart.Products[id]++
 	} else {
 		// Otherwise, we just create a new Cart item, with the product
-		cart[id] = 1
+		cart.Products[id] = 1
 	}
 
 	s.Values["Cart"] = cart
@@ -81,12 +81,12 @@ func CartDELETE(w http.ResponseWriter, r *http.Request, s *models.Session) (int,
 	}
 
 	// Remove one item of this type from the cart
-	cart := s.Values["Cart"].(map[int]int)
-	if _, ok := cart[id]; ok {
-		if cart[id]-1 == 0 {
-			delete(cart, id)
+	cart := s.Values["Cart"].(models.CartCookie)
+	if _, ok := cart.Products[id]; ok {
+		if cart.Products[id]-1 == 0 {
+			delete(cart.Products, id)
 		} else {
-			cart[id]--
+			cart.Products[id]--
 		}
 	}
 

@@ -8,6 +8,7 @@ type Promocode struct {
 	Code        string     `db:"code"`
 	Expires     *time.Time `db:"expires"`
 	Discount    int        `db:"discount"`
+	Percentage  bool       `db:"percentage"`
 	Deactivated bool       `db:"deactivated"`
 }
 
@@ -16,6 +17,7 @@ var promocodeColumns = []string{
 	"code",
 	"expires",
 	"discount",
+	"percentage",
 	"deactivated",
 }
 
