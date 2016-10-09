@@ -1,30 +1,13 @@
 package pages
 
 import (
-	"encoding/gob"
+	"database/sql"
 	"net/http"
 	"strconv"
 	"strings"
 
-	"database/sql"
-
 	"github.com/upframe/fest/models"
 )
-
-type cartItem struct {
-	*models.Product
-	Quantity int
-}
-
-type cart struct {
-	Products map[int]*cartItem
-	Total    int
-}
-
-func init() {
-	gob.Register(cartItem{})
-	gob.Register(cart{})
-}
 
 // CartGET returns the list of items in the cart
 func CartGET(w http.ResponseWriter, r *http.Request, s *models.Session) (int, error) {
@@ -32,7 +15,12 @@ func CartGET(w http.ResponseWriter, r *http.Request, s *models.Session) (int, er
 		return Redirect(w, r, "/login")
 	}
 
-	return RenderHTML(w, s, s.Values["Cart"], "cart")
+	cart, err := s.GetCart()
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	return RenderHTML(w, s, cart, "cart")
 }
 
 // CartPOST adds a product to the cart
@@ -60,23 +48,17 @@ func CartPOST(w http.ResponseWriter, r *http.Request, s *models.Session) (int, e
 		return http.StatusNotFound, err
 	}
 
-	cart := s.Values["Cart"].(cart)
+	cart := s.Values["Cart"].(map[int]int)
 
-	if val, ok := cart.Products[id]; ok {
+	if _, ok := cart[id]; ok {
 		// If the Product is already in the cart, increment the quantity
 		// Notice that in order for this to work, we have to use pointers
 		// (check line 20) and not "normal" values
-		val.Quantity++
+		cart[id]++
 	} else {
 		// Otherwise, we just create a new Cart item, with the product
-		cart.Products[id] = &cartItem{
-			Product:  product,
-			Quantity: 1,
-		}
+		cart[id] = 1
 	}
-
-	// Increments the total
-	cart.Total += product.Price
 
 	s.Values["Cart"] = cart
 	err = s.Save(r, w)
@@ -98,16 +80,16 @@ func CartDELETE(w http.ResponseWriter, r *http.Request, s *models.Session) (int,
 		return http.StatusInternalServerError, err
 	}
 
-	cart := s.Values["Cart"].(cart)
-
-	if val, ok := cart.Products[id]; ok {
-		cart.Total -= val.Price
-		if val.Quantity-1 == 0 {
-			delete(cart.Products, id)
+	// Remove one item of this type from the cart
+	cart := s.Values["Cart"].(map[int]int)
+	if _, ok := cart[id]; ok {
+		if cart[id]-1 == 0 {
+			delete(cart, id)
 		} else {
-			val.Quantity--
+			cart[id]--
 		}
 	}
+
 	s.Values["Cart"] = cart
 
 	err = s.Save(r, w)

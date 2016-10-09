@@ -2,6 +2,7 @@ package upframe
 
 import (
 	"crypto/rand"
+	"encoding/gob"
 	"io"
 	"log"
 	"path/filepath"
@@ -30,6 +31,8 @@ var (
 )
 
 func init() {
+	gob.Register(map[int]int{})
+
 	var keyPairs [][]byte
 
 	if !development {

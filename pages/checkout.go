@@ -11,8 +11,10 @@ import (
 	"github.com/upframe/fest/models"
 )
 
+// TODO: REVIEW THIS FILE TO WORK WITH NEW CHANGES
+
 type order struct {
-	Cart      cart
+	Cart      models.Cart
 	Promocode *models.Promocode
 	Credits   int
 	Total     float32
@@ -37,7 +39,7 @@ func CheckoutGET(w http.ResponseWriter, r *http.Request, s *models.Session) (int
 	case "discounts":
 		// Checks if there are any products in the cart. If there aren't any
 		// products, redirect to the cart.
-		if len(s.Values["Cart"].(cart).Products) == 0 {
+		if len(s.Values["Cart"].(models.Cart).Products) == 0 {
 			return Redirect(w, r, "/cart")
 		}
 
@@ -72,8 +74,8 @@ func CheckoutPOST(w http.ResponseWriter, r *http.Request, s *models.Session) (in
 		// Creates a new order, adds the Cart of the session, the Promocode,
 		// and the credits
 		o := order{}
-		o.Cart = s.Values["Cart"].(cart)
-		o.Total = float32(o.Cart.Total)
+		o.Cart = s.GetCart()
+		o.Total = float32(o.Cart.GetTotal())
 		o.Credits, err = strconv.Atoi(r.FormValue("credits"))
 		if err != nil {
 			return http.StatusInternalServerError, err
