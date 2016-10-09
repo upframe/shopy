@@ -14,6 +14,7 @@
             <tr>
                 <th>#</th>
                 <th>Code</th>
+                <th>Percentage</th>
                 <th>Discount</th>
                 <th>Expiration Date (UTC)</th>
                 <th>Deactivated</th>
@@ -24,6 +25,7 @@
         <tr data-id="{{ $promocode.ID }}">
             <td data-name="ID">{{ $promocode.ID }}</td>
             <td data-name="Code">{{ $promocode.Code }}</td>
+            <td data-name="Percentage">{{ $promocode.Percentage }}</td>
             <td data-name="Discount">{{ $promocode.Discount }}</td>
             <td data-name="Expires">{{ $promocode.Expires.Format "02 Jan 06 15:04 MST" }}</td>
             <td data-name="Deactivated"><input type="checkbox" disabled value="second_checkbox" {{ if $promocode.Deactivated }}checked{{ end }}></td>
@@ -47,6 +49,9 @@
 
         <label for="Code">Code</label>
         <input name="Code" id="Code" required type="text" value="">
+
+        <input name="Percentage" id="Percentage" type="checkbox">
+        <label for="Percentage">Percentage</label>
 
         <label for="Discount">Discount</label>
         <input name="Discount" id="Discount" required type="number" value="">

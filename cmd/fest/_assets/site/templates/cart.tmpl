@@ -6,36 +6,40 @@
 <main role="main" class="floating-box checkout">
     <h1>Cart</h1>
 
-    {{ if .Products }}
-    <table id="cart">
-        <thead>
-            <tr>
-                <th>QTY</th>
-                <th>Name</th>
-                <th>Price</th>
-                <th></th>
-            </tr>
-        </thead>
-        {{ range $product := .Products }}
-        <tr data-id="{{ $product.ID }}" data-price="{{ DisplayCents $product.Price }}">
-            <td data-name="Quantity">{{ $product.Quantity }}</td>
-            <td data-name="Name">{{ $product.Name }}</td>
-            <td data-name="Price">{{ DisplayCents $product.GetPrice }}</td>
-            <td><button class="btnRemove">&#215;</button></td>
-        </tr>
-        {{ end }}
-    </table>
-
-    <div class="information">
-        <div>
-            <span>Total</span>
-            <span>€ <span id="total">{{ DisplayCents .GetTotal }}</span></span>
-        </div>
-    </div>
-
-    <a href="/checkout/discounts"><button>Continue &rarr;</button></a>
+    {{ if .Locked }}
+        <p>You should <a href="/checkout/pay">finish your checkout</a> before being able to access your cart again!</p>
     {{ else }}
-    <p>The car is empty. Head to the <a href="/store">store</a> and start adding some items!</p>
+        {{ if .Products }}
+        <table id="cart">
+            <thead>
+                <tr>
+                    <th>QTY</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th></th>
+                </tr>
+            </thead>
+            {{ range $product := .Products }}
+            <tr data-id="{{ $product.ID }}" data-price="{{ DisplayCents $product.Price }}">
+                <td data-name="Quantity">{{ $product.Quantity }}</td>
+                <td data-name="Name">{{ $product.Name }}</td>
+                <td data-name="Price">{{ DisplayCents $product.GetPrice }}</td>
+                <td><button class="btnRemove">&#215;</button></td>
+            </tr>
+            {{ end }}
+        </table>
+
+        <div class="information">
+            <div>
+                <span>Total</span>
+                <span>€ <span id="total">{{ DisplayCents .GetTotal }}</span></span>
+            </div>
+        </div>
+
+        <a href="/checkout/discounts"><button>Continue &rarr;</button></a>
+        {{ else }}
+        <p>The car is empty. Head to the <a href="/store">store</a> and start adding some items!</p>
+        {{ end }}
     {{ end }}
 </main>
 {{ end }}
