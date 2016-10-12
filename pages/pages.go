@@ -52,7 +52,9 @@ func RenderHTML(w http.ResponseWriter, s *models.Session, data interface{}, temp
 		"DisplayCents": func(cents int) string {
 			price := strconv.Itoa(cents)
 
-			if len(price) == 2 {
+			if len(price) == 1 {
+				price = "0.0" + price
+			} else if len(price) == 2 {
 				price = "0." + price
 			} else {
 				cents := price[len(price)-2:]

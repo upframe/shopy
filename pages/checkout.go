@@ -29,8 +29,18 @@ func CheckoutGET(w http.ResponseWriter, r *http.Request, s *models.Session) (int
 
 		return RenderHTML(w, s, cart, "checkout-discounts")
 	case "pay":
+		data := map[string]interface{}{}
+
+		var err error
+		data["Cart"], err = s.GetCart()
+		if err != nil {
+			return http.StatusInternalServerError, err
+		}
+
+		data["Order"] = s.Values["Order"].(models.OrderCookie)
 		// TODO: Get the cart, promocode, cookie, everything to show on your summary page
-		return RenderHTML(w, s, s.Values["Order"], "checkout-pay")
+
+		return RenderHTML(w, s, data, "checkout-pay")
 	default:
 		return http.StatusNotFound, nil
 	}
