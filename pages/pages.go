@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"path/filepath"
 	"strconv"
+	"strings"
 
 	"github.com/upframe/fest/models"
 )
@@ -40,7 +41,12 @@ type page struct {
 // RenderHTML renders an HTML response and send it to the client based on the
 // choosen templates
 func RenderHTML(w http.ResponseWriter, s *models.Session, data interface{}, templates ...string) (int, error) {
-	templates = append(templates, "base")
+	if strings.HasPrefix(templates[0], "admin/") {
+		templates = append(templates, "admin/base")
+	} else {
+		templates = append(templates, "base")
+	}
+
 	var tpl *template.Template
 
 	funcs := template.FuncMap{
