@@ -30,7 +30,7 @@ func AdminGenericGET(w http.ResponseWriter, r *http.Request, s *models.Session, 
 	// If the user wants to create a new promocode, redirect to /item#new and the
 	// javascript will take of the rest.
 	if r.URL.Path == "/admin/"+kind+"/new" {
-		return Redirect(w, r, "/admin/"+kind+"#new")
+		return RenderHTML(w, s, nil, "admin/"+kind+"-new")
 	}
 
 	// Checks if the user is in a table page.
