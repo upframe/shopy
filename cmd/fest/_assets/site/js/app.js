@@ -33,11 +33,13 @@ document.addEventListener("DOMContentLoaded", () => {
         thing.addEventListener('submit', submitSettings);
     }
 
-    document.addEventListener('click', function(event) {
-        if (event.target.id != "dropdown" && event.target.parentElement.getAttribute("for") != "dropdown") {
-            document.querySelector('body>nav input[type="checkbox"]').checked = false;
-        }
-    });
+    if (thing = document.querySelector('body>nav input[type="checkbox"]')) {
+        document.addEventListener('click', function(event) {
+            if (event.target.id != "dropdown" && event.target.parentElement.getAttribute("for") != "dropdown") {
+                document.querySelector('body>nav input[type="checkbox"]').checked = false;
+            }
+        });
+    }
 
     if (thing = document.getElementById("store")) {
         initializeStore();
