@@ -24,10 +24,24 @@
         {{ end }}
     </table>
 
-    <span id="subtotal">Subtotal: € {{ .Cart.Total }}</span><br>
-    <span id="subtotal">Promocode: € -{{ .Promocode.Discount }}</span><br>
-    <span id="subtotal">Credits: € -{{ .Credits }}</span><br>
-    <span id="subtotal">Total: € {{ .Total }}</span>
+    <div class="information">
+        <div>
+            <span>Subtotal</span>
+            <span>€ {{ DisplayCents .Cart.GetTotal }}</span>
+        </div>
+        <div>
+            <span>Promocode</span>
+            <span>€ -{{ DisplayCents .Order.Promocode.DiscountAmount }}</span>
+        </div>
+        <div>
+            <span>Credits</span>
+            <span>€ -{{ DisplayCents .Order.Credits }}</span>
+        </div>
+        <div>
+            <span>Promocode</span>
+            <span>€ {{ DisplayCents .Order.Total }}</span>
+        </div>
+    </div>
 
     <input type="radio" name="payment" value="cc" checked><label>Credit Card</label>
     <input type="radio" name="payment" value="paypal"><label>PayPal</label>

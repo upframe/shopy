@@ -15,11 +15,6 @@ body.covered {
     background: url(/imgs/cover.jpg) center center / cover;
 }
 
-body>main {
-    max-width: 1300px;
-    width: 0 auto;
-}
-
 a {
     color: inherit;
     text-decoration: none;
@@ -32,7 +27,7 @@ img {
 body>main,
 body>nav>ul {
     width: 90%;
-    max-width: 1300px;
+    max-width: 950px;
     margin: 0 auto;
 }
 
@@ -359,6 +354,7 @@ body>nav li>ul>li:last-child a {
     border: 1px solid #49A34B;
     background: #1EBE39;
 }
+
 
 /* footer */
 
