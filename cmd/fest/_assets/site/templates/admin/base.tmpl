@@ -3,39 +3,28 @@
 <head>
     <title>{{ template "title" }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,600,700" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="/css/normalize.css">
-    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/backend.css">
 </head>
 <body>
     <nav>
         <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/store">Store</a></li>
-
-            {{ if not .IsLoggedIn }}
-            <li><a href="/register">Register</a></li>
-            <li><a href="/login">Login</a></li>
-            {{ end }}
-
-            {{ if .IsLoggedIn }}
-            <li><a href="/cart">Cart</a></li>
-            <li>
-                <label for="dropdown"><img src="https://www.gravatar.com/avatar/{{ MD5 .Session.Email }}?s=200" /><span>&#9660;</span></label>
-                <input type="checkbox" id="dropdown">
-                <ul>
-                    <li>{{ .Session.FirstName }} {{ .Session.LastName }}</li>
-                    <li><strong>Credit</strong><span>{{ .Session.Credit }}€</span></li>
-                    <li><strong>Invites</strong><span>{{ .Session.Invites }}</span></li>
-                    <li><a id="copy-ref" data-copy="{{ .BaseAddress }}/register?ref={{ .Session.Referral }}">Copy Referral</a></li>
-                    <li><a href="/settings">Settings</a></li>
-                    <li><a href="/logout">Logout</a></li>
-                    {{ if .Session.IsAdmin }}<li><a href="/admin">Admin</a></li>{{ end }}
-                </ul>
-            </li>
-            {{ end }}
+            <li><a href="/"><i class="material-icons">home</i><span>Home</span></a></li>
+            <li><i class="material-icons">exit_to_app</i></li>
         </ul>
     </nav>
+
+    <aside>
+        <ul>
+            <li><a href="/admin"><i class="material-icons">home</i></a></li>
+            <li><a href="/admin/users"><i class="material-icons">supervisor_account</i></a></li>
+            <li><a href="/admin/products"><i class="material-icons">exit_to_app</i></a></li>
+            <li><a href="/admin/promocodes"><i class="material-icons">exit_to_app</i></a></li>
+            <li><a href="/admin/orders"><i class="material-icons">shopping_cart</i></a></li>
+        </ul>
+    </aside>
 
     {{ template "content" . }}
 
