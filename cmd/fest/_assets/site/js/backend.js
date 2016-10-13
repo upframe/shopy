@@ -9,6 +9,9 @@ var singleForm,
     ];
 
 document.addEventListener("DOMContentLoaded", () => {
+    let thing;
+
+
     // Initializes the Single Form variable
     singleForm = document.getElementById("single-form");
 

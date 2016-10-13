@@ -29,8 +29,13 @@
         <td data-name="Description">{{ $product.Description }}</td>
         <td data-name="Price">{{ $product.Price }}</td>
         <td data-name="Picture">{{ $product.Picture }}</td>
-        <td data-name="Deactivated"><input type="checkbox" disabled value="second_checkbox" {{ if $product.Deactivated }}checked{{ end }}></td>
-        <td><button class="edit">&#9998;</button></td>
+        <td data-name="Deactivated">
+            <div class="checkbox">
+                <input type="checkbox" disabled value="second_checkbox" {{ if $product.Deactivated }}checked{{ end }}>
+                <label></label>
+            </div>
+        </td>
+        <td><button class="edit"><i class="material-icons">mode_edit</i></button></td>
     </tr>
     {{ end }}
 </table>
