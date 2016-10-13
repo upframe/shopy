@@ -1,41 +1,38 @@
-{{ define "title" }}Orders &bull; Upframe {{ end }}
+{{ define "title" }}Orders{{ end }}
+{{ define "header-left" }}<h1>Orders</h1>{{ end }}
+{{ define "header-right" }}
+<button id="edit" alt="Edit" title="Edit"><i class="material-icons">mode_edit</i> Edit</button>
+<button id="add"><i class="material-icons">add</i> New</button>
+{{ end }}
 {{ define "content" }}
-<main role="main" class="backend">
-    <div id="table-toolbar">
-        <h1>Orders</h1>
-        <button id="edit">&#9998; Edit</button>
-        <button id="add">&#65291; New</button>
-    </div>
-
-    <table id="orders">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>User ID</th>
-                <th>Product ID</th>
-                <th>Promocode ID</th>
-                <th>Value</th>
-                <th>Status</th>
-                <th></th>
-            </tr>
-        </thead>
-        {{range $order := .Data.Items }}
-        <tr data-id="{{ $order.ID }}">
-            <td data-name="ID">{{ $order.ID }}</td>
-            <td data-name="UserID">{{ $order.UserID }}</td>
-            <td data-name="ProductID">{{ $order.ProductID }}</td>
-            <td data-name="PromocodeID">{{ if $order.PromocodeID.Valid }}{{ $order.PromocodeID.Int64 }}{{ else }}null{{ end }}</td>
-            <td data-name="Value">{{ $order.Value }}</td>
-            <td data-name="Status">{{ $order.Status }}</td>
-            <td><button class="edit">&#9998;</button></td>
+<table id="orders">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>User ID</th>
+            <th>Product ID</th>
+            <th>Promocode ID</th>
+            <th>Value</th>
+            <th>Status</th>
+            <th></th>
         </tr>
-        {{ end }}
-    </table>
-    <div class="navigation">
-        <a {{ if .Data.HasPrevious }}href="{{ .Data.LinkPrevious }}" ><button>Previous</button></a>{{ else }}><button disabled>Previous</button>{{ end }}</a>
-        <a {{ if .Data.HasNext }}href="{{ .Data.LinkNext }}" ><button>Next</button></a>{{ else }}><button disabled>Next</button>{{ end }}</a>
-    </div>
-</main>
+    </thead>
+    {{range $order := .Data.Items }}
+    <tr data-id="{{ $order.ID }}">
+        <td data-name="ID">{{ $order.ID }}</td>
+        <td data-name="UserID">{{ $order.UserID }}</td>
+        <td data-name="ProductID">{{ $order.ProductID }}</td>
+        <td data-name="PromocodeID">{{ if $order.PromocodeID.Valid }}{{ $order.PromocodeID.Int64 }}{{ else }}null{{ end }}</td>
+        <td data-name="Value">{{ $order.Value }}</td>
+        <td data-name="Status">{{ $order.Status }}</td>
+        <td><button class="edit">&#9998;</button></td>
+    </tr>
+    {{ end }}
+</table>
+<div class="navigation">
+    <a {{ if .Data.HasPrevious }}href="{{ .Data.LinkPrevious }}" ><button>Previous</button></a>{{ else }}><button disabled>Previous</button>{{ end }}</a>
+    <a {{ if .Data.HasNext }}href="{{ .Data.LinkNext }}" ><button>Next</button></a>{{ else }}><button disabled>Next</button>{{ end }}</a>
+</div>
 
 <form method="POST" id="single-form" class="floating-box"  data-link="/admin/orders">
     <h2><span id="new-text">New Order</span><span id="edit-text">Order #<span id="barID"></span></span><span id="expand">&#9660;</span></h2>
@@ -66,6 +63,4 @@
         <button type="submit">Save</button>
     </div>
 </form>
-
-<script src="/js/backend.js"></script>
 {{ end }}
