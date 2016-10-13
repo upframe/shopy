@@ -1,13 +1,11 @@
-{{ define "title" }}Admin &bull; Upframe {{ end }}
+{{ define "title" }}Home{{ end }}
+{{ define "header-left" }}<h1>Home</h1>{{ end }}
+{{ define "header-right" }}{{ end }}
 {{ define "content" }}
-
-<main role="main" class="backend">
-    <ul>
-        <li><a href="/admin/promocodes">Promocodes</a></li>
-        <li><a href="/admin/orders">Orders</a></li>
-        <li><a href="/admin/users">Users</a></li>
-        <li><a href="/admin/products">Products</a></li>
-    </ul>
-</main>
-
+<ul>
+    <li><a href="/admin/promocodes">Promocodes</a></li>
+    <li><a href="/admin/orders">Orders</a></li>
+    <li><a href="/admin/users">Users</a></li>
+    <li><a href="/admin/products">Products</a></li>
+</ul>
 {{ end }}
