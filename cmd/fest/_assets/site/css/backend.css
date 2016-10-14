@@ -343,7 +343,7 @@ tr .checkbox {
 
 /* SINGLE FORM */
 
-#single-form {
+#editor {
     background-color: #2f3242;
     transition: .5s ease-in-out all;
     position: fixed;
@@ -358,7 +358,7 @@ tr .checkbox {
     width: 90%;
 }
 
-#single-form h2 {
+#editor h2 {
     padding: .67em;
     background-color: #2196f3;
     color: #fff;
@@ -367,7 +367,7 @@ tr .checkbox {
     text-align: left;
 }
 
-#single-form #expand {
+#editor #expand {
     position: absolute;
     top: 0;
     right: 0;
@@ -382,37 +382,41 @@ tr .checkbox {
     transition: .2s ease all;
 }
 
-#single-form>div {
+#editor>div {
     padding: .5em 1.5em 1.5em;
     overflow-y: auto;
     display: block;
     max-height: 80vh;
 }
 
-#single-form.show {
+#editor.show {
     transform: translateY(0);
 }
 
-#single-form.show #expand {
+#editor.show #expand {
     transform: rotate(0);
 }
 
-#single-form #edit-text {
+#editor #edit-text {
     display: none;
 }
 
-#single-form .flex {
+#editor .flex {
     display: flex;
 }
 
-
-#single-form .checkbox {
+#editor .checkbox {
     margin-right: 1em;
 }
 
-#single-form .checkbox label {
+#editor .checkbox label {
+    background: #2196f3;
+}
 
-background: #2196f3;
+#editor button {
+    background: #2196f3;
+    padding: .5em 2em;
+    border-radius: 5px;
 }
 
 

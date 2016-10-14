@@ -1,6 +1,6 @@
 'use strict';
 
-var singleForm,
+var editor,
     monthNames = [
         "Jan", "Feb", "Mar",
         "Apr", "May", "Jun", "Jul",
@@ -10,15 +10,15 @@ var singleForm,
 
 document.addEventListener("DOMContentLoaded", () => {
     // Initializes the Single Form variable
-    singleForm = document.getElementById("single-form");
+    editor = document.getElementById("editor");
 
     let thing;
 
-    if (singleForm) {
+    if (editor) {
         // Add an event listener to the Single Form
         document.addEventListener("click", pageClick)
-        singleForm.addEventListener('submit', submitHandler);
-        singleForm.addEventListener('keyup', escapeHandler)
+        editor.addEventListener('submit', submitHandler);
+        editor.addEventListener('keyup', escapeHandler)
 
         // Get all the edit buttons and initialize them
         var btns = document.getElementsByClassName("edit");
@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         document.getElementById('expand').addEventListener('click', function(event) {
             event.preventDefault();
-            singleForm.classList.toggle("show");
+            editor.classList.toggle("show");
         });
 
         let rows = document.querySelectorAll('tbody tr');
@@ -93,7 +93,7 @@ function refreshButtons() {
 function pageClick(event) {
     for (let i = 0; i < event.path.length; i++) {
         if (event.path[i].id == "add" ||
-            event.path[i].id == "single-form" ||
+            event.path[i].id == "editor" ||
             event.path[i].id == "delete" ||
             event.path[i].id == "edit") {
             return true;
@@ -104,44 +104,44 @@ function pageClick(event) {
         }
     }
 
-    if (singleForm.classList.contains("show")) {
-        singleForm.classList.remove("show");
+    if (editor.classList.contains("show")) {
+        editor.classList.remove("show");
     }
 }
 
 function escapeHandler(event) {
     if (event.key == "Escape") {
-        document.getElementById("single-form").classList.remove("show");
+        document.getElementById("editor").classList.remove("show");
     }
 }
 
 function newHandler(event) {
-    if (!singleForm.classList.contains("show")) {
-        singleForm.classList.add('show');
+    if (!editor.classList.contains("show")) {
+        editor.classList.add('show');
     }
 
-    clearForm(singleForm);
-    singleForm.children[1].children[3].focus();
+    clearForm(editor);
+    editor.children[1].children[3].focus();
 }
 
 function editHandler(btn) {
     btn.addEventListener("click", function(e) {
         e.preventDefault();
-        singleForm.querySelector('#edit-text').style.display = "block";
-        singleForm.querySelector('#new-text').style.display = "none";
-        singleForm.classList.add("show");
+        editor.querySelector('#edit-text').style.display = "block";
+        editor.querySelector('#new-text').style.display = "none";
+        editor.classList.add("show");
         copyRowToForm(btn.parentElement.parentElement);
-        singleForm.children[1].children[3].focus();
+        editor.children[1].children[3].focus();
     });
 }
 
 function editMultipleHandler(event) {
     event.preventDefault();
 
-    var div = singleForm.children[1];
+    var div = editor.children[1];
 
-    singleForm.querySelector('#edit-text').style.display = "block";
-    singleForm.querySelector('#new-text').style.display = "none";
+    editor.querySelector('#edit-text').style.display = "block";
+    editor.querySelector('#new-text').style.display = "none";
     document.getElementById('barID').innerHTML = "multiple";
 
     for (var x = 0; x < div.childElementCount; x++) {
@@ -164,7 +164,7 @@ function editMultipleHandler(event) {
         }
     }
 
-    singleForm.classList.add("show");
+    editor.classList.add("show");
 }
 
 function deactivateHandler(event) {
@@ -195,7 +195,7 @@ function activateHandler(event) {
         let link = "/admin/" + window.location.pathname.split("/")[2] + "/" + row.dataset.id
 
         copyRowToForm(row);
-        let data = copyFormToObject(singleForm);
+        let data = copyFormToObject(editor);
         data["Deactivated"] = false;
 
         let request = new XMLHttpRequest();
@@ -230,7 +230,7 @@ function submitHandler(event) {
     request.onreadystatechange = function() {
         if (request.readyState == 4) {
             if (request.status == 200) {
-                singleForm.className = "Down";
+                editor.className = "Down";
 
                 if (method == "PUT") {
                     copyFormToRow(document.querySelector('tr[data-id="' + data.ID + '"]'));
@@ -245,7 +245,7 @@ function submitHandler(event) {
 }
 
 function copyFormToRow(row) {
-    let form = singleForm;
+    let form = editor;
 
     if (typeof form == 'undefined') {
         return;
@@ -302,7 +302,7 @@ function getPrettyDate(date) {
 
 // Copies the information from a row to the editor form
 function copyRowToForm(row) {
-    let form = singleForm;
+    let form = editor;
 
     if (typeof form == 'undefined') {
         return;
@@ -337,8 +337,8 @@ function copyRowToForm(row) {
 function clearForm(form) {
     var div = form.children[1];
 
-    singleForm.querySelector('#edit-text').style.display = "none";
-    singleForm.querySelector('#new-text').style.display = "block";
+    editor.querySelector('#edit-text').style.display = "none";
+    editor.querySelector('#new-text').style.display = "block";
 
     for (var x = 0; x < div.childElementCount; x++) {
         let type = div.children[x].type;
