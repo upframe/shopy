@@ -12,6 +12,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // Initializes the Single Form variable
     singleForm = document.getElementById("single-form");
 
+    let thing;
+
     if (singleForm) {
         // Add an event listener to the Single Form
         document.addEventListener("click", pageClick)
@@ -23,29 +25,43 @@ document.addEventListener("DOMContentLoaded", () => {
         Array.from(btns).forEach(editHandler);
 
         // Initialize add button
-        document.getElementById("add").addEventListener("click", newHandler);
-        document.getElementById("deactivate").addEventListener("click", deactivateHandler);
-        document.getElementById("edit").addEventListener("click", editMultipleHandler);
-        document.getElementById("activate").addEventListener("click", activateHandler);
+        if (thing = document.getElementById("add")) {
+            thing.addEventListener("click", newHandler);
+        }
+        if (thing = document.getElementById("deactivate")) {
+            thing.addEventListener("click", deactivateHandler);
+        }
+        if (thing = document.getElementById("edit")) {
+            thing.addEventListener("click", editMultipleHandler);
+        }
+        if (thing = document.getElementById("activate")) {
+            thing.addEventListener("click", activateHandler);
+        }
 
         document.getElementById('expand').addEventListener('click', function(event) {
             event.preventDefault();
             singleForm.classList.toggle("show");
         });
 
-        let rows = document.querySelectorAll('tr');
+        let rows = document.querySelectorAll('tbody tr');
         Array.from(rows).forEach((row) => {
             row.addEventListener('click', function(event) {
+                if (event.target.innerHTML == 'mode_edit') return;
                 this.classList.toggle('highlight');
+                refreshButtons();
             });
         });
     }
 
     highlight();
+    refreshButtons();
 });
 
 function highlight() {
     let hash = window.location.hash.replace('#', '');
+
+    if (hash === '') return;
+
     let items = hash.split(',')
 
     document.querySelector('tr[data-id="' + items[0] + '"]').scrollIntoView();
@@ -54,6 +70,24 @@ function highlight() {
         if (typeof row == 'undefined' || row == null) continue;
         row.classList.add('highlight');
     }
+}
+
+function refreshButtons() {
+    let selected = document.querySelectorAll('tr.highlight'),
+        deactivate = document.getElementById("deactivate"),
+        edit = document.getElementById("edit"),
+        activate = document.getElementById("activate");
+
+    if (selected.length == 0) {
+        if (deactivate) deactivate.setAttribute("disabled", "true");
+        if (edit) edit.setAttribute("disabled", "true");
+        if (activate) activate.setAttribute("disabled", "true");
+        return;
+    }
+
+    if (deactivate) deactivate.removeAttribute("disabled");
+    if (edit) edit.removeAttribute("disabled");
+    if (activate) activate.removeAttribute("disabled");
 }
 
 function pageClick(event) {

@@ -69,8 +69,10 @@
         <label for="Expires">Expiration Date (UTC)</label>
         <input name="Expires" id="Expires" required type="datetime-local" value="">
 
-        <input name="Deactivated" id="Deactivated" type="checkbox">
-        <label for="Deactivated">Disabled</label>
+        <div class="checkbox">
+            <input type="checkbox" disabled name="Deactivated" id="Deactivated">
+            <label for="Deactivated"></label><span>Deactivated</span>
+        </div>
 
         <button type="submit">Save</button>
     </div>
