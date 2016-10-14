@@ -424,9 +424,11 @@ aside li {
     color: #757da4;
     text-align: center;
     margin: 2.313em 0;
+    transition: .2s ease color;
     cursor: pointer;
 }
 
+aside li:hover,
 aside li.active {
     color: #f4f5f7;
 }
