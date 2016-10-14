@@ -64,8 +64,13 @@
         <label for="Picture">Picture</label>
         <input name="Picture" id="Picture" required type="text" value="">
 
-        <label for="Deactivated">Disabled</label>
-        <input name="Deactivated" id="Deactivated" type="checkbox">
+        <div class="flex">
+            <div class="checkbox">
+                <input type="checkbox" name="Deactivated" id="Deactivated">
+                <label for="Deactivated"></label>
+            </div>
+            <label for="Deactivated">Deactivated</label>
+        </div>
 
         <button type="submit">Save</button>
     </div>

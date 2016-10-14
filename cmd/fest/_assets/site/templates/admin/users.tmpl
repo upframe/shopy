@@ -90,14 +90,29 @@
         <label for="Credit">Credit</label>
         <input name="Credit" id="Credit" required type="number" value="0">
 
-        <input name="Confirmed" id="Confirmed" required type="checkbox">
-        <label for="Confirmed">Confirmed</label>
+        <div class="flex">
+            <div class="checkbox">
+                <input type="checkbox" name="Confirmed" id="Confirmed">
+                <label for="Confirmed"></label>
+            </div>
+            <label for="Confirmed">Confirmed</label>
+        </div>
 
-        <input name="Admin" id="Admin" required type="checkbox">
-        <label for="Admin">Admin</label>
+        <div class="flex">
+            <div class="checkbox">
+                <input type="checkbox" name="Admin" id="Admin">
+                <label for="Admin"></label>
+            </div>
+            <label for="Admin">Admin</label>
+        </div>
 
-        <input name="Deactivated" id="Deactivated" required type="checkbox">
-        <label for="Deactivated">Disabled</label>
+        <div class="flex">
+            <div class="checkbox">
+                <input type="checkbox" name="Deactivated" id="Deactivated">
+                <label for="Deactivated"></label>
+            </div>
+            <label for="Deactivated">Deactivated</label>
+        </div>
 
         <button type="submit">Save</button>
     </div>
