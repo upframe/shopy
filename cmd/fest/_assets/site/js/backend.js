@@ -294,7 +294,7 @@ function copyRowToForm(row) {
                 input.value = new Date(row.children[x].innerHTML).toISOString().substr(0, 16);
                 break;
             case "checkbox":
-                input.checked = row.children[x].querySelector('input[type="checkbox"]').checked;
+                input.checked = row.children[x].children[0].checked;
                 break;
             default:
                 input.value = row.children[x].innerHTML;
