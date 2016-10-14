@@ -60,18 +60,26 @@
         <label for="Code">Code</label>
         <input name="Code" id="Code" required type="text" value="">
 
-        <input name="Percentage" id="Percentage" type="checkbox">
-        <label for="Percentage">Percentage</label>
-
         <label for="Discount">Discount</label>
         <input name="Discount" id="Discount" required type="number" value="">
 
         <label for="Expires">Expiration Date (UTC)</label>
         <input name="Expires" id="Expires" required type="datetime-local" value="">
 
-        <div class="checkbox">
-            <input type="checkbox" disabled name="Deactivated" id="Deactivated">
-            <label for="Deactivated"></label><span>Deactivated</span>
+        <div class="flex">
+            <div class="checkbox">
+                <input type="checkbox" name="Percentage" id="Percentage">
+                <label for="Percentage"></label>
+            </div>
+            <label for="Percentage">Percentage</label>
+        </div>
+
+        <div class="flex">
+            <div class="checkbox">
+                <input type="checkbox" name="Deactivated" id="Deactivated">
+                <label for="Deactivated"></label>
+            </div>
+            <label for="Deactivated">Deactivated</label>
         </div>
 
         <button type="submit">Save</button>

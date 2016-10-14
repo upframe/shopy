@@ -180,6 +180,7 @@ function deactivateHandler(event) {
                 if (request.status == 200) {
                     row.querySelector('td[data-name="Deactivated"] input[type="checkbox"]').checked = true;
                     row.classList.remove("highlight");
+                    refreshButtons();
                 }
             }
         }
@@ -205,6 +206,7 @@ function activateHandler(event) {
                 if (request.status == 200) {
                     row.querySelector('td[data-name="Deactivated"] input[type="checkbox"]').checked = false;
                     row.classList.remove("highlight");
+                    refreshButtons();
                 }
             }
         }
@@ -249,36 +251,32 @@ function copyFormToRow(row) {
         return;
     }
 
-    let div = form.querySelector('div');
+    let inputs = form.querySelectorAll('input');
 
-    if (typeof div == 'undefined') {
-        return;
-    }
-
-    for (var i = 0; i < div.childElementCount; i++) {
-        let name = div.children[i].name;
+    Array.from(inputs).forEach((input) => {
+        let name = input.name;
 
         if (typeof name == 'undefined' || name == null || name == "") {
-            continue;
+            return;
         }
 
         let space = row.querySelector('td[data-name="' + name + '"]');
 
         if (typeof space == 'undefined' || space == null) {
-            continue;
+            return;
         }
 
-        switch (div.children[i].type) {
+        switch (input.type) {
             case "datetime-local":
-                space.innerHTML = getPrettyDate(new Date(div.children[i].value));
+                space.innerHTML = getPrettyDate(new Date(input.value));
                 break;
             case "checkbox":
-                space.querySelector('input[type="checkbox"]').checked = div.children[i].checked;
+                space.querySelector('input[type="checkbox"]').checked = input.checked;
                 break;
             default:
-                space.innerHTML = div.children[i].value;
+                space.innerHTML = input.value;
         }
-    }
+    });
 }
 
 // getPrettyDate puts the date in a 22 Oct 99 08:48 UTC pretty format
