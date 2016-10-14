@@ -272,7 +272,7 @@ body>nav li>ul>li a {
 }
 
 body>nav>ul ul a:hover {
-    background-color: #00e5d4;
+    background-color: #121952;
 }
 
 body>nav li>ul>li:first-child,
@@ -364,6 +364,19 @@ body>footer p {
     font-size: .9em;
     margin: 1em;
 }
+
+
+/* ---------------------------------
+------------ BACK END ONLY ---------
+------------------------------------ */
+
+.edit {
+    cursor: pointer;
+    border: 0;
+    background: none;
+    color: #212121;
+}
+
 
 /* TABLE */
 

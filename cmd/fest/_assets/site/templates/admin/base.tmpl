@@ -3,44 +3,40 @@
 <head>
     <title>{{ template "title" }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <meta name="robots" content="noindex">
-    <link href="https://fonts.googleapis.com/css?family=Roboto:400,400i,600,700" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="/css/normalize.css">
     <link rel="stylesheet" href="/css/backend.css">
 </head>
 <body>
-    <nav id="sidebar">
+    <nav>
         <ul>
-            <li><a href="/admin">Home</a></li>
-            <li><a href="/admin/promocodes">Promocodes</a></li>
-            <li><a href="/admin/orders">Orders</a></li>
-            <li><a href="/admin/users">Users</a></li>
-            <li><a href="/admin/products">Products</a></li>
+            <li><a href="/"><img src="https://upframe.xyz/img/logo.svg"></a></li>
+            <li><i class="material-icons">exit_to_app</i></li>
         </ul>
     </nav>
 
-
-    <!-- {{ if .IsLoggedIn }}
-    <li><a href="/cart">Cart</a></li>
-    <li>
-        <label for="dropdown"><img src="https://www.gravatar.com/avatar/{{ MD5 .Session.Email }}?s=200" /><span>&#9660;</span></label>
-        <input type="checkbox" id="dropdown">
+    <aside>
         <ul>
-            <li>{{ .Session.FirstName }} {{ .Session.LastName }}</li>
-            <li><strong>Credit</strong><span>{{ .Session.Credit }}€</span></li>
-            <li><strong>Invites</strong><span>{{ .Session.Invites }}</span></li>
-            <li><a id="copy-ref" data-copy="{{ .BaseAddress }}/register?ref={{ .Session.Referral }}">Copy Referral</a></li>
-            <li><a href="/settings">Settings</a></li>
-            <li><a href="/logout">Logout</a></li>
-            {{ if .Session.IsAdmin }}<li><a href="/admin">Admin</a></li>{{ end }}
+            <li><a href="/admin" alt="Home" title="Home"><i class="material-icons">home</i></a></li>
+            <li><a href="/admin/users" alt="Users" title="Users"><i class="material-icons">supervisor_account</i></a></li>
+            <li><a href="/admin/products" alt="Products" title="Products"><i class="material-icons">shopping_basket</i></a></li>
+            <li><a href="/admin/promocodes" alt="Promocodes" title="Promocodes"><i class="material-icons">redeem</i></a></li>
+            <li><a href="/admin/orders" alt="Orders" title="Orders"><i class="material-icons">shopping_cart</i></a></li>
         </ul>
-    </li>
-    {{ end }} -->
+    </aside>
 
-    {{ template "content" . }}
+    <header>
+        <div>{{ template "header-left" . }}</div>
+        <div>{{ template "header-right" . }}</div>
+    </header>
 
-    <script src="/js/app.js"></script>
+    <main role="main">
+        {{ template "content" . }}
+    </main>
+
+    <script src="/js/common.js"></script>
     <script src="/js/backend.js"></script>
+    <script src="/js/vendor/smooth-scroll.js">smoothScroll.init();</script>
 </body>
 </html>
