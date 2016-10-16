@@ -55,20 +55,7 @@ func RenderHTML(w http.ResponseWriter, s *models.Session, data interface{}, temp
 			hasher.Write([]byte(s))
 			return hex.EncodeToString(hasher.Sum(nil))
 		},
-		"DisplayCents": func(cents int) string {
-			price := strconv.Itoa(cents)
-
-			if len(price) == 1 {
-				price = "0.0" + price
-			} else if len(price) == 2 {
-				price = "0." + price
-			} else {
-				cents := price[len(price)-2:]
-				price = price[0:len(price)-2] + "." + cents
-			}
-
-			return price
-		},
+		"DisplayCents": displayCents,
 	}
 
 	// For each template, add it to the the tpl variable
@@ -129,4 +116,19 @@ func RenderHTML(w http.ResponseWriter, s *models.Session, data interface{}, temp
 func Redirect(w http.ResponseWriter, r *http.Request, path string) (int, error) {
 	http.Redirect(w, r, path, http.StatusTemporaryRedirect)
 	return http.StatusOK, nil
+}
+
+func displayCents(cents int) string {
+	price := strconv.Itoa(cents)
+
+	if len(price) == 1 {
+		price = "0.0" + price
+	} else if len(price) == 2 {
+		price = "0." + price
+	} else {
+		cents := price[len(price)-2:]
+		price = price[0:len(price)-2] + "." + cents
+	}
+
+	return price
 }

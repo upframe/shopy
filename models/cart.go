@@ -1,5 +1,7 @@
 package models
 
+import "strconv"
+
 type CartItem struct {
 	*Product
 	Quantity int
@@ -22,4 +24,14 @@ func (c Cart) GetTotal() int {
 	}
 
 	return total
+}
+
+func (c Cart) GetDescription() string {
+	description := ""
+
+	for _, product := range c.Products {
+		description += strconv.Itoa(product.Quantity) + " x " + product.Name + "\n"
+	}
+
+	return description
 }

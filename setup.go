@@ -160,6 +160,15 @@ func setup(c *caddy.Controller) error {
 		return err
 	}
 
+	// Configures PayPal TODO: get from caddyfile
+	if pages.InitPayPal(
+		"AeMshfG7Rpy6zsw7GCREUBXi897HzkwuVshrf2BmYk2uU7Q4If3ax4AOJtaEqfU8lS-QymRuQYX0R9LL",
+		"EIYSLuOY6B19Yqc_2tONbjOdhHxR15w166Pa3JxiEylZZn7ZSWC7SZtpSLbOJcLS9n7fs391hZ9XY6N6",
+		development,
+	) != nil {
+		return err
+	}
+
 	// Adds the middleware to Caddy
 	mid := func(next httpserver.Handler) httpserver.Handler {
 		return Upframe{
