@@ -35,8 +35,10 @@
     <h2>Do you want to use a promocode?</h2>
     <input id="promocode" name="promocode" value="" placeholder="Coupon code">
 
+    {{ if not (eq $credit 0) }}
     <h2>Want to use some of your credits?</h2>
     <input id="credits" name="credits" type="number" value="0" min="0" max="{{ $credit }}">
+    {{ end }}
 
     <!-- TODO: handle submit with JS -->
     <input type="Submit">
