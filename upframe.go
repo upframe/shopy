@@ -88,6 +88,8 @@ func (u Upframe) ServeHTTP(w http.ResponseWriter, r *http.Request) (int, error) 
 		return pages.CheckoutPOST(w, r, s)
 	case r.URL.Path == "/coupon/validate" && r.Method == http.MethodPost:
 		return pages.ValidatePromocode(w, r, s)
+	case r.URL.Path == "/myorders" && r.Method == http.MethodGet:
+		return pages.MyOrdersGET(w, r, s)
 	case r.URL.Path == "/reset" && r.Method == http.MethodGet:
 		return pages.ResetGET(w, r, s)
 	case r.URL.Path == "/reset" && r.Method == http.MethodPost:

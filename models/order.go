@@ -67,3 +67,16 @@ func GetOrders(first, limit int, order string) ([]Generic, error) {
 
 	return generics, err
 }
+
+// GetAllOrdersByUser gets all user orders
+func GetAllOrdersByUser(user int) ([]Generic, error) {
+	orders := []Order{}
+	err := db.Select(&orders, "SELECT * FROM orders WHERE user_id =?", user)
+
+	generics := make([]Generic, len(orders))
+	for i := range orders {
+		generics[i] = orders[i]
+	}
+
+	return generics, err
+}
