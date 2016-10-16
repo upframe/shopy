@@ -6,8 +6,8 @@ import (
 	"github.com/upframe/fest/models"
 )
 
-// MyOrdersGET displays user orders
-func MyOrdersGET(w http.ResponseWriter, r *http.Request, s *models.Session) (int, error) {
+// OrdersGET displays user orders
+func OrdersGET(w http.ResponseWriter, r *http.Request, s *models.Session) (int, error) {
 	if !s.IsLoggedIn() {
 		return Redirect(w, r, "/login")
 	}
