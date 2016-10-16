@@ -58,78 +58,97 @@ func CheckoutPOST(w http.ResponseWriter, r *http.Request, s *models.Session) (in
 
 	switch strings.Replace(r.URL.Path, "/checkout/", "", -1) {
 	case "discounts":
-		cart, err := s.GetCart()
-		if err != nil {
-			return http.StatusInternalServerError, err
-		}
-
-		// Lock the cart
-		cartCookie := s.Values["Cart"].(models.CartCookie)
-		cartCookie.Locked = true
-
-		order := models.OrderCookie{}
-		order.Total = cart.GetTotal()
-
-		// Obtain the credits and discount them
-		credits := r.FormValue("credits")
-		if len(credits) == 0 {
-			credits = "0"
-		}
-
-		order.Credits, err = strconv.Atoi(credits)
-		if err != nil {
-			return http.StatusInternalServerError, err
-		}
-
-		if s.User.Credit < order.Credits || order.Credits > order.Total {
-			return http.StatusBadRequest, nil
-		}
-
-		order.Total -= order.Credits
-
-		// Gets the promocode
-		promocode := r.FormValue("promocode")
-
-		if promocode != "" {
-			// Gets the promocode and checks for errors
-			var generic models.Generic
-			generic, err = models.GetPromocodeByCode(r.FormValue("promocode"))
-			if err == sql.ErrNoRows {
-				return http.StatusNotFound, nil
-			}
-
-			if err != nil {
-				return http.StatusInternalServerError, err
-			}
-
-			promo := generic.(*models.Promocode)
-			order.Promocode.Code = promo.Code
-
-			if promo.Percentage {
-				order.Promocode.DiscountAmount = (promo.Discount * order.Total) / 100
-				order.Promocode.DiscountAmount = order.Total - order.Promocode.DiscountAmount
-			} else {
-				order.Promocode.DiscountAmount = promo.Discount
-			}
-
-			order.Total -= order.Promocode.DiscountAmount
-		}
-
-		// Saves the cookie
-		s.Values["Cart"] = cartCookie
-		s.Values["Order"] = order
-		err = s.Save(r, w)
-		if err != nil {
-			return http.StatusInternalServerError, err
-		}
-
-		return http.StatusOK, nil
+		return checkoutPOSTDiscount(w, r, s)
 	case "pay":
-		// TODO
-		return http.StatusNotImplemented, nil
+		return checkoutPOSTPay(w, r, s)
 	default:
 		return http.StatusNotFound, nil
 	}
+}
+
+func checkoutPOSTDiscount(w http.ResponseWriter, r *http.Request, s *models.Session) (int, error) {
+	cart, err := s.GetCart()
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	// Lock the cart
+	cartCookie := s.Values["Cart"].(models.CartCookie)
+	cartCookie.Locked = true
+
+	order := models.OrderCookie{}
+	order.Total = cart.GetTotal()
+
+	// Obtain the credits and discount them
+	credits := r.FormValue("credits")
+	if len(credits) == 0 {
+		credits = "0"
+	}
+
+	order.Credits, err = strconv.Atoi(credits)
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	if s.User.Credit < order.Credits || order.Credits > order.Total {
+		return http.StatusBadRequest, nil
+	}
+
+	order.Total -= order.Credits
+
+	// Gets the promocode
+	promocode := r.FormValue("promocode")
+
+	if promocode != "" {
+		// Gets the promocode and checks for errors
+		var generic models.Generic
+		generic, err = models.GetPromocodeByCode(r.FormValue("promocode"))
+		if err == sql.ErrNoRows {
+			return http.StatusNotFound, nil
+		}
+
+		if err != nil {
+			return http.StatusInternalServerError, err
+		}
+
+		promo := generic.(*models.Promocode)
+		order.Promocode.Code = promo.Code
+
+		if promo.Percentage {
+			order.Promocode.DiscountAmount = (promo.Discount * order.Total) / 100
+			order.Promocode.DiscountAmount = order.Total - order.Promocode.DiscountAmount
+		} else {
+			order.Promocode.DiscountAmount = promo.Discount
+		}
+
+		order.Total -= order.Promocode.DiscountAmount
+	}
+
+	// Saves the cookie
+	s.Values["Cart"] = cartCookie
+	s.Values["Order"] = order
+	err = s.Save(r, w)
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	return http.StatusOK, nil
+}
+
+func checkoutPOSTPay(w http.ResponseWriter, r *http.Request, s *models.Session) (int, error) {
+	/*
+
+		// IF: STRIPEs
+		params := &stripe.ChargeParams{
+			Amount:   1000,
+			Currency: currency.USD,
+			Card:     &stripe.CardParams{Token: "tok_14dlcYGBoqcjK6A1Th7tPXfJ"},
+			Desc:     "Gopher t-shirt",
+		}
+
+		ch, err := charge.New(params) */
+
+	return http.StatusNotImplemented, nil
 }
 
 // ValidatePromocode validates a promocode and returns the discount amount

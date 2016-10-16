@@ -81,6 +81,8 @@ func setup(c *caddy.Controller) error {
 
 	dbPort = "3306"
 
+	// TODO: add stripe.Key = "tGN0bIwXnHdwOa85VABjPdSn8nWY7G7I"
+
 	// Gets the options from the Caddyfile
 	for c.Next() {
 		for c.NextBlock() {
