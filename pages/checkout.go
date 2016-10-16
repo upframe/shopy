@@ -27,7 +27,7 @@ func CheckoutGET(w http.ResponseWriter, r *http.Request, s *models.Session) (int
 			return http.StatusInternalServerError, err
 		}
 
-		return RenderHTML(w, s, cart, "checkout-discounts")
+		return RenderHTML(w, s, cart, "checkout/discounts")
 	case "pay":
 		data := map[string]interface{}{}
 
@@ -38,7 +38,7 @@ func CheckoutGET(w http.ResponseWriter, r *http.Request, s *models.Session) (int
 		}
 
 		data["Order"] = s.Values["Order"].(models.OrderCookie)
-		return RenderHTML(w, s, data, "checkout-pay")
+		return RenderHTML(w, s, data, "checkout/pay")
 	default:
 		return http.StatusNotFound, nil
 	}

@@ -24,7 +24,7 @@ func RegisterGET(w http.ResponseWriter, r *http.Request, s *models.Session) (int
 		link, err := models.GetLinkByHash(r.URL.Query().Get("confirm"))
 
 		if err != nil || link.Used || link.Expires.Unix() < time.Now().Unix() || link.Path != "/register" {
-			return RenderHTML(w, s, nil, "confirmation-expired") // create a file for this
+			return RenderHTML(w, s, nil, "invalid-link")
 		}
 
 		g, err := models.GetUserByID(link.User)
@@ -59,16 +59,16 @@ func RegisterGET(w http.ResponseWriter, r *http.Request, s *models.Session) (int
 	// is invitation only
 	if err != nil {
 		log.Println(err)
-		return RenderHTML(w, s, nil, "register-invite")
+		return RenderHTML(w, s, nil, "register/invite")
 	}
 
 	// If the user exists, but doesn't have invites, show that information
 	if referrer.Invites < 1 {
-		return RenderHTML(w, s, referrer, "register-gone")
+		return RenderHTML(w, s, referrer, "register/gone")
 	}
 
 	// Otherwise, show the registration page
-	return RenderHTML(w, s, nil, "register")
+	return RenderHTML(w, s, nil, "register/form")
 }
 
 // RegisterPOST handles the POST http request in register page

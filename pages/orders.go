@@ -17,5 +17,5 @@ func OrdersGET(w http.ResponseWriter, r *http.Request, s *models.Session) (int, 
 		return http.StatusInternalServerError, err
 	}
 
-	return RenderHTML(w, s, data, "myorder")
+	return RenderHTML(w, s, data, "orders")
 }
