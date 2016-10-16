@@ -3,7 +3,7 @@
 
 {{ $credit := .Session.Credit }}
 {{ with .Data }}
-<form role="main" class="floating-box checkout" method="POST">
+<form role="main" class="floating-box checkout" id="checkout-discounts" method="POST">
     <h1>Checkout</h1>
 
     <div id="form-error"></div>
@@ -38,6 +38,7 @@
     <h2>Want to use some of your credits?</h2>
     <input id="credits" name="credits" type="number" value="0" min="0" max="{{ $credit }}">
 
+    <!-- TODO: handle submit with JS -->
     <input type="Submit">
 </form>
 {{ end }}
