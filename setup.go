@@ -15,9 +15,6 @@ import (
 	"github.com/upframe/fest/pages"
 )
 
-// TODO: CHANGE THIS IN PRODUCTION
-const development = true
-
 var (
 	// Store stores the session cookies and help us to handle them
 	store *sessions.CookieStore
@@ -30,33 +27,6 @@ var (
 )
 
 func init() {
-	var keyPairs [][]byte
-
-	if !development {
-		// Generates 5 random key pairs to secure the cookies
-		// NOTE: generating this at startup will automatically log out the
-		// users when the server is rebooted
-		keyPairs = [][]byte{}
-		for i := 0; i < 5; i++ {
-			keyPairs = append(keyPairs, make([]byte, 32))
-			_, err := io.ReadFull(rand.Reader, keyPairs[i])
-			if err != nil {
-				log.Fatal(err)
-			}
-		}
-	} else {
-		keyPairs = [][]byte{[]byte("HEY")}
-	}
-
-	// Creates the new cookie session;
-	store = sessions.NewCookieStore(keyPairs...)
-	store.Options = &sessions.Options{
-		Path:     "/",
-		MaxAge:   3600 * 3,
-		Secure:   !development,
-		HttpOnly: true,
-	}
-
 	// Regists the caddy middleware
 	caddy.RegisterPlugin("fest", caddy.Plugin{
 		ServerType: "http",
@@ -67,21 +37,19 @@ func init() {
 func setup(c *caddy.Controller) error {
 	// Gets the base address
 	cfg := httpserver.GetConfig(c)
-	store.Options.Domain = cfg.Host()
 
 	pages.BaseAddress = cfg.Addr.String()
 	pages.Templates = filepath.Clean(cfg.Root+"/templates/") + string(filepath.Separator)
 	email.Templates = pages.Templates + "email" + string(filepath.Separator)
 
 	var (
-		smtpUser, smtpPass, smtpHost, smtpPort string
-		dbUser, dbPass, dbHost, dbPort, dbName string
 		err                                    error
+		smtpUser, smtpPass, smtpHost, smtpPort string
+		dbUser, dbPass, dbHost, dbName         string
+		dbPort                                 = "3306"
+		development                            = false
+		keyPairs                               [][]byte
 	)
-
-	dbPort = "3306"
-
-	// TODO: add stripe.Key = "tGN0bIwXnHdwOa85VABjPdSn8nWY7G7I"
 
 	// Gets the options from the Caddyfile
 	for c.Next() {
@@ -150,9 +118,38 @@ func setup(c *caddy.Controller) error {
 				if err != nil {
 					return err
 				}
+			case "development":
+				development = true
 			}
 		}
 	}
+
+	// Sets up the cookies
+	if !development {
+		// Generates 5 random key pairs to secure the cookies
+		// NOTE: generating this at startup will automatically log out the
+		// users when the server is rebooted
+		keyPairs = [][]byte{}
+		for i := 0; i < 5; i++ {
+			keyPairs = append(keyPairs, make([]byte, 32))
+			_, err = io.ReadFull(rand.Reader, keyPairs[i])
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+	} else {
+		keyPairs = [][]byte{[]byte("HEY")}
+	}
+
+	// Creates the new cookie session;
+	store = sessions.NewCookieStore(keyPairs...)
+	store.Options = &sessions.Options{
+		Path:     "/",
+		MaxAge:   3600 * 3,
+		Secure:   cfg.Addr.Scheme == "https",
+		HttpOnly: true,
+	}
+	store.Options.Domain = cfg.Host()
 
 	// Configures the email
 	email.InitSMTP(smtpUser, smtpPass, smtpHost, smtpPort)
