@@ -54,6 +54,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (window.location.pathname === "/checkout/discounts") {
         document.getElementById("promocode").addEventListener("keyup", validateCoupon)
+        document.getElementById("checkout-discount").addEventListener("submit", function(e) {
+            if( document.getElementById("credits").value >= document.getElementById("credits").getAttribute("max")) {
+                e.preventDefault();
+                formError("", "");
+            }
+        })
     }
 });
 
