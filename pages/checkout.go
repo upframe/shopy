@@ -155,14 +155,13 @@ func checkoutPOSTPay(w http.ResponseWriter, r *http.Request, s *models.Session) 
 // if it exists.
 func ValidatePromocode(w http.ResponseWriter, r *http.Request, s *models.Session) (int, error) {
 	if !s.IsLoggedIn() {
-		return http.StatusUnauthorized, nil
+		return http.StatusUnauthorized, errNotLoggedIn
 	}
 
 	code := new(bytes.Buffer)
 	code.ReadFrom(r.Body)
 
 	p, err := models.GetPromocodeByCode(string(code.Bytes()))
-	promocode := p.(*models.Promocode)
 	if err == sql.ErrNoRows {
 		return http.StatusNotFound, nil
 	}
@@ -170,6 +169,6 @@ func ValidatePromocode(w http.ResponseWriter, r *http.Request, s *models.Session
 		return http.StatusInternalServerError, err
 	}
 
-	w.Write([]byte(strconv.Itoa(promocode.Discount)))
+	w.Write([]byte(strconv.Itoa(p.(*models.Promocode).Discount)))
 	return http.StatusOK, nil
 }

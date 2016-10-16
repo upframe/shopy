@@ -1,100 +1,158 @@
 package pages
 
 import (
+	"bytes"
+	"database/sql"
+	"encoding/json"
+	"math"
 	"net/http"
+	"strconv"
+	"strings"
 
 	"github.com/upframe/fest/models"
 )
 
 const itemsPerPage = 50
 
-// AdminPromocodesGET handles the GET request for every /admin/promocodes/... URLs
-func AdminPromocodesGET(w http.ResponseWriter, r *http.Request, s *models.Session) (int, error) {
-	return AdminGenericGET(w, r, s, "promocodes", models.GetPromocodes)
+type adminTable struct {
+	Items        []models.Generic
+	HasPrevious  bool
+	LinkPrevious string
+	HasNext      bool
+	LinkNext     string
 }
 
-// AdminPromocodesPOST creates a new item
-func AdminPromocodesPOST(w http.ResponseWriter, r *http.Request) (int, error) {
-	return AdminGenericPOST(w, r, new(models.Promocode))
+// AdminGenericGET handles the three types of GET requests
+func AdminGenericGET(w http.ResponseWriter, r *http.Request, s *models.Session, kind string, fn models.GetGenerics) (int, error) {
+	// Redirects the user to the first page if he's on /admin/item.
+	if r.URL.Path == "/admin/"+kind {
+		return Redirect(w, r, "/admin/"+kind+"/page/1")
+	}
+
+	// If the user wants to create a new promocode, redirect to /item#new and the
+	// javascript will take of the rest.
+	if r.URL.Path == "/admin/"+kind+"/new" {
+		return RenderHTML(w, s, nil, "admin/"+kind+"-new")
+	}
+
+	// Checks if the user is in a table page.
+	if !strings.HasPrefix(r.URL.Path, "/admin/"+kind+"/page/") {
+		// Gets the number of the item and checks for errors
+		id, err := strconv.Atoi(strings.Replace(r.URL.Path, "/admin/"+kind+"/", "", 1))
+		if err != nil {
+			return http.StatusNotFound, err
+		}
+
+		// Calculates the number of the page
+		page := int(math.Ceil(float64(id) / float64(itemsPerPage)))
+		return Redirect(w, r, "/admin/"+kind+"/page/"+strconv.Itoa(page)+"#"+strconv.Itoa(id))
+	}
+
+	// Gets the number of the page.
+	page, err := strconv.Atoi(strings.Replace(r.URL.Path, "/admin/"+kind+"/page/", "", 1))
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	data := &adminTable{}
+	// Calculates the offset and gets the item.
+	offset := (page - 1) * itemsPerPage
+	data.Items, err = fn(offset, itemsPerPage, "id")
+
+	// Checks if there are any item. If we're in the first page, show
+	// it anyway so we're able to create new item.
+	if page != 1 && len(data.Items) == 0 {
+		return http.StatusNotFound, err
+	}
+
+	// Checks for other errors.
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	data.HasPrevious = page != 1
+	data.LinkPrevious = "/admin/" + kind + "/page/" + (strconv.Itoa(page - 1))
+
+	total, err := (models.GetTableRecords(kind))
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	data.HasNext = total > (itemsPerPage * page)
+	data.LinkNext = "/admin/" + kind + "/page/" + strconv.Itoa(page+1)
+
+	// Show the page with the table.
+	return RenderHTML(w, s, data, "admin/"+kind)
 }
 
-// AdminPromocodesDELETE deactivates a promocode
-func AdminPromocodesDELETE(w http.ResponseWriter, r *http.Request) (int, error) {
-	return AdminGenericDELETE(w, r, "promocodes", models.GetPromocode)
+// AdminGenericPOST creates a new item
+func AdminGenericPOST(w http.ResponseWriter, r *http.Request, item models.Generic) (int, error) {
+	// Get the JSON information
+	rawBuffer := new(bytes.Buffer)
+	rawBuffer.ReadFrom(r.Body)
+
+	// Parses the JSON into the promocode object and checks for errors
+	err := json.Unmarshal(rawBuffer.Bytes(), item)
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	// Inserts the promocode into the database and checks for errors
+	id, err := item.Insert()
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	w.Write([]byte(strconv.Itoa(int(id))))
+	return http.StatusOK, nil
 }
 
-// AdminPromocodesPUT changes a promocode
-func AdminPromocodesPUT(w http.ResponseWriter, r *http.Request) (int, error) {
-	return AdminGenericPUT(w, r, new(models.Promocode), models.UpdateAll)
+// AdminGenericDELETE deletes an item
+func AdminGenericDELETE(w http.ResponseWriter, r *http.Request, kind string, fn models.GetGeneric) (int, error) {
+	// Removes the "/admin/kind/" part from the URL and converts the integer
+	// string into a integer variable. Checks for errors
+	id, err := strconv.Atoi(strings.Replace(r.URL.Path, "/admin/"+kind+"/", "", 1))
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	// Gets the item and checks if it exists
+	item, err := fn(id)
+	if err == sql.ErrNoRows {
+		return http.StatusNotFound, err
+	}
+
+	// Checks for additional errors
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	// Deactivates the item and checks for errors
+	err = item.Deactivate()
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	return http.StatusOK, nil
 }
 
-// AdminOrdersGET is
-func AdminOrdersGET(w http.ResponseWriter, r *http.Request, s *models.Session) (int, error) {
-	return AdminGenericGET(w, r, s, "orders", models.GetOrders)
-}
+// AdminGenericPUT updates an item
+func AdminGenericPUT(w http.ResponseWriter, r *http.Request, item models.Generic, fields ...string) (int, error) {
+	// Get the JSON information
+	rawBuffer := new(bytes.Buffer)
+	rawBuffer.ReadFrom(r.Body)
 
-// AdminOrdersPOST is
-func AdminOrdersPOST(w http.ResponseWriter, r *http.Request) (int, error) {
-	return AdminGenericPOST(w, r, new(models.Order))
-}
+	// Parses the JSON into the item object and checks for errors
+	err := json.Unmarshal(rawBuffer.Bytes(), item)
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
 
-// AdminOrdersDELETE is
-func AdminOrdersDELETE(w http.ResponseWriter, r *http.Request) (int, error) {
-	return AdminGenericDELETE(w, r, "orders", models.GetOrder)
-}
+	// Updates the item into the database and checks for errors
+	err = item.Update(fields...)
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
 
-// AdminOrdersPUT is
-func AdminOrdersPUT(w http.ResponseWriter, r *http.Request) (int, error) {
-	return AdminGenericPUT(w, r, new(models.Order), models.UpdateAll)
-}
-
-// AdminUsersGET is
-func AdminUsersGET(w http.ResponseWriter, r *http.Request, s *models.Session) (int, error) {
-	return AdminGenericGET(w, r, s, "users", models.GetUsers)
-}
-
-// AdminUsersPOST is
-func AdminUsersPOST(w http.ResponseWriter, r *http.Request) (int, error) {
-	return AdminGenericPOST(w, r, new(models.User))
-}
-
-// AdminUsersDELETE is
-func AdminUsersDELETE(w http.ResponseWriter, r *http.Request) (int, error) {
-	return AdminGenericDELETE(w, r, "users", models.GetUserByID)
-}
-
-// AdminUsersPUT is
-func AdminUsersPUT(w http.ResponseWriter, r *http.Request) (int, error) {
-	// In Users, we do not update: password_hash, password_salt, referral,
-	// nor referrer
-	return AdminGenericPUT(w, r, new(models.User), "id",
-		"first_name",
-		"last_name",
-		"email",
-		"address",
-		"invites",
-		"credit",
-		"confirmed",
-		"admin",
-		"deactivated")
-}
-
-// AdminProductsGET is
-func AdminProductsGET(w http.ResponseWriter, r *http.Request, s *models.Session) (int, error) {
-	return AdminGenericGET(w, r, s, "products", models.GetProducts)
-}
-
-// AdminProductsPOST is
-func AdminProductsPOST(w http.ResponseWriter, r *http.Request) (int, error) {
-	return AdminGenericPOST(w, r, new(models.Product))
-}
-
-// AdminProductsDELETE is
-func AdminProductsDELETE(w http.ResponseWriter, r *http.Request) (int, error) {
-	return AdminGenericDELETE(w, r, "products", models.GetProduct)
-}
-
-// AdminProductsPUT is
-func AdminProductsPUT(w http.ResponseWriter, r *http.Request) (int, error) {
-	return AdminGenericPUT(w, r, new(models.Product), models.UpdateAll)
+	return http.StatusOK, nil
 }

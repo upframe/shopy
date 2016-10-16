@@ -26,7 +26,7 @@ func CartGET(w http.ResponseWriter, r *http.Request, s *models.Session) (int, er
 // CartPOST adds a product to the cart
 func CartPOST(w http.ResponseWriter, r *http.Request, s *models.Session) (int, error) {
 	if !s.IsLoggedIn() {
-		return http.StatusUnauthorized, nil
+		return http.StatusUnauthorized, errNotLoggedIn
 	}
 
 	id, err := strconv.Atoi(strings.Replace(r.URL.Path, "/cart/", "", -1))

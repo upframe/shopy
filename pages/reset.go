@@ -27,7 +27,7 @@ func ResetGET(w http.ResponseWriter, r *http.Request, s *models.Session) (int, e
 			return http.StatusInternalServerError, err
 		}
 
-		return RenderHTML(w, s, link.User, "reset-form")
+		return RenderHTML(w, s, link.User, "reset/form")
 	}
 	return RenderHTML(w, s, nil, "reset")
 }
