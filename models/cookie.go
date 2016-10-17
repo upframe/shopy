@@ -7,6 +7,7 @@ type OrderCookie struct {
 	Promocode struct {
 		Code           string
 		DiscountAmount int
+		ID             int
 	}
 	Credits int
 	Total   int

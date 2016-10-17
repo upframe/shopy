@@ -49,7 +49,9 @@ func CartPOST(w http.ResponseWriter, r *http.Request, s *models.Session) (int, e
 	}
 
 	cart := s.Values["Cart"].(models.CartCookie)
-
+	if cart.Locked {
+		return http.StatusForbidden, nil
+	}
 	if _, ok := cart.Products[id]; ok {
 		// If the Product is already in the cart, increment the quantity
 		// Notice that in order for this to work, we have to use pointers
@@ -82,6 +84,9 @@ func CartDELETE(w http.ResponseWriter, r *http.Request, s *models.Session) (int,
 
 	// Remove one item of this type from the cart
 	cart := s.Values["Cart"].(models.CartCookie)
+	if cart.Locked {
+		return http.StatusForbidden, nil
+	}
 	if _, ok := cart.Products[id]; ok {
 		if cart.Products[id]-1 == 0 {
 			delete(cart.Products, id)

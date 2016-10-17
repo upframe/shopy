@@ -3,6 +3,7 @@ package pages
 import (
 	"bytes"
 	"database/sql"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -81,17 +82,49 @@ func CheckoutGET(w http.ResponseWriter, r *http.Request, s *models.Session) (int
 			return http.StatusInternalServerError, err
 		}
 
-		//executeResult, err := c.ExecuteApprovedPayment(paymentID, payerID)
-		_, err = c.ExecuteApprovedPayment(paymentID, payerID)
+		executeResult, err := c.ExecuteApprovedPayment(paymentID, payerID)
 		if err != nil {
 			return http.StatusInternalServerError, err
 		}
 
-		// TODO: adicionar order à DB:
-		// criar order
-		// a order statud = executeResult.Status
-		// criar rows em orders_products com todos os produtos correspondentes a esta order
+		cart, err := s.GetCart()
+		if err != nil {
+			return http.StatusInternalServerError, err
+		}
 
+		order := s.Values["Order"].(models.OrderCookie)
+
+		o := &models.Order{
+			UserID:      s.User.ID,
+			PayPalID:    paymentID,
+			Value:       cart.GetTotal(),
+			Status:      executeResult.State,
+			PromocodeID: models.NullInt64JSON{},
+		}
+		if order.Promocode.Code == "" {
+			o.PromocodeID.Valid = false
+		} else {
+			o.PromocodeID.Valid = true
+			o.PromocodeID.Int64 = int64(order.Promocode.ID)
+		}
+
+		orderID, err := o.Insert()
+		if err != nil {
+			return http.StatusInternalServerError, err
+		}
+		fmt.Println(orderID)
+		for _, product := range cart.Products {
+			op := models.OrderProduct{
+				OrderID:   orderID,
+				ProductID: int64(product.ID),
+				Quantity:  product.Quantity,
+			}
+
+			_, err = op.Insert()
+			if err != nil {
+				return http.StatusInternalServerError, err
+			}
+		}
 		s.Values["Cart"] = &models.CartCookie{Products: map[int]int{}, Locked: false}
 		s.Values["Order"] = &models.OrderCookie{}
 
@@ -177,7 +210,7 @@ func checkoutPOSTDiscount(w http.ResponseWriter, r *http.Request, s *models.Sess
 
 		promo := generic.(*models.Promocode)
 		order.Promocode.Code = promo.Code
-
+		order.Promocode.ID = promo.ID
 		if time.Now().Unix() > promo.Expires.Unix() {
 			return http.StatusGone, nil
 		}

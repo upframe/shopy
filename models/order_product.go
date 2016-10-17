@@ -2,15 +2,17 @@ package models
 
 // OrderProduct contains the relationship between a product and an order
 type OrderProduct struct {
-	ID        int `db:"id"` // TODO: remove id or not?
-	OrderID   int `db:"order_id"`
-	ProductID int `db:"product_id"`
+	ID        int64 `db:"id"`
+	OrderID   int64 `db:"order_id"`
+	ProductID int64 `db:"product_id"`
+	Quantity  int   `db:"quantity"`
 }
 
 var orderProductColumns = []string{
 	"id",
 	"order_id",
 	"product_id",
+	"quantity",
 }
 
 // Insert inserts an order-product into the database
