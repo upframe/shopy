@@ -5,17 +5,18 @@ type Order struct {
 	ID          int           `db:"id"`
 	UserID      int           `db:"user_id"`
 	PromocodeID NullInt64JSON `db:"promocode_id"`
-	Value       int           `db:"value"`
-	Status      int           `db:"status"`
 	PayPalID    string        `db:"paypal_id"`
+	Value       int           `db:"value"`
+	Status      string        `db:"status"`
 }
 
 var orderColumns = []string{
 	"id",
 	"user_id",
 	"promocode_id",
-	"value",
 	"paypal_id",
+	"value",
+	"status",
 }
 
 // Insert inserts an order into the database
