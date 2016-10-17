@@ -2,9 +2,9 @@ package models
 
 // OrderProduct contains the relationship between a product and an order
 type OrderProduct struct {
-  ID           int           `db:"id"` // TODO: remove id or not?
-  OrderID      int           `db:"order_id"`
-  ProductID    int           `db:"product_id"`
+	ID        int `db:"id"` // TODO: remove id or not?
+	OrderID   int `db:"order_id"`
+	ProductID int `db:"product_id"`
 }
 
 var orderProductColumns = []string{
@@ -43,4 +43,3 @@ func (op OrderProduct) Deactivate() error {
 }
 
 // NOTE: incorporate this on order? Get Order returns  JOIN? Or Order should have a method like GetProducts that returns an array of OrderProduct?
-
