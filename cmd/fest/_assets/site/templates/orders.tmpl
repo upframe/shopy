@@ -1,3 +1,33 @@
 {{ define "title" }}My orders &bull; Upframe{{ end }}
 {{ define "content" }}
+    <main role="orders" class="floating-box my-orders">
+        <table id="orders">
+            <tr>
+                <th>ID</th>
+                <th>Promocode</th>
+                <th>Status</th>
+                <th>Products</th>
+                <th>Price/unit</th>
+                <th>Total</th>
+            </tr>
+            {{ range $order := .Data }}
+            <tr>
+                <td>{{ $order.ID }}</td>
+                <td>{{ $order.PromocodeCode }}</td>
+                <td style="text-transform: capitalize;">{{ $order.Status }}</td>
+                <td id="order-products">
+                    {{ range $product := $order.Products }}
+                        {{ $product.Quantity }}x {{ $product.Name }}<br>
+                    {{ end }}
+                </td>
+                <td>
+                    {{ range $product := $order.Products }}
+                        {{ DisplayCents $product.Price }}€<br>
+                    {{ end }}
+                </td>
+                <td>{{ DisplayCents $order.Value }}€</td>
+            </tr>
+            {{ end }}
+        </table>
+    </main>
 {{ end }}

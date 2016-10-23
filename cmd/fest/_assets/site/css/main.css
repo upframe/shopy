@@ -489,3 +489,11 @@ table th:first-child {
     border: 0;
     display: inline;
 }
+
+/* My orders */
+main.floating-box.my-orders {
+    max-width: 70%;
+}
+
+#order-products {
+}
