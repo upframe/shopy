@@ -8,6 +8,25 @@ type Order struct {
 	PayPalID    string        `db:"paypal_id"`
 	Value       int           `db:"value"`
 	Status      string        `db:"status"`
+	Credits     int           `db:"credits"`
+}
+
+// UserOrder will be used in /orders
+type UserOrder struct {
+	ID            int    `db:"id"`
+	PromocodeID   int    `db:"promocode_id"`
+	PromocodeCode string `db:"code"`
+	Status        string `db:"status"`
+	Value         int    `db:"value"`
+	Products      []UserOrderProduct
+}
+
+// UserOrderProduct will be part of UserOrder
+type UserOrderProduct struct {
+	ID       int    `db:"product_id"`
+	Name     string `db:"name"`
+	Price    int    `db:"price"`
+	Quantity int    `db:"quantity"`
 }
 
 var orderColumns = []string{
@@ -17,6 +36,7 @@ var orderColumns = []string{
 	"paypal_id",
 	"value",
 	"status",
+	"credits",
 }
 
 // Insert inserts an order into the database
@@ -70,14 +90,15 @@ func GetOrders(first, limit int, order string) ([]Generic, error) {
 }
 
 // GetAllOrdersByUser gets all user orders
-func GetAllOrdersByUser(user int) ([]Generic, error) {
-	orders := []Order{}
-	err := db.Select(&orders, "SELECT * FROM orders WHERE user_id =?", user)
+func GetAllOrdersByUser(user int) ([]UserOrder, error) {
+	orders := []UserOrder{}
+	err := db.Select(&orders, "SELECT o.id, pc.id as `promocode_id`, pc.code, o.status, o.value FROM upframe.orders AS o INNER JOIN upframe.promocodes AS pc ON o.promocode_id=pc.id AND o.user_id=?", user)
 
-	generics := make([]Generic, len(orders))
-	for i := range orders {
-		generics[i] = orders[i]
+	for o := range orders {
+		products := []UserOrderProduct{}
+		db.Select(&products, "SELECT op.product_id, pd.name, pd.price, op.quantity FROM upframe.orders_products as op INNER JOIN upframe.products as pd ON op.product_id=pd.id AND op.order_id=?", orders[o].ID)
+		orders[o].Products = products
 	}
 
-	return generics, err
+	return orders, err
 }

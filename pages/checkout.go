@@ -3,7 +3,6 @@ package pages
 import (
 	"bytes"
 	"database/sql"
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -112,7 +111,6 @@ func CheckoutGET(w http.ResponseWriter, r *http.Request, s *models.Session) (int
 		if err != nil {
 			return http.StatusInternalServerError, err
 		}
-		fmt.Println(orderID)
 		for _, product := range cart.Products {
 			op := models.OrderProduct{
 				OrderID:   orderID,
