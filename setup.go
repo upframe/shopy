@@ -133,6 +133,15 @@ func setup(c *caddy.Controller) error {
 				paypalSecret = c.Val()
 			case "development":
 				development = true
+			case "invite_only":
+				if !c.NextArg() {
+					pages.InviteOnly = true
+				} else {
+					pages.InviteOnly, err = strconv.ParseBool(c.Val())
+					if err != nil {
+						return err
+					}
+				}
 			}
 		}
 	}
