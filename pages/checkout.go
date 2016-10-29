@@ -32,111 +32,115 @@ func CheckoutGET(w http.ResponseWriter, r *http.Request, s *models.Session) (int
 		return Redirect(w, r, "/login")
 	}
 
-	if r.URL.Path == "/checkout" {
-		return Redirect(w, r, "/checkout/discounts")
+	cart, err := s.GetCart()
+	if err != nil {
+		return http.StatusInternalServerError, err
 	}
 
-	switch strings.Replace(r.URL.Path, "/checkout/", "", -1) {
-	case "discounts":
-		cart, err := s.GetCart()
-		if err != nil {
-			return http.StatusInternalServerError, err
-		}
-
-		return RenderHTML(w, s, cart, "checkout/discounts")
-	case "cancel":
-		cart := s.Values["Cart"].(models.CartCookie)
-		cart.Locked = false
-
-		s.Values["Order"] = &models.OrderCookie{}
-		s.Values["Cart"] = cart
-
-		err := s.Save(r, w)
-		if err != nil {
-			return http.StatusInternalServerError, err
-		}
-
-		return Redirect(w, r, "/cart")
-	case "pay":
-		data := map[string]interface{}{}
-
-		var err error
-		data["Cart"], err = s.GetCart()
-		if err != nil {
-			return http.StatusInternalServerError, err
-		}
-
-		data["Order"] = s.Values["Order"].(models.OrderCookie)
-		return RenderHTML(w, s, data, "checkout/pay")
-	case "confirm":
-		paymentID := r.URL.Query().Get("paymentId")
-		payerID := r.URL.Query().Get("PayerID")
-
-		if paymentID == "" || payerID == "" {
-			return http.StatusBadRequest, nil
-		}
-
-		_, err := c.GetAccessToken()
-		if err != nil {
-			return http.StatusInternalServerError, err
-		}
-
-		executeResult, err := c.ExecuteApprovedPayment(paymentID, payerID)
-		if err != nil {
-			return http.StatusInternalServerError, err
-		}
-
-		cart, err := s.GetCart()
-		if err != nil {
-			return http.StatusInternalServerError, err
-		}
-
-		order := s.Values["Order"].(models.OrderCookie)
-
-		o := &models.Order{
-			UserID:      s.User.ID,
-			PayPalID:    paymentID,
-			Value:       cart.GetTotal(),
-			Status:      executeResult.State,
-			PromocodeID: models.NullInt64JSON{},
-		}
-		if order.Promocode.Code == "" {
-			o.PromocodeID.Valid = false
-		} else {
-			o.PromocodeID.Valid = true
-			o.PromocodeID.Int64 = int64(order.Promocode.ID)
-		}
-
-		orderID, err := o.Insert()
-		if err != nil {
-			return http.StatusInternalServerError, err
-		}
-		for _, product := range cart.Products {
-			op := models.OrderProduct{
-				OrderID:   orderID,
-				ProductID: int64(product.ID),
-				Quantity:  product.Quantity,
-			}
-
-			_, err = op.Insert()
+	return RenderHTML(w, s, cart, "checkout")
+	/*
+		switch strings.Replace(r.URL.Path, "/checkout/", "", -1) {
+		case "discounts":
+			cart, err := s.GetCart()
 			if err != nil {
 				return http.StatusInternalServerError, err
 			}
-		}
-		s.Values["Cart"] = &models.CartCookie{Products: map[int]int{}, Locked: false}
-		s.Values["Order"] = &models.OrderCookie{}
 
-		// Saves the cookie and checks for errors
-		err = s.Save(r, w)
-		if err != nil {
-			return http.StatusInternalServerError, err
-		}
+			return RenderHTML(w, s, cart, "checkout/discounts")
+		case "cancel":
+			cart := s.Values["Cart"].(models.CartCookie)
+			cart.Locked = false
 
-		// TODO: send email
-		return Redirect(w, r, "/orders")
-	default:
-		return http.StatusNotFound, nil
-	}
+			s.Values["Order"] = &models.OrderCookie{}
+			s.Values["Cart"] = cart
+
+			err := s.Save(r, w)
+			if err != nil {
+				return http.StatusInternalServerError, err
+			}
+
+			return Redirect(w, r, "/cart")
+		case "pay":
+			data := map[string]interface{}{}
+
+			var err error
+			data["Cart"], err = s.GetCart()
+			if err != nil {
+				return http.StatusInternalServerError, err
+			}
+
+			data["Order"] = s.Values["Order"].(models.OrderCookie)
+			return RenderHTML(w, s, data, "checkout/pay")
+		case "confirm":
+			paymentID := r.URL.Query().Get("paymentId")
+			payerID := r.URL.Query().Get("PayerID")
+
+			if paymentID == "" || payerID == "" {
+				return http.StatusBadRequest, nil
+			}
+
+			_, err := c.GetAccessToken()
+			if err != nil {
+				return http.StatusInternalServerError, err
+			}
+
+			executeResult, err := c.ExecuteApprovedPayment(paymentID, payerID)
+			if err != nil {
+				return http.StatusInternalServerError, err
+			}
+
+			cart, err := s.GetCart()
+			if err != nil {
+				return http.StatusInternalServerError, err
+			}
+
+			order := s.Values["Order"].(models.OrderCookie)
+
+			o := &models.Order{
+				UserID:      s.User.ID,
+				PayPalID:    paymentID,
+				Value:       cart.GetTotal(),
+				Status:      executeResult.State,
+				PromocodeID: models.NullInt64JSON{},
+			}
+			if order.Promocode.Code == "" {
+				o.PromocodeID.Valid = false
+			} else {
+				o.PromocodeID.Valid = true
+				o.PromocodeID.Int64 = int64(order.Promocode.ID)
+			}
+
+			orderID, err := o.Insert()
+			if err != nil {
+				return http.StatusInternalServerError, err
+			}
+			for _, product := range cart.Products {
+				op := models.OrderProduct{
+					OrderID:   orderID,
+					ProductID: int64(product.ID),
+					Quantity:  product.Quantity,
+				}
+
+				_, err = op.Insert()
+				if err != nil {
+					return http.StatusInternalServerError, err
+				}
+			}
+			s.Values["Cart"] = &models.CartCookie{Products: map[int]int{}, Locked: false}
+			s.Values["Order"] = &models.OrderCookie{}
+
+			// Saves the cookie and checks for errors
+			err = s.Save(r, w)
+			if err != nil {
+				return http.StatusInternalServerError, err
+			}
+
+			// TODO: send email
+			return Redirect(w, r, "/orders")
+		default:
+			return http.StatusNotFound, nil
+		}
+	*/
 }
 
 // CheckoutPOST handles the POST request for /checkout page
