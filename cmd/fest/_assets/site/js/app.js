@@ -91,7 +91,7 @@ function validateCoupon(e) {
         if (request.readyState == 4) {
             switch (request.status) {
                 case 200:
-                    //useCoupon(request.responseText);
+                    alert(request.responseText);
                     el.classList.add("works");
                     el.classList.remove("error");
                     break;

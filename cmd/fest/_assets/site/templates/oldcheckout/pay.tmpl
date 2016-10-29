@@ -19,7 +19,7 @@
         <tr data-id="{{ $product.ID }}">
             <td data-name="Quantity">{{ $product.Quantity }}x</td>
             <td data-name="Name">{{ $product.Name }}</td>
-            <td data-name="Price">{{ $product.Price }}</td>
+            <td data-name="Price">€ {{ DisplayCents $product.Price }}</td>
         </tr>
         {{ end }}
     </table>

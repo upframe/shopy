@@ -7,7 +7,7 @@
     <h1>Cart</h1>
 
     {{ if .Locked }}
-        <p>You should <a href="/checkout/pay">finish your checkout</a> before being able to access your cart again!</p>
+        <p>You should <a href="/checkout">finish your checkout</a> before being able to access your cart again!</p>
     {{ else }}
         {{ if .Products }}
         <table id="cart">
@@ -15,7 +15,7 @@
                 <tr>
                     <th>QTY</th>
                     <th>Name</th>
-                    <th>Price</th>
+                    <th>Price/Unit</th>
                     <th></th>
                 </tr>
             </thead>
@@ -23,7 +23,7 @@
             <tr data-id="{{ $product.ID }}" data-price="{{ DisplayCents $product.Price }}">
                 <td data-name="Quantity">{{ $product.Quantity }}</td>
                 <td data-name="Name">{{ $product.Name }}</td>
-                <td data-name="Price">{{ DisplayCents $product.GetPrice }}</td>
+                <td data-name="Price">{{ DisplayCents $product.Price }}</td>
                 <td><button class="btnRemove">&#215;</button></td>
             </tr>
             {{ end }}
@@ -36,7 +36,7 @@
             </div>
         </div>
 
-        <a href="/checkout/discounts"><button>Continue &rarr;</button></a>
+        <a href="/checkout"><button>Continue &rarr;</button></a>
         {{ else }}
         <p>The car is empty. Head to the <a href="/store">store</a> and start adding some items!</p>
         {{ end }}

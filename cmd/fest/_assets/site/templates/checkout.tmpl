@@ -1,0 +1,48 @@
+{{ define "title" }}Checkout &bull; Upframe{{ end }}
+{{ define "content" }}
+
+{{ $credit := .Session.Credit }}
+{{ with .Data }}
+<form role="main" class="floating-box checkout" id="checkout-discounts" method="POST">
+    <h1>Checkout</h1>
+
+    <div id="form-error"></div>
+
+    <table id="summary">
+        <thead>
+            <tr>
+                <th>Qty</th>
+                <th>Name</th>
+                <th>Price</th>
+            </tr>
+        </thead>
+        {{ range $product := .Products }}
+        <tr data-id="{{ $product.ID }}">
+            <td data-name="Quantity">{{ $product.Quantity }}x</td>
+            <td data-name="Name">{{ $product.Name }}</td>
+            <td data-name="Price">{{ DisplayCents $product.Price }}</td>
+        </tr>
+        {{ end }}
+    </table>
+
+    <div class="information">
+        <div>
+            <span>Subtotal</span>
+            <span>€ {{ DisplayCents .GetTotal }}</span>
+        </div>
+    </div>
+
+    <h2>Do you want to use a promocode?</h2>
+    <input id="promocode" name="promocode" value="" placeholder="Coupon code">
+
+    {{ if not (eq $credit 0) }}
+    <h2>Want to use some of your credits?</h2>
+    <input id="credits" name="credits" type="number" value="0" min="0" max="{{ $credit }}">
+    {{ end }}
+
+    <!-- TODO: handle submit with JS -->
+    <input type="Submit">
+    <div id="form-error"></div>
+</form>
+{{ end }}
+{{ end }}
