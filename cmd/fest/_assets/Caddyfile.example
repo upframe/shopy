@@ -9,11 +9,13 @@ http://fest.localhost {
         db_host host
         db_name port
 
-        # This are only test data/sandbox
         smtp_user user
         smtp_pass pass
         smtp_host host
         smtp_port port
+
+        paypal_client SOMETHING
+        paypal_secret SOMETHING
 
         # Other configuration
         base_invites 5

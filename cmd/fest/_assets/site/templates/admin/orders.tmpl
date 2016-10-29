@@ -10,7 +10,7 @@
         <tr>
             <th>#</th>
             <th>User ID</th>
-            <th>Product ID</th>
+            <th>PayPal ID</th>
             <th>Promocode ID</th>
             <th>Value</th>
             <th>Status</th>
@@ -21,7 +21,7 @@
     <tr data-id="{{ $order.ID }}">
         <td data-name="ID">{{ $order.ID }}</td>
         <td data-name="UserID">{{ $order.UserID }}</td>
-        <td data-name="ProductID">{{ $order.ProductID }}</td>
+        <td data-name="PayPalID">{{ $order.PayPalID }}</td>
         <td data-name="PromocodeID">{{ if $order.PromocodeID.Valid }}{{ $order.PromocodeID.Int64 }}{{ else }}null{{ end }}</td>
         <td data-name="Value">{{ $order.Value }}</td>
         <td data-name="Status">{{ $order.Status }}</td>
@@ -45,8 +45,8 @@
         <label for="UserID">User ID</label>
         <input name="UserID" id="UserID" required type="number" value="">
 
-        <label for="ProductID">Product ID</label>
-        <input name="ProductID" id="ProductID" required type="number" value="">
+        <label for="PayPalID">PayPal ID</label>
+        <input name="PayPalID" id="PayPalID" required type="text" value="">
 
         <label for="PromocodeID">Promocode ID</label>
         <input name="PromocodeID" id="PromocodeID" type="number" value="">
