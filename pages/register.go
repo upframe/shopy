@@ -123,6 +123,11 @@ func RegisterPOST(w http.ResponseWriter, r *http.Request, s *models.Session) (in
 
 		// This is the last thing to do
 		defer func() {
+			// TODO: check if this works
+			if err != nil {
+				return
+			}
+
 			// Decrement one value from the referrer invites number and updates it in
 			// the database and checks for errors. In this case, if there is an error
 			// we will keep the registration going because it's no user-fault and the
