@@ -2,6 +2,7 @@ package pages
 
 import (
 	"database/sql"
+	"errors"
 	"log"
 	"net/http"
 	"net/mail"
@@ -121,9 +122,9 @@ func RegisterPOST(w http.ResponseWriter, r *http.Request, s *models.Session) (in
 			},
 		}
 
-		// This is the last thing to do
+		// This is the last thing to do. If there is a problem removing one invite,
+		// who cares? We just need to make sure that everything is logged!
 		defer func() {
-			// TODO: check if this works
 			if err != nil {
 				return
 			}
@@ -132,27 +133,22 @@ func RegisterPOST(w http.ResponseWriter, r *http.Request, s *models.Session) (in
 			// the database and checks for errors. In this case, if there is an error
 			// we will keep the registration going because it's no user-fault and the
 			// refferer had invites available.
-			//
-			// The error is logged using a prefix and can be checked afterwards by
-			// system administrators.
 			referrer.Invites--
 			err = referrer.Update("invites")
-
-			if err != nil {
-				log.Println("INVITE DECREMENT ERROR: " + err.Error())
-			}
 		}()
 	}
 
 	// Checks if any of the fields is empty, if so, return a 400 Bad Request error
 	if user.FirstName == "" || user.LastName == "" || user.Email == "" || r.FormValue("password") == "" {
-		return http.StatusBadRequest, nil
+		err = errors.New("First Name, Last Name, Email or Password is missing.")
+		return http.StatusBadRequest, err
 	}
 
 	// Checks if there is already an user with this email. If there is,
 	// return a 407 Conflict error.
 	if is, _ := isExistentUser(user.Email); is {
-		return http.StatusConflict, nil
+		err = errors.New("Email already registred.")
+		return http.StatusConflict, err
 	}
 
 	// Generates a unique referral hash for this user
@@ -175,8 +171,12 @@ func RegisterPOST(w http.ResponseWriter, r *http.Request, s *models.Session) (in
 		return http.StatusInternalServerError, err
 	}
 
-	// Send the confirmation email
-	return confirmationEmail(user)
+	// Send the confirmation email. We return a StatusCreated even if we
+	// get an error while sending the email. Why? Because the status response
+	// is directed to the user CREATION. The user may ask for the resending
+	// of the email if he needs to.
+	_, err = confirmationEmail(user)
+	return http.StatusCreated, err
 }
 
 func confirmationEmail(user *models.User) (int, error) {
