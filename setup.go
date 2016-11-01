@@ -1,4 +1,4 @@
-package upframe
+package fest
 
 import (
 	"crypto/rand"
@@ -46,6 +46,7 @@ func setup(c *caddy.Controller) error {
 		err                                    error
 		smtpUser, smtpPass, smtpHost, smtpPort string
 		dbUser, dbPass, dbHost, dbName         string
+		paypalClient, paypalSecret             string
 		dbPort                                 = "3306"
 		development                            = false
 		keyPairs                               [][]byte
@@ -118,8 +119,29 @@ func setup(c *caddy.Controller) error {
 				if err != nil {
 					return err
 				}
+			case "paypal_client":
+				if !c.NextArg() {
+					return c.ArgErr()
+				}
+
+				paypalClient = c.Val()
+			case "paypal_secret":
+				if !c.NextArg() {
+					return c.ArgErr()
+				}
+
+				paypalSecret = c.Val()
 			case "development":
 				development = true
+			case "invite_only":
+				if !c.NextArg() {
+					pages.InviteOnly = true
+				} else {
+					pages.InviteOnly, err = strconv.ParseBool(c.Val())
+					if err != nil {
+						return err
+					}
+				}
 			}
 		}
 	}
@@ -160,12 +182,8 @@ func setup(c *caddy.Controller) error {
 		return err
 	}
 
-	// Configures PayPal TODO: get from caddyfile
-	if pages.InitPayPal(
-		"AeMshfG7Rpy6zsw7GCREUBXi897HzkwuVshrf2BmYk2uU7Q4If3ax4AOJtaEqfU8lS-QymRuQYX0R9LL",
-		"EIYSLuOY6B19Yqc_2tONbjOdhHxR15w166Pa3JxiEylZZn7ZSWC7SZtpSLbOJcLS9n7fs391hZ9XY6N6",
-		development,
-	) != nil {
+	// Configures PayPal
+	if pages.InitPayPal(paypalClient, paypalSecret, development) != nil {
 		return err
 	}
 

@@ -2,6 +2,7 @@ package pages
 
 import (
 	"database/sql"
+	"errors"
 	"log"
 	"net/http"
 	"net/mail"
@@ -12,7 +13,10 @@ import (
 )
 
 // BaseInvites is the number of invitations the user has when creating the account
-var BaseInvites = 0
+var (
+	BaseInvites = 0
+	InviteOnly  = false
+)
 
 // RegisterGET handles the GET request for register page
 func RegisterGET(w http.ResponseWriter, r *http.Request, s *models.Session) (int, error) {
@@ -52,19 +56,21 @@ func RegisterGET(w http.ResponseWriter, r *http.Request, s *models.Session) (int
 		return http.StatusOK, nil
 	}
 
-	// Gets the referrer user
-	referrer, err := models.GetUserByReferral(r.URL.Query().Get("ref"))
+	if InviteOnly {
+		// Gets the referrer user
+		referrer, err := models.GetUserByReferral(r.URL.Query().Get("ref"))
 
-	// If the user doesn't exist show a page telling that registration
-	// is invitation only
-	if err != nil {
-		log.Println(err)
-		return RenderHTML(w, s, nil, "register/invite")
-	}
+		// If the user doesn't exist show a page telling that registration
+		// is invitation only
+		if err != nil {
+			log.Println(err)
+			return RenderHTML(w, s, nil, "register/invite")
+		}
 
-	// If the user exists, but doesn't have invites, show that information
-	if referrer.Invites < 1 {
-		return RenderHTML(w, s, referrer, "register/gone")
+		// If the user exists, but doesn't have invites, show that information
+		if referrer.Invites < 1 {
+			return RenderHTML(w, s, referrer, "register/gone")
+		}
 	}
 
 	// Otherwise, show the registration page
@@ -77,21 +83,8 @@ func RegisterPOST(w http.ResponseWriter, r *http.Request, s *models.Session) (in
 		return http.StatusBadRequest, nil
 	}
 
-	// Gets the referrer user using the ?referral= option in the URL. If it doesn't
-	// find the user, return a 403 Forbidden status
-	referrer, err := models.GetUserByReferral(r.URL.Query().Get("ref"))
-	if err != nil {
-		return http.StatusForbidden, err
-	}
-
-	// Checks if the referrer still has invites available! This is important! If
-	// it doesn't, return a 410 Status Gone
-	if referrer.Invites < 1 {
-		return http.StatusGone, nil
-	}
-
 	// Parses the form and checks for errors
-	err = r.ParseForm()
+	err := r.ParseForm()
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -104,18 +97,58 @@ func RegisterPOST(w http.ResponseWriter, r *http.Request, s *models.Session) (in
 		Invites:   BaseInvites,
 		Credit:    0,
 		Confirmed: false,
-		Referrer:  models.NullInt64JSON{NullInt64: sql.NullInt64{Int64: int64(referrer.ID), Valid: true}},
+		Referrer:  models.NullInt64JSON{NullInt64: sql.NullInt64{Int64: 0, Valid: false}},
+	}
+
+	if InviteOnly {
+		// Gets the referrer user using the ?referral= option in the URL. If it doesn't
+		// find the user, return a 403 Forbidden status
+		var referrer *models.User
+		referrer, err = models.GetUserByReferral(r.URL.Query().Get("ref"))
+		if err != nil {
+			return http.StatusForbidden, err
+		}
+
+		// Checks if the referrer still has invites available! This is important! If
+		// it doesn't, return a 410 Status Gone
+		if referrer.Invites < 1 {
+			return http.StatusGone, nil
+		}
+
+		user.Referrer = models.NullInt64JSON{
+			NullInt64: sql.NullInt64{
+				Int64: int64(referrer.ID),
+				Valid: true,
+			},
+		}
+
+		// This is the last thing to do. If there is a problem removing one invite,
+		// who cares? We just need to make sure that everything is logged!
+		defer func() {
+			if err != nil {
+				return
+			}
+
+			// Decrement one value from the referrer invites number and updates it in
+			// the database and checks for errors. In this case, if there is an error
+			// we will keep the registration going because it's no user-fault and the
+			// refferer had invites available.
+			referrer.Invites--
+			err = referrer.Update("invites")
+		}()
 	}
 
 	// Checks if any of the fields is empty, if so, return a 400 Bad Request error
 	if user.FirstName == "" || user.LastName == "" || user.Email == "" || r.FormValue("password") == "" {
-		return http.StatusBadRequest, nil
+		err = errors.New("First Name, Last Name, Email or Password is missing.")
+		return http.StatusBadRequest, err
 	}
 
 	// Checks if there is already an user with this email. If there is,
 	// return a 407 Conflict error.
 	if is, _ := isExistentUser(user.Email); is {
-		return http.StatusConflict, nil
+		err = errors.New("Email already registred.")
+		return http.StatusConflict, err
 	}
 
 	// Generates a unique referral hash for this user
@@ -138,22 +171,12 @@ func RegisterPOST(w http.ResponseWriter, r *http.Request, s *models.Session) (in
 		return http.StatusInternalServerError, err
 	}
 
-	// Decrement one value from the referrer invites number and updates it in
-	// the database and checks for errors. In this case, if there is an error
-	// we will keep the registration going because it's no user-fault and the
-	// refferer had invites available.
-	//
-	// The error is logged using a prefix and can be checked afterwards by
-	// system administrators.
-	referrer.Invites--
-	err = referrer.Update("invites")
-
-	if err != nil {
-		log.Println("INVITE DECREMENT ERROR: " + err.Error())
-	}
-
-	// Send the confirmation email
-	return confirmationEmail(user)
+	// Send the confirmation email. We return a StatusCreated even if we
+	// get an error while sending the email. Why? Because the status response
+	// is directed to the user CREATION. The user may ask for the resending
+	// of the email if he needs to.
+	_, err = confirmationEmail(user)
+	return http.StatusCreated, err
 }
 
 func confirmationEmail(user *models.User) (int, error) {
