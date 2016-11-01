@@ -3,6 +3,7 @@ package pages
 import (
 	"bytes"
 	"database/sql"
+	"encoding/json"
 	"net/http"
 	"strconv"
 	"strings"
@@ -33,6 +34,14 @@ func CheckoutGET(w http.ResponseWriter, r *http.Request, s *models.Session) (int
 	}
 
 	cart, err := s.GetCart()
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	cartCookie := s.Values["Cart"].(models.CartCookie)
+	cartCookie.Locked = true
+	s.Values["Cart"] = cartCookie
+	err = s.Save(r, w)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -289,6 +298,19 @@ func ValidatePromocode(w http.ResponseWriter, r *http.Request, s *models.Session
 		return http.StatusNotFound, nil
 	}
 
-	w.Write([]byte(strconv.Itoa(promocode.Discount)))
+	res := map[string]interface{}{}
+	res["Discount"] = promocode.Discount
+	res["Percentage"] = promocode.Percentage
+
+	marsh, err := json.MarshalIndent(res, "", "")
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	w.Header().Set("Content-Type", "applicaion/json; charset=utf-8")
+	if _, err := w.Write(marsh); err != nil {
+		return http.StatusInternalServerError, err
+	}
+
 	return http.StatusOK, nil
 }
