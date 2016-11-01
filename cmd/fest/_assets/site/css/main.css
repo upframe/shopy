@@ -490,6 +490,16 @@ table th:first-child {
     display: inline;
 }
 
+.information #promocode-value:before,
+.information #credits:before {
+    content: "€ -";
+}
+
+.information #subtotal:before,
+.information #total:before {
+    content: "€ ";
+}
+
 /* My orders */
 main.floating-box.my-orders {
     max-width: 70%;

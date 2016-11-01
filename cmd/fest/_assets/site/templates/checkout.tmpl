@@ -6,8 +6,6 @@
 <form role="main" class="floating-box checkout" id="checkout-discounts" method="POST">
     <h1>Checkout</h1>
 
-    <div id="form-error"></div>
-
     <table id="summary">
         <thead>
             <tr>
@@ -28,7 +26,21 @@
     <div class="information">
         <div>
             <span>Subtotal</span>
-            <span>€ {{ DisplayCents .GetTotal }}</span>
+            <span id="subtotal" data-cents="{{ .GetTotal }}"> {{ DisplayCents .GetTotal }}</span>
+        </div>
+        <div>
+            <span>Promocode</span>
+            <span id="promocode-value"> {{ DisplayCents 0}}</span>
+        </div>
+        {{ if not (eq $credit 0) }}
+        <div>
+            <span>Credits</span>
+            <span id="credits"> {{ DisplayCents 0}}</span>
+        </div>
+        {{ end }}
+        <div>
+            <span>Total</span>
+            <span id="total" data-cents="{{ .GetTotal }}"> {{ DisplayCents .GetTotal }}</span>
         </div>
     </div>
 
@@ -37,12 +49,14 @@
 
     {{ if not (eq $credit 0) }}
     <h2>Want to use some of your credits?</h2>
-    <input id="credits" name="credits" type="number" value="0" min="0" max="{{ $credit }}">
+    <input name="credits" type="number" value="0" min="0" max="{{ $credit }}">
     {{ end }}
 
-    <!-- TODO: handle submit with JS -->
-    <input type="Submit">
     <div id="form-error"></div>
+
+    <form method="POST">
+      <input type="submit" class="submit" value="Pay">
+    </form>
 </form>
 {{ end }}
 {{ end }}

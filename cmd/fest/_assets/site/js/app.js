@@ -52,14 +52,9 @@ document.addEventListener("DOMContentLoaded", () => {
         thing.addEventListener("submit", resetForm);
     }
 
-    if (window.location.pathname === "/checkout/discounts") {
-        document.getElementById("promocode").addEventListener("keyup", validateCoupon)
-        document.getElementById("checkout-discount").addEventListener("submit", function(e) {
-            if( document.getElementById("credits").value >= document.getElementById("credits").getAttribute("max")) {
-                e.preventDefault();
-                formError("", "");
-            }
-        })
+    if (window.location.pathname === "/checkout") {
+        document.getElementById("promocode").addEventListener("keyup", validateCoupon);
+        document.querySelector('input[name="credits"').addEventListener("change", validateCredits);
     }
 });
 
@@ -91,9 +86,10 @@ function validateCoupon(e) {
         if (request.readyState == 4) {
             switch (request.status) {
                 case 200:
-                    alert(request.responseText);
+                    useCoupon(request.responseText);
                     el.classList.add("works");
                     el.classList.remove("error");
+                    el.disabled = true;
                     break;
                 case 404:
                     el.classList.remove("works");
@@ -103,10 +99,34 @@ function validateCoupon(e) {
         }
     }
 }
-/*
-function useCoupon(discount) {
-    document.getElementById("price").innerHTML = "Total: € " + (document.getElementById("price").innerHTML.substr(7) * (1 - (discount / 100)));
-} */
+
+function useCoupon(response) {
+    var ob = JSON.parse(response),
+    total = document.getElementById("total"),
+    subtotal = document.getElementById("subtotal"),
+    promocode = document.getElementById("promocode-value"),
+    credits = document.getElementById("credits");
+
+    if (ob.Percentage) {
+        promocode.innerHTML = (((ob.Discount / 100) * subtotal.dataset.cents) / 100).toFixed(2);
+    } else {
+        promocode.innerHTML = (ob.Discount).toFixed(2);
+    }
+
+    total.innerHTML = (subtotal.innerHTML - promocode.innerHTML - credits.innerHTML).toFixed(2);
+}
+
+function validateCredits(e) {
+    let input = this;
+    if(input.value > input.max) {
+        input.value = input.max;
+    }
+
+    let credits = document.getElementById("credits"),
+        total = document.getElementById("total");
+    //credits.innerHTML = (input.value).toFixed(2);
+    //total.innerHTML = (total.innerHTML - input.value).toFixed(2);
+}
 
 function initializeStore() {
     let request = function() {
