@@ -90,7 +90,8 @@ type UserOrderProduct struct {
 }
 
 // GetAllOrdersByUser gets all user orders
-// TODO: format de sql to be easier to read; Do only two queries and process them
+// TODO: format de sql to be easier to read; Do only two queries and process them;
+// BUG: this do not retrieve promocodeless orders...
 // with Go.
 func GetAllOrdersByUser(user int) ([]UserOrder, error) {
 	orders := []UserOrder{}
