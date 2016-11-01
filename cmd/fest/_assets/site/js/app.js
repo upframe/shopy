@@ -89,7 +89,7 @@ function validateCoupon(e) {
                     useCoupon(request.responseText);
                     el.classList.add("works");
                     el.classList.remove("error");
-                    el.disabled = true;
+                    el.setAttribute("readonly", true);
                     break;
                 case 404:
                     el.classList.remove("works");
@@ -107,13 +107,16 @@ function useCoupon(response) {
     promocode = document.getElementById("promocode-value"),
     credits = document.getElementById("credits");
 
+    let base = subtotal.innerHTML * 100;
+    let discount = 0;
+
     if (ob.Percentage) {
-        promocode.innerHTML = (((ob.Discount / 100) * subtotal.dataset.cents) / 100).toFixed(2);
+        discount = ((ob.Discount / 100) * base).toFixed(0);
     } else {
-        promocode.innerHTML = (ob.Discount).toFixed(2);
+        discount = ob.Discount;
     }
 
-    total.innerHTML = (subtotal.innerHTML - promocode.innerHTML - credits.innerHTML).toFixed(2);
+    total.innerHTML = ((base - discount - credits.innerHTML) / 100).toFixed(2);
 }
 
 function validateCredits(e) {

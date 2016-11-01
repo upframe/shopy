@@ -25,7 +25,7 @@
                 <input type="checkbox" id="dropdown">
                 <ul>
                     <li>{{ .Session.FirstName }} {{ .Session.LastName }}</li>
-                    <li><strong>Credit</strong><span>{{ .Session.Credit }}€</span></li>
+                    <li><strong>Credit</strong><span>{{ .Session.Credit }}</span></li>
                     <li><strong>Invites</strong><span>{{ .Session.Invites }}</span></li>
                     <li><a href="/orders">My orders</a></li>
                     <li><a id="copy-ref" data-copy="{{ .BaseAddress }}/register?ref={{ .Session.Referral }}">Copy Referral</a></li>
