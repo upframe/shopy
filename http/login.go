@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/upframe/fest"
-	"github.com/upframe/fest/crypto"
 )
 
 // LoginHandler ...
@@ -99,7 +98,7 @@ func (h *LoginHandler) POST(w http.ResponseWriter, r *http.Request) (int, error)
 	}
 
 	// Checks the password and checks for errors
-	ok, err := crypto.CheckPassword(user, password)
+	ok, err := user.CheckPassword(password)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}

@@ -9,9 +9,7 @@ import (
 	"time"
 
 	"github.com/upframe/fest"
-	"github.com/upframe/fest/crypto"
 	"github.com/upframe/fest/email"
-	"github.com/upframe/fest/utils/random"
 )
 
 // TODO: move to domain
@@ -186,10 +184,10 @@ func (h *RegisterHandler) POST(w http.ResponseWriter, r *http.Request) (int, err
 	}
 
 	// Generates a unique referral hash for this user
-	user.Referral = random.UniqueHash(user.Email)
+	user.Referral = fest.UniqueHash(user.Email)
 
 	// Sets the password hash and salt for the user and checks for errors
-	err = crypto.SetPassword(user, r.FormValue("password"))
+	err = user.SetPassword(r.FormValue("password"))
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -215,7 +213,7 @@ func confirmationEmail(s fest.LinkService, user *fest.User) (int, error) {
 
 	link := &fest.Link{
 		Path:    "/register",
-		Hash:    random.UniqueHash(user.Email),
+		Hash:    fest.UniqueHash(user.Email),
 		User:    user.ID,
 		Used:    false,
 		Time:    &now,

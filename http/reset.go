@@ -7,9 +7,7 @@ import (
 	"time"
 
 	"github.com/upframe/fest"
-	"github.com/upframe/fest/crypto"
 	"github.com/upframe/fest/email"
-	"github.com/upframe/fest/utils/random"
 )
 
 // ResetHandler ...
@@ -100,7 +98,7 @@ func (h *ResetHandler) POST(w http.ResponseWriter, r *http.Request) (int, error)
 			return http.StatusInternalServerError, err
 		}
 
-		err = crypto.SetPassword(user, newPassword)
+		err = user.SetPassword(newPassword)
 		if err != nil {
 			return http.StatusInternalServerError, err
 		}
@@ -144,7 +142,7 @@ func (h *ResetHandler) POST(w http.ResponseWriter, r *http.Request) (int, error)
 
 	link := &fest.Link{
 		Path:    "/reset",
-		Hash:    random.UniqueHash(formEmail),
+		Hash:    fest.UniqueHash(formEmail),
 		User:    user.ID,
 		Used:    false,
 		Time:    &now,

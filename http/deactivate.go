@@ -8,7 +8,6 @@ import (
 
 	"github.com/upframe/fest"
 	"github.com/upframe/fest/email"
-	"github.com/upframe/fest/utils/random"
 )
 
 // DeactivateHandler ...
@@ -91,7 +90,7 @@ func (h *DeactivateHandler) POST(w http.ResponseWriter, r *http.Request) (int, e
 
 	link := &fest.Link{
 		Path:    "/settings/deactivate",
-		Hash:    random.UniqueHash(s.Values["Email"].(string)),
+		Hash:    fest.UniqueHash(s.Values["Email"].(string)),
 		User:    s.Values["UserID"].(int),
 		Used:    false,
 		Time:    &now,
