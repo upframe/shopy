@@ -1,0 +1,120 @@
+{{ define "title" }}Users{{ end }}
+
+{{ define "header-left" }}<h1>Users</h1>{{ end }}
+
+{{ define "header-right" }}
+<button id="edit" alt="Edit" title="Edit"><i class="material-icons">mode_edit</i> Edit</button>
+<button id="activate"><i class="material-icons">lens</i> Activate</button>
+<button id="deactivate" alt="Deactivate" title="Deactivate"><i class="material-icons">blur_on</i> Deactivate</button>
+<button id="add"><i class="material-icons">add</i> New</button>
+{{ end }}
+
+{{ define "content" }}
+<table id="users">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+            <th>Address</th>
+            <th>Invites</th>
+            <th>Credit</th>
+            <th>Confirmed</th>
+            <th>Referrer</th>
+            <th>Admin</th>
+            <th>Deactivated</th>
+            <th></th>
+        </tr>
+    </thead>
+    {{range $user := .Data.Items }}
+    <tr data-id="{{ $user.ID }}">
+        <td data-name="ID">{{ $user.ID }}</td>
+        <td data-name="FirstName">{{ $user.FirstName }}</td>
+        <td data-name="LastName">{{ $user.LastName }}</td>
+        <td data-name="Email">{{ $user.Email }}</td>
+        <td data-name="Address">{{ if $user.Address.Valid }}{{ $user.Address.String }}{{ else }}null{{ end }}</td>
+        <td data-name="Invites">{{ $user.Invites }}</td>
+        <td data-name="Credit">{{ $user.Credit }}</td>
+        <td data-name="Confirmed">
+            <div class="checkbox">
+                <input type="checkbox" disabled value="second_checkbox" {{ if $user.Confirmed }}checked{{ end }}>
+                <label></label>
+            </div>
+        </td>
+        <td>{{ if $user.Referrer.Valid }}{{ $user.Referrer.Int64 }}{{ else }}null{{ end }}</td> <!-- This is readyonly; at least for now. -->
+        <td data-name="Admin">
+            <div class="checkbox">
+                <input type="checkbox" disabled value="second_checkbox" {{ if $user.Admin }}checked{{ end }}>
+                <label></label>
+            </div>
+        </td>
+        <td data-name="Deactivated">
+            <div class="checkbox">
+                <input type="checkbox" disabled value="second_checkbox" {{ if $user.Deactivated }}checked{{ end }}>
+                <label></label>
+            </div>
+        </td>
+        <td><button class="edit"><i class="material-icons">mode_edit</i></button></td>
+    </tr>
+    {{ end }}
+</table>
+<div class="navigation">
+    <a {{ if .Data.HasPrevious }}href="{{ .Data.LinkPrevious }}" ><button>Previous</button></a>{{ else }}><button disabled>Previous</button>{{ end }}</a>
+    <a {{ if .Data.HasNext }}href="{{ .Data.LinkNext }}" ><button>Next</button></a>{{ else }}><button disabled>Next</button>{{ end }}</a>
+</div>
+
+<form method="POST" id="editor" class="floating-box"  data-link="/admin/users">
+    <h2><span id="new-text">New User</span><span id="edit-text">User #<span id="barID"></span></span><span id="expand">&#9660;</span></h2>
+
+    <div>
+        <input name="ID" id="ID" required readonly type="number" value="0">
+
+        <div id="form-error"></div>
+
+        <label for="FirstName">First name</label>
+        <input name="FirstName" id="FirstName" required type="text" value="">
+
+        <label for="LastName">Last name</label>
+        <input name="LastName" id="LastName" required type="text" value="">
+
+        <label for="Email">Email</label>
+        <input name="Email" id="Email" required type="email" value="">
+
+        <label for="Address">Address</label>
+        <input name="Address" id="Address" type="text" value="">
+
+        <label for="Invites">Invites</label>
+        <input name="Invites" id="invites" required type="number" value="0">
+
+        <label for="Credit">Credit</label>
+        <input name="Credit" id="Credit" required type="number" value="0">
+
+        <div class="flex">
+            <div class="checkbox">
+                <input type="checkbox" name="Confirmed" id="Confirmed">
+                <label for="Confirmed"></label>
+            </div>
+            <label for="Confirmed">Confirmed</label>
+        </div>
+
+        <div class="flex">
+            <div class="checkbox">
+                <input type="checkbox" name="Admin" id="Admin">
+                <label for="Admin"></label>
+            </div>
+            <label for="Admin">Admin</label>
+        </div>
+
+        <div class="flex">
+            <div class="checkbox">
+                <input type="checkbox" name="Deactivated" id="Deactivated">
+                <label for="Deactivated"></label>
+            </div>
+            <label for="Deactivated">Deactivated</label>
+        </div>
+
+        <button type="submit">Save</button>
+    </div>
+</form>
+{{ end }}

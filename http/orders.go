@@ -1,0 +1,48 @@
+package http
+
+import (
+	"net/http"
+
+	"github.com/upframe/fest"
+)
+
+// OrdersHandler ...
+type OrdersHandler struct {
+	SessionService fest.SessionService
+	OrderService   fest.OrderService
+}
+
+func (h *OrdersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	var (
+		code int
+		err  error
+	)
+
+	switch r.Method {
+	case http.MethodGet:
+		code, err = h.GET(w, r)
+	default:
+		code, err = http.StatusNotImplemented, nil
+	}
+
+	checkErrors(w, code, err)
+}
+
+// GET ...
+func (h *OrdersHandler) GET(w http.ResponseWriter, r *http.Request) (int, error) {
+	s, err := h.SessionService.Session(w, r)
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	if !s.IsLoggedIn() {
+		return Redirect(w, r, "/login")
+	}
+
+	data, err := h.OrderService.GetByUser(s.Values["UserID"].(int))
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	return RenderHTML(w, s, data, "orders")
+}
