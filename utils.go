@@ -1,4 +1,4 @@
-package random
+package fest
 
 import (
 	"crypto/sha256"
