@@ -106,20 +106,73 @@ func main() {
 	userService := &mysql.UserService{}
 	linkService := &mysql.LinkService{}
 	productService := &mysql.ProductService{}
-	//promoService := &mysql.PromocodeService{}
-	//orderService := &mysql.OrderService{}
+	promoService := &mysql.PromocodeService{}
+	orderService := &mysql.OrderService{}
 
 	r := mux.NewRouter()
-	// Routes consist of a path and a handler function.
-	r.Handle("/", &handlers.IndexHandler{UserService: userService})
-	r.Handle("/login", &handlers.LoginHandler{UserService: userService, LinkService: linkService})
-	r.Handle("/register", &handlers.RegisterHandler{UserService: userService, LinkService: linkService})
-	r.Handle("/reset", &handlers.ResetHandler{UserService: userService, LinkService: linkService})
-	r.Handle("/settings", &handlers.SettingsHandler{UserService: userService})
-	r.Handle("/store", &handlers.StoreHandler{UserService: userService, ProductsService: productService})
-	r.Handle("/cart", &handlers.CartHandler{UserService: userService, ProductService: productService})
-	r.Handle("/cart/{id}", &handlers.CartItemHandler{UserService: userService, ProductService: productService})
-	r.Handle("/settings/deactivate", &handlers.DeactivateHandler{UserService: userService, LinkService: linkService})
+
+	r.Handle("/", &handlers.IndexHandler{
+		UserService: userService,
+	})
+
+	r.Handle("/login", &handlers.LoginHandler{
+		UserService: userService,
+		LinkService: linkService,
+	})
+
+	r.Handle("/register", &handlers.RegisterHandler{
+		UserService: userService,
+		LinkService: linkService,
+	})
+
+	r.Handle("/reset", &handlers.ResetHandler{
+		UserService: userService,
+		LinkService: linkService,
+	})
+
+	r.Handle("/settings", &handlers.SettingsHandler{
+		UserService: userService,
+	})
+
+	r.Handle("/store", &handlers.StoreHandler{
+		UserService:     userService,
+		ProductsService: productService,
+	})
+
+	r.Handle("/cart", &handlers.CartHandler{
+		UserService:    userService,
+		ProductService: productService,
+	})
+
+	r.Handle("/cart/{id}", &handlers.CartItemHandler{
+		UserService:    userService,
+		ProductService: productService,
+	})
+
+	r.Handle("/settings/deactivate", &handlers.DeactivateHandler{
+		UserService: userService,
+		LinkService: linkService,
+	})
+
+	r.Handle("/checkout/cancel", &handlers.CheckoutCancelHandler{
+		UserService: userService,
+	})
+	r.Handle("/checkout/confirm", &handlers.CheckoutConfirmHandler{
+		UserService:    userService,
+		ProductService: productService,
+		OrderService:   orderService,
+	})
+
+	r.Handle("/checkout", &handlers.CheckoutHandler{
+		UserService:      userService,
+		ProductService:   productService,
+		PromocodeService: promoService,
+	})
+
+	r.Handle("/coupon/validate", &handlers.ValidatePromocodeHandler{
+		UserService:      userService,
+		PromocodeService: promoService,
+	})
 
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("_assets/static/"))))
 

@@ -16,7 +16,9 @@ type Order struct {
 // OrderProduct ...
 type OrderProduct struct {
 	*Product
-	Quantity int
+	OrderID   int `db:"order_id"`
+	ProductID int `db:"product_id"`
+	Quantity  int `db:"quantity"`
 }
 
 // OrderService ...
@@ -26,6 +28,7 @@ type OrderService interface {
 	Gets(first, limit int, order string) ([]*Order, error)
 
 	Create(o *Order) error
+	AddProducts(o *Order) error
 	Update(o *Order, fields ...string) error
 	Delete(id int) error
 }

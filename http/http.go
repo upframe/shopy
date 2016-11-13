@@ -7,13 +7,17 @@ import (
 	"github.com/upframe/fest"
 )
 
-func checkErrors(w http.ResponseWriter, code int, err error) {
+func checkErrors(w http.ResponseWriter, r *http.Request, code int, err error) {
+	if code != 0 {
+		w.WriteHeader(code)
+	}
+
 	if err != nil {
 		log.Print(err)
 	}
 
-	if code != 0 {
-		w.WriteHeader(code)
+	if r.Method == http.MethodGet {
+		// TODO:
 	}
 }
 

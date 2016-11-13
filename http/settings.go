@@ -20,6 +20,7 @@ func (h *SettingsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		code int
 		err  error
 	)
+	defer checkErrors(w, r, code, err)
 
 	switch r.Method {
 	case http.MethodGet:
@@ -29,8 +30,6 @@ func (h *SettingsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	default:
 		code, err = http.StatusNotImplemented, nil
 	}
-
-	checkErrors(w, code, err)
 }
 
 type settings struct {
