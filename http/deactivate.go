@@ -12,9 +12,8 @@ import (
 
 // DeactivateHandler ...
 type DeactivateHandler struct {
-	SessionService fest.SessionService
-	UserService    fest.UserService
-	LinkService    fest.LinkService
+	UserService fest.UserService
+	LinkService fest.LinkService
 }
 
 func (h *DeactivateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -43,7 +42,7 @@ func (h *DeactivateHandler) GET(w http.ResponseWriter, r *http.Request) (int, er
 	}
 
 	// Fetches the link from the database
-	link, err := h.LinkService.GetByHash(r.URL.Query().Get("hash"))
+	link, err := h.LinkService.Get(r.URL.Query().Get("hash"))
 
 	// If the error is no rows, or the link is used, or it's expired or the path
 	// is incorrect, show a 404 Not Found page.
@@ -75,7 +74,7 @@ func (h *DeactivateHandler) GET(w http.ResponseWriter, r *http.Request) (int, er
 
 // POST ...
 func (h *DeactivateHandler) POST(w http.ResponseWriter, r *http.Request) (int, error) {
-	s, err := h.SessionService.Session(w, r)
+	s, err := GetSession(w, r, h.UserService)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}

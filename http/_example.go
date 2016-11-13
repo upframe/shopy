@@ -32,7 +32,7 @@ func (h *ExampleHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // GET ...
 func (h *ExampleHandler) GET(w http.ResponseWriter, r *http.Request) (int, error) {
-	s, err := h.SessionService.Session(w, r)
+	s, err := GetSession(w, r, h.UserService)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -42,7 +42,7 @@ func (h *ExampleHandler) GET(w http.ResponseWriter, r *http.Request) (int, error
 
 // POST ...
 func (h *ExampleHandler) POST(w http.ResponseWriter, r *http.Request) (int, error) {
-	s, err := h.SessionService.Session(w, r)
+	s, err := GetSession(w, r, h.UserService)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}

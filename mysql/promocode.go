@@ -69,7 +69,12 @@ func (s *PromocodeService) Update(p *fest.Promocode, fields ...string) error {
 }
 
 // Delete ...
-func (s *PromocodeService) Delete(p *fest.Promocode) error {
+func (s *PromocodeService) Delete(id int) error {
+	p, err := s.Get(id)
+	if err != nil {
+		return err
+	}
+
 	p.Deactivated = true
 	return s.Update(p, "Deactivated")
 }

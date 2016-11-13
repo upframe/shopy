@@ -12,8 +12,7 @@ import (
 
 // SettingsHandler ...
 type SettingsHandler struct {
-	SessionService fest.SessionService
-	UserService    fest.UserService
+	UserService fest.UserService
 }
 
 func (h *SettingsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -41,7 +40,7 @@ type settings struct {
 
 // GET ...
 func (h *SettingsHandler) GET(w http.ResponseWriter, r *http.Request) (int, error) {
-	s, err := h.SessionService.Session(w, r)
+	s, err := GetSession(w, r, h.UserService)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -67,7 +66,7 @@ func (h *SettingsHandler) GET(w http.ResponseWriter, r *http.Request) (int, erro
 
 // POST ...
 func (h *SettingsHandler) POST(w http.ResponseWriter, r *http.Request) (int, error) {
-	s, err := h.SessionService.Session(w, r)
+	s, err := GetSession(w, r, h.UserService)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}

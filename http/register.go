@@ -14,9 +14,8 @@ import (
 
 // RegisterHandler ...
 type RegisterHandler struct {
-	SessionService fest.SessionService
-	LinkService    fest.LinkService
-	UserService    fest.UserService
+	LinkService fest.LinkService
+	UserService fest.UserService
 }
 
 func (h *RegisterHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -39,7 +38,7 @@ func (h *RegisterHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // GET ...
 func (h *RegisterHandler) GET(w http.ResponseWriter, r *http.Request) (int, error) {
-	s, err := h.SessionService.Session(w, r)
+	s, err := GetSession(w, r, h.UserService)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -50,7 +49,7 @@ func (h *RegisterHandler) GET(w http.ResponseWriter, r *http.Request) (int, erro
 
 	if r.URL.Query().Get("confirm") != "" {
 		var link *fest.Link
-		link, err = h.LinkService.GetByHash(r.URL.Query().Get("confirm"))
+		link, err = h.LinkService.Get(r.URL.Query().Get("confirm"))
 
 		if err != nil || link.Used || link.Expires.Unix() < time.Now().Unix() || link.Path != "/register" {
 			return RenderHTML(w, s, nil, "invalid-link")
@@ -100,7 +99,7 @@ func (h *RegisterHandler) GET(w http.ResponseWriter, r *http.Request) (int, erro
 
 // POST ...
 func (h *RegisterHandler) POST(w http.ResponseWriter, r *http.Request) (int, error) {
-	s, err := h.SessionService.Session(w, r)
+	s, err := GetSession(w, r, h.UserService)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}

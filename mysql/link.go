@@ -17,15 +17,7 @@ var linkMap = map[string]string{
 }
 
 // Get ...
-func (s *LinkService) Get(id int) (*fest.Link, error) {
-	link := &fest.Link{}
-	err := db.Get(link, "SELECT * FROM links WHERE id=?", id)
-
-	return link, err
-}
-
-// GetByHash ...
-func (s *LinkService) GetByHash(hash string) (*fest.Link, error) {
+func (s *LinkService) Get(hash string) (*fest.Link, error) {
 	link := &fest.Link{}
 	err := db.Get(link, "SELECT * FROM links WHERE hash=?", hash)
 
@@ -59,7 +51,12 @@ func (s *LinkService) Update(l *fest.Link, fields ...string) error {
 }
 
 // Delete ...
-func (s *LinkService) Delete(l *fest.Link) error {
+func (s *LinkService) Delete(hash string) error {
+	l, err := s.Get(hash)
+	if err != nil {
+		return err
+	}
+
 	l.Used = true
 	return s.Update(l, "Used")
 }

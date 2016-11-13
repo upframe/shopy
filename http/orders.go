@@ -8,8 +8,8 @@ import (
 
 // OrdersHandler ...
 type OrdersHandler struct {
-	SessionService fest.SessionService
-	OrderService   fest.OrderService
+	OrderService fest.OrderService
+	UserService  fest.UserService
 }
 
 func (h *OrdersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -30,7 +30,7 @@ func (h *OrdersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // GET ...
 func (h *OrdersHandler) GET(w http.ResponseWriter, r *http.Request) (int, error) {
-	s, err := h.SessionService.Session(w, r)
+	s, err := GetSession(w, r, h.UserService)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}

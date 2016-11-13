@@ -11,7 +11,6 @@ import (
 
 // CartHandler ...
 type CartHandler struct {
-	SessionService fest.SessionService
 	UserService    fest.UserService
 	ProductService fest.ProductService
 }
@@ -38,7 +37,7 @@ func (h *CartHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // GET ...
 func (h *CartHandler) GET(w http.ResponseWriter, r *http.Request) (int, error) {
-	s, err := h.SessionService.Session(w, r)
+	s, err := GetSession(w, r, h.UserService)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -57,7 +56,7 @@ func (h *CartHandler) GET(w http.ResponseWriter, r *http.Request) (int, error) {
 
 // POST ...
 func (h *CartHandler) POST(w http.ResponseWriter, r *http.Request) (int, error) {
-	s, err := h.SessionService.Session(w, r)
+	s, err := GetSession(w, r, h.UserService)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -109,7 +108,7 @@ func (h *CartHandler) POST(w http.ResponseWriter, r *http.Request) (int, error) 
 
 // DELETE ...
 func (h *CartHandler) DELETE(w http.ResponseWriter, r *http.Request) (int, error) {
-	s, err := h.SessionService.Session(w, r)
+	s, err := GetSession(w, r, h.UserService)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}

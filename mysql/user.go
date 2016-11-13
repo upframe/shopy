@@ -85,7 +85,12 @@ func (s *UserService) Update(u *fest.User, fields ...string) error {
 }
 
 // Delete ...
-func (s *UserService) Delete(u *fest.User) error {
+func (s *UserService) Delete(id int) error {
+	u, err := s.Get(id)
+	if err != nil {
+		return err
+	}
+
 	u.Deactivated = true
 	return s.Update(u, "Deactivated")
 }

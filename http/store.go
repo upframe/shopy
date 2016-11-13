@@ -9,7 +9,7 @@ import (
 // StoreHandler ...
 type StoreHandler struct {
 	ProductsService fest.ProductService
-	SessionService  fest.SessionService
+	UserService     fest.UserService
 }
 
 func (h *StoreHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -30,7 +30,7 @@ func (h *StoreHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // GET ...
 func (h *StoreHandler) GET(w http.ResponseWriter, r *http.Request) (int, error) {
-	s, err := h.SessionService.Session(w, r)
+	s, err := GetSession(w, r, h.UserService)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}

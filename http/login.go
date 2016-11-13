@@ -9,9 +9,8 @@ import (
 
 // LoginHandler ...
 type LoginHandler struct {
-	SessionService fest.SessionService
-	UserService    fest.UserService
-	LinkService    fest.LinkService
+	UserService fest.UserService
+	LinkService fest.LinkService
 }
 
 func (h *LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -34,7 +33,7 @@ func (h *LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // GET ...
 func (h *LoginHandler) GET(w http.ResponseWriter, r *http.Request) (int, error) {
-	s, err := h.SessionService.Session(w, r)
+	s, err := GetSession(w, r, h.UserService)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -48,7 +47,7 @@ func (h *LoginHandler) GET(w http.ResponseWriter, r *http.Request) (int, error) 
 
 // POST ...
 func (h *LoginHandler) POST(w http.ResponseWriter, r *http.Request) (int, error) {
-	s, err := h.SessionService.Session(w, r)
+	s, err := GetSession(w, r, h.UserService)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}

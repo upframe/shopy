@@ -2,7 +2,15 @@ package main
 
 import (
 	"encoding/gob"
+	"encoding/json"
+	"log"
+	"net/http"
+	"os"
+	"runtime"
 
+	handlers "github.com/upframe/fest/http"
+
+	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"github.com/upframe/fest"
 	"github.com/upframe/fest/email"
@@ -39,13 +47,24 @@ func init() {
 	gob.Register(fest.OrderCookie{})
 
 	c := &config{}
+	// then config file settings
+
+	configFile, err := os.Open("config.json")
+	if err != nil {
+		log.Fatal("opening config file", err.Error())
+	}
+
+	jsonParser := json.NewDecoder(configFile)
+	if err = jsonParser.Decode(&c); err != nil {
+		log.Fatal("parsing config file", err.Error())
+	}
 
 	fest.BaseInvites = c.BaseInvites
 	fest.InviteOnly = c.InviteOnly
 
 	fest.BaseAddress = "http://localhost/"
-	fest.Templates = "_assets/templates"
-	email.Templates = "_assets/templates/email"
+	fest.Templates = "_assets/templates/"
+	email.Templates = "_assets/templates/email/"
 
 	// Creates the new cookie session;
 	fest.Store = sessions.NewCookieStore([]byte(c.Key))
@@ -62,7 +81,7 @@ func init() {
 	email.InitSMTP(c.SMTP.User, c.SMTP.Password, c.SMTP.Host, c.SMTP.Port)
 
 	// Connects to the database and checks for an error
-	err := mysql.InitDB(
+	err = mysql.InitDB(
 		c.Database.User,
 		c.Database.Password,
 		c.Database.Host,
@@ -81,5 +100,27 @@ func init() {
 }
 
 func main() {
+	runtime.GOMAXPROCS(runtime.NumCPU())
 
+	// Create services.
+	userService := &mysql.UserService{}
+	linkService := &mysql.LinkService{}
+	//productService := &mysql.ProductService{}
+	//promoService := &mysql.PromocodeService{}
+	//orderService := &mysql.OrderService{}
+
+	r := mux.NewRouter()
+	// Routes consist of a path and a handler function.
+	r.Handle("/", &handlers.IndexHandler{UserService: userService})
+	r.Handle("/login", &handlers.LoginHandler{UserService: userService, LinkService: linkService})
+
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("_assets/static/"))))
+
+	/* api := r.PathPrefix("/api").Subrouter()
+	api.HandleFunc("/user/:id", GetUser).Methods("GET") */
+
+	// Bind to a port and pass our router in
+	log.Fatal(http.ListenAndServe(":80", r))
+
+	// TODO: check csrf things
 }

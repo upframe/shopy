@@ -89,7 +89,12 @@ func (s *ProductService) Update(p *fest.Product, fields ...string) error {
 }
 
 // Delete ...
-func (s *ProductService) Delete(p *fest.Product) error {
+func (s *ProductService) Delete(id int) error {
+	p, err := s.Get(id)
+	if err != nil {
+		return err
+	}
+
 	p.Deactivated = true
 	return s.Update(p, "Deactivated")
 }

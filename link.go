@@ -14,13 +14,12 @@ type Link struct {
 
 // LinkService ...
 type LinkService interface {
-	Get(id int) (*Link, error)
-	GetByHash(hash string) (*Link, error)
+	Get(hash string) (*Link, error)
 	Gets(first, limit int, order string) ([]*Link, error)
 
 	Create(l *Link) error
 	Update(l *Link, fields ...string) error
-	Delete(id int) error
+	Delete(hash string) error
 }
 
 // IsValid returns if the link is still valid and not used

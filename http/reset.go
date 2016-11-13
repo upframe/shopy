@@ -12,9 +12,8 @@ import (
 
 // ResetHandler ...
 type ResetHandler struct {
-	SessionService fest.SessionService
-	UserService    fest.UserService
-	LinkService    fest.LinkService
+	UserService fest.UserService
+	LinkService fest.LinkService
 }
 
 func (h *ResetHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -37,14 +36,14 @@ func (h *ResetHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // GET ...
 func (h *ResetHandler) GET(w http.ResponseWriter, r *http.Request) (int, error) {
-	s, err := h.SessionService.Session(w, r)
+	s, err := GetSession(w, r, h.UserService)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
 
 	if hash := r.URL.Query().Get("hash"); hash != "" {
 		// Fetches the link from the database
-		link, err := h.LinkService.GetByHash(hash)
+		link, err := h.LinkService.Get(hash)
 
 		// If the error is no rows, or the link is used, or it's expired or the path
 		// is incorrect, show a 404 Not Found page.
@@ -73,7 +72,7 @@ func (h *ResetHandler) POST(w http.ResponseWriter, r *http.Request) (int, error)
 	if hash := r.URL.Query().Get("hash"); hash != "" {
 		// Fetches the link from the database
 		var link *fest.Link
-		link, err = h.LinkService.GetByHash(hash)
+		link, err = h.LinkService.Get(hash)
 
 		// If the error is no rows, or the link is used, or it's expired or the path
 		// is incorrect, show a 404 Not Found page.
