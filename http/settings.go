@@ -61,7 +61,7 @@ func (h *SettingsHandler) GET(w http.ResponseWriter, r *http.Request) (int, erro
 
 	return RenderHTML(w, s, settings{
 		User:    user,
-		BaseURL: BaseAddress,
+		BaseURL: fest.BaseAddress,
 	}, "settings")
 }
 

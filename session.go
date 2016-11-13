@@ -2,6 +2,8 @@ package fest
 
 import (
 	"net/http"
+	"strconv"
+	"strings"
 
 	"github.com/gorilla/sessions"
 )
@@ -31,8 +33,40 @@ func (s Session) IsAdmin() bool {
 	return s.User.Admin
 }
 
+// GetCart returns the user Cart
+func (s Session) GetCart(service ProductService) (*Cart, error) {
+	ids := "("
+
+	c := s.Values["Cart"].(CartCookie)
+
+	if len(c.Products) == 0 {
+		return &Cart{}, nil
+	}
+
+	for k := range c.Products {
+		ids += strconv.Itoa(k) + ", "
+	}
+
+	ids = strings.TrimSuffix(ids, ", ") + ")"
+	products, err := service.GetsWhereIn(0, 0, "id", ids, "id")
+	if err != nil {
+		return nil, err
+	}
+
+	cart := &Cart{}
+	cart.Locked = c.Locked
+
+	for k := range products {
+		cart.Products = append(cart.Products, &CartItem{
+			Quantity: c.Products[products[k].ID],
+			Product:  products[k],
+		})
+	}
+
+	return cart, nil
+}
+
 // SessionService ...
 type SessionService interface {
 	Session(w http.ResponseWriter, r *http.Request) (*Session, error)
-	Cart(s *Session) (*Cart, error)
 }

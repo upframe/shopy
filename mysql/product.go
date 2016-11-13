@@ -58,12 +58,12 @@ func (s *ProductService) Create(p *fest.Product) error {
 		return nil
 	}
 
-	res, err := db.NamedExec(insertQuery("products", getAllColumns(productMap)), p)
+	_, err := db.NamedExec(insertQuery("products", getAllColumns(productMap)), p)
 	if err != nil {
 		return err
 	}
 
-	p.ID, err = res.LastInsertId()
+	//p.ID, err = res.LastInsertId()
 	return err
 }
 

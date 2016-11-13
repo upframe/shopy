@@ -105,7 +105,7 @@ func (h *DeactivateHandler) POST(w http.ResponseWriter, r *http.Request) (int, e
 	data := make(map[string]interface{})
 	data["Name"] = s.User.FirstName + " " + s.User.LastName
 	data["Hash"] = link.Hash
-	data["Host"] = BaseAddress
+	data["Host"] = fest.BaseAddress
 
 	email := &email.Email{
 		From: &mail.Address{

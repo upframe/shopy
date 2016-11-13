@@ -12,12 +12,6 @@ import (
 	"github.com/upframe/fest/email"
 )
 
-// TODO: move to domain
-var (
-	BaseInvites = 0
-	InviteOnly  = false
-)
-
 // RegisterHandler ...
 type RegisterHandler struct {
 	SessionService fest.SessionService
@@ -83,7 +77,7 @@ func (h *RegisterHandler) GET(w http.ResponseWriter, r *http.Request) (int, erro
 		return http.StatusOK, nil
 	}
 
-	if InviteOnly {
+	if fest.InviteOnly {
 		// Gets the referrer user
 		referrer, err := h.UserService.GetByReferral(r.URL.Query().Get("ref"))
 
@@ -126,13 +120,13 @@ func (h *RegisterHandler) POST(w http.ResponseWriter, r *http.Request) (int, err
 		FirstName: r.FormValue("first_name"),
 		LastName:  r.FormValue("last_name"),
 		Email:     r.FormValue("email"),
-		Invites:   BaseInvites,
+		Invites:   fest.BaseInvites,
 		Credit:    0,
 		Confirmed: false,
 		Referrer:  fest.NullInt64{NullInt64: sql.NullInt64{Int64: 0, Valid: false}},
 	}
 
-	if InviteOnly {
+	if fest.InviteOnly {
 		// Gets the referrer user using the ?referral= option in the URL. If it doesn't
 		// find the user, return a 403 Forbidden status
 		var referrer *fest.User
@@ -228,7 +222,7 @@ func confirmationEmail(s fest.LinkService, user *fest.User) (int, error) {
 	data := make(map[string]interface{})
 	data["Name"] = user.FirstName + " " + user.LastName
 	data["Hash"] = link.Hash
-	data["Host"] = BaseAddress
+	data["Host"] = fest.BaseAddress
 
 	email := &email.Email{
 		From: &mail.Address{

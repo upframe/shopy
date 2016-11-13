@@ -4,7 +4,7 @@ import "time"
 
 // Promocode ...
 type Promocode struct {
-	ID          int      `db:"id"`
+	ID          int        `db:"id"`
 	Code        string     `db:"code"`
 	Expires     *time.Time `db:"expires"`
 	Discount    int        `db:"discount"`

@@ -15,14 +15,6 @@ import (
 	"github.com/upframe/fest"
 )
 
-// TODO: move this to domain
-var (
-	// BaseAddress is the base URL of the website
-	BaseAddress string
-	// Templates is the path to the tempaltes folder
-	Templates string
-)
-
 // page is the type that contains the information that goes into the page
 type page struct {
 	IsLoggedIn  bool
@@ -62,7 +54,7 @@ func RenderHTML(w http.ResponseWriter, s *fest.Session, data interface{}, templa
 	// For each template, add it to the the tpl variable
 	for i := range templates {
 		// Get the template from the assets
-		page, err := ioutil.ReadFile(filepath.Clean(Templates + templates[i] + ".tmpl"))
+		page, err := ioutil.ReadFile(filepath.Clean(fest.Templates + templates[i] + ".tmpl"))
 
 		// Check if there is some error. If so, the template doesn't exist
 		if err != nil {
@@ -87,7 +79,7 @@ func RenderHTML(w http.ResponseWriter, s *fest.Session, data interface{}, templa
 	p := &page{
 		IsLoggedIn:  s.IsLoggedIn(),
 		Data:        data,
-		BaseAddress: BaseAddress,
+		BaseAddress: fest.BaseAddress,
 	}
 
 	// Refresh user information
