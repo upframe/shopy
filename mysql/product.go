@@ -52,18 +52,33 @@ func (s *ProductService) GetsWhere(first, limit int, order, where, sth string) (
 	return products, err
 }
 
+// GetsWhereIn ...
+func (s *ProductService) GetsWhereIn(first, limit int, order, where, in string) ([]*fest.Product, error) {
+	products := []*fest.Product{}
+	var err error
+
+	if limit == 0 {
+		err = db.Select(&products, "SELECT * FROM products WHERE "+where+" IN ? ORDER BY ?", in, order)
+	} else {
+		err = db.Select(&products, "SELECT * FROM products WHERE "+where+" IN ? ORDER BY ? LIMIT ? OFFSET ?", in, order, limit, first)
+	}
+
+	return products, err
+}
+
 // Create ...
 func (s *ProductService) Create(p *fest.Product) error {
 	if p.ID != 0 {
 		return nil
 	}
 
-	_, err := db.NamedExec(insertQuery("products", getAllColumns(productMap)), p)
+	res, err := db.NamedExec(insertQuery("products", getAllColumns(productMap)), p)
 	if err != nil {
 		return err
 	}
 
-	//p.ID, err = res.LastInsertId()
+	id, err := res.LastInsertId()
+	p.ID = int(id)
 	return err
 }
 

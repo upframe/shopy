@@ -7,6 +7,9 @@ import (
 	"github.com/logpacker/PayPal-Go-SDK"
 )
 
+// UpdateAll is used as a placeholder to update all of the fields
+const UpdateAll = "#update#"
+
 const (
 	passwordSaltBytes = 32
 	passwordHashBytes = 64

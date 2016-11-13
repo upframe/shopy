@@ -187,7 +187,7 @@ func (h *RegisterHandler) POST(w http.ResponseWriter, r *http.Request) (int, err
 	}
 
 	// Inserts the user into the database
-	user.ID, err = h.UserService.Create(user)
+	err = h.UserService.Create(user)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}

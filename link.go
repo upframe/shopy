@@ -5,7 +5,7 @@ import "time"
 // Link ...
 type Link struct {
 	Hash    string     `db:"hash"`
-	User    int      `db:"user_id"`
+	User    int        `db:"user_id"`
 	Path    string     `db:"path"`
 	Used    bool       `db:"used"`
 	Time    *time.Time `db:"time"`
@@ -21,4 +21,9 @@ type LinkService interface {
 	Create(l *Link) error
 	Update(l *Link, fields ...string) error
 	Delete(id int) error
+}
+
+// IsValid returns if the link is still valid and not used
+func (l Link) IsValid() bool {
+	return l.Expires.Unix() < time.Now().Unix() && !l.Used
 }

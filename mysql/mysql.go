@@ -6,10 +6,8 @@ import (
 	// Import driver
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
+	"github.com/upframe/fest"
 )
-
-// UpdateAll is used as a placeholder to update all of the fields
-const UpdateAll = "#update#"
 
 var db *sqlx.DB
 
@@ -81,7 +79,7 @@ func insertQuery(table string, fields []string) string {
 func fieldsToColumns(m map[string]string, fields ...string) []string {
 	columns := []string{}
 
-	if fields[0] == UpdateAll {
+	if fields[0] == fest.UpdateAll {
 		columns = getAllColumns(m)
 	} else {
 		for i := range fields {
