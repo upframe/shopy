@@ -100,6 +100,10 @@ func init() {
 }
 
 func main() {
+	// TODO: admin
+	// TODO: api
+	// TODO: clean
+
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	// Create services.
