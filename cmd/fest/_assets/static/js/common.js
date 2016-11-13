@@ -31,7 +31,7 @@ function copyFormToObject(form) {
     let object = new Object();
     object.ID = 0;
 
-    let inputs = form.querySelectorAll('input');
+    let inputs = form.querySelectorAll('input, textarea');
 
     Array.from(inputs).forEach((input) => {
         let name = input.name;

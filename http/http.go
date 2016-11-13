@@ -1,13 +1,20 @@
 package http
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/upframe/fest"
 )
 
 func checkErrors(w http.ResponseWriter, code int, err error) {
+	if err != nil {
+		log.Print(err)
+	}
 
+	if code != 0 {
+		w.WriteHeader(code)
+	}
 }
 
 // Redirect redirects the user to a page

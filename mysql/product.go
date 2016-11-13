@@ -1,8 +1,6 @@
 package mysql
 
-import (
-	"github.com/upframe/fest"
-)
+import "github.com/upframe/fest"
 
 // ProductService ...
 type ProductService struct{}
@@ -58,9 +56,9 @@ func (s *ProductService) GetsWhereIn(first, limit int, order, where, in string) 
 	var err error
 
 	if limit == 0 {
-		err = db.Select(&products, "SELECT * FROM products WHERE "+where+" IN ? ORDER BY ?", in, order)
+		err = db.Select(&products, "SELECT * FROM products WHERE "+where+" IN "+in+" ORDER BY ?", order)
 	} else {
-		err = db.Select(&products, "SELECT * FROM products WHERE "+where+" IN ? ORDER BY ? LIMIT ? OFFSET ?", in, order, limit, first)
+		err = db.Select(&products, "SELECT * FROM products WHERE "+where+" IN "+in+" ORDER BY ? LIMIT ? OFFSET ?", order, limit, first)
 	}
 
 	return products, err

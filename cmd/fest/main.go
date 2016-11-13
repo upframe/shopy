@@ -62,7 +62,7 @@ func init() {
 	fest.BaseInvites = c.BaseInvites
 	fest.InviteOnly = c.InviteOnly
 
-	fest.BaseAddress = "http://localhost/"
+	fest.BaseAddress = "http://localhost"
 	fest.Templates = "_assets/templates/"
 	email.Templates = "_assets/templates/email/"
 
@@ -105,7 +105,7 @@ func main() {
 	// Create services.
 	userService := &mysql.UserService{}
 	linkService := &mysql.LinkService{}
-	//productService := &mysql.ProductService{}
+	productService := &mysql.ProductService{}
 	//promoService := &mysql.PromocodeService{}
 	//orderService := &mysql.OrderService{}
 
@@ -113,6 +113,13 @@ func main() {
 	// Routes consist of a path and a handler function.
 	r.Handle("/", &handlers.IndexHandler{UserService: userService})
 	r.Handle("/login", &handlers.LoginHandler{UserService: userService, LinkService: linkService})
+	r.Handle("/register", &handlers.RegisterHandler{UserService: userService, LinkService: linkService})
+	r.Handle("/reset", &handlers.ResetHandler{UserService: userService, LinkService: linkService})
+	r.Handle("/settings", &handlers.SettingsHandler{UserService: userService})
+	r.Handle("/store", &handlers.StoreHandler{UserService: userService, ProductsService: productService})
+	r.Handle("/cart", &handlers.CartHandler{UserService: userService, ProductService: productService})
+	r.Handle("/cart/{id}", &handlers.CartItemHandler{UserService: userService, ProductService: productService})
+	r.Handle("/settings/deactivate", &handlers.DeactivateHandler{UserService: userService, LinkService: linkService})
 
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("_assets/static/"))))
 

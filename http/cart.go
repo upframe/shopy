@@ -24,10 +24,6 @@ func (h *CartHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
 		code, err = h.GET(w, r)
-	case http.MethodPost:
-		code, err = h.POST(w, r)
-	case http.MethodDelete:
-		code, err = h.DELETE(w, r)
 	default:
 		code, err = http.StatusNotImplemented, nil
 	}
@@ -54,8 +50,34 @@ func (h *CartHandler) GET(w http.ResponseWriter, r *http.Request) (int, error) {
 	return RenderHTML(w, s, cart, "cart")
 }
 
+// CartItemHandler ...
+type CartItemHandler struct {
+	UserService    fest.UserService
+	ProductService fest.ProductService
+}
+
+func (h *CartItemHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	var (
+		code int
+		err  error
+	)
+
+	switch r.Method {
+	case http.MethodGet:
+		code, err = http.StatusNotFound, nil
+	case http.MethodPost:
+		code, err = h.POST(w, r)
+	case http.MethodDelete:
+		code, err = h.DELETE(w, r)
+	default:
+		code, err = http.StatusNotImplemented, nil
+	}
+
+	checkErrors(w, code, err)
+}
+
 // POST ...
-func (h *CartHandler) POST(w http.ResponseWriter, r *http.Request) (int, error) {
+func (h *CartItemHandler) POST(w http.ResponseWriter, r *http.Request) (int, error) {
 	s, err := GetSession(w, r, h.UserService)
 	if err != nil {
 		return http.StatusInternalServerError, err
@@ -107,7 +129,7 @@ func (h *CartHandler) POST(w http.ResponseWriter, r *http.Request) (int, error) 
 }
 
 // DELETE ...
-func (h *CartHandler) DELETE(w http.ResponseWriter, r *http.Request) (int, error) {
+func (h *CartItemHandler) DELETE(w http.ResponseWriter, r *http.Request) (int, error) {
 	s, err := GetSession(w, r, h.UserService)
 	if err != nil {
 		return http.StatusInternalServerError, err

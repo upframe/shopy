@@ -91,7 +91,7 @@ func (h *SettingsHandler) POST(w http.ResponseWriter, r *http.Request) (int, err
 	}
 
 	// Updates and checks for errors
-	err = h.UserService.Update(user, "first_name", "last_name", "email", "address")
+	err = h.UserService.Update(user, "FirstName", "LastName", "Email", "Address")
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
