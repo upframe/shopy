@@ -7,10 +7,7 @@ import (
 )
 
 // OrdersHandler ...
-type OrdersHandler struct {
-	OrderService fest.OrderService
-	UserService  fest.UserService
-}
+type OrdersHandler handler
 
 func (h *OrdersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var (
@@ -35,7 +32,7 @@ func (h *OrdersHandler) GET(w http.ResponseWriter, r *http.Request) (int, error)
 		return Redirect(w, r, "/login")
 	}
 
-	data, err := h.OrderService.GetByUser(s.Values["UserID"].(int))
+	data, err := h.Services.Order.GetByUser(s.Values["UserID"].(int))
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}

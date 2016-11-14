@@ -7,9 +7,7 @@ import (
 )
 
 // IndexHandler ...
-type IndexHandler struct {
-	UserService fest.UserService
-}
+type IndexHandler handler
 
 func (h *IndexHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var (

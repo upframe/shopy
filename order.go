@@ -16,9 +16,7 @@ type Order struct {
 // OrderProduct ...
 type OrderProduct struct {
 	*Product
-	OrderID   int `db:"order_id"`
-	ProductID int `db:"product_id"`
-	Quantity  int `db:"quantity"`
+	Quantity int `db:"quantity"`
 }
 
 // OrderService ...

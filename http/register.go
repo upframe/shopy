@@ -13,10 +13,7 @@ import (
 )
 
 // RegisterHandler ...
-type RegisterHandler struct {
-	LinkService fest.LinkService
-	UserService fest.UserService
-}
+type RegisterHandler handler
 
 func (h *RegisterHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var (
@@ -43,25 +40,25 @@ func (h *RegisterHandler) GET(w http.ResponseWriter, r *http.Request) (int, erro
 	}
 
 	if r.URL.Query().Get("confirm") != "" {
-		link, err := h.LinkService.Get(r.URL.Query().Get("confirm"))
+		link, err := h.Services.Link.Get(r.URL.Query().Get("confirm"))
 
 		if err != nil || link.Used || link.Expires.Unix() < time.Now().Unix() || link.Path != "/register" {
 			return RenderHTML(w, s, nil, "invalid-link")
 		}
 
-		user, err := h.UserService.Get(link.User)
+		user, err := h.Services.User.Get(link.User)
 		if err != nil {
 			return http.StatusInternalServerError, err
 		}
 
 		user.Confirmed = true
-		err = h.UserService.Update(user, "Confirmed")
+		err = h.Services.User.Update(user, "Confirmed")
 		if err != nil {
 			return http.StatusInternalServerError, err
 		}
 
 		link.Used = true
-		err = h.LinkService.Update(link, "Used")
+		err = h.Services.Link.Update(link, "Used")
 		if err != nil {
 			return http.StatusInternalServerError, err
 		}
@@ -72,7 +69,7 @@ func (h *RegisterHandler) GET(w http.ResponseWriter, r *http.Request) (int, erro
 
 	if fest.InviteOnly {
 		// Gets the referrer user
-		referrer, err := h.UserService.GetByReferral(r.URL.Query().Get("ref"))
+		referrer, err := h.Services.User.GetByReferral(r.URL.Query().Get("ref"))
 
 		// If the user doesn't exist show a page telling that registration
 		// is invitation only
@@ -120,7 +117,7 @@ func (h *RegisterHandler) POST(w http.ResponseWriter, r *http.Request) (int, err
 		// Gets the referrer user using the ?referral= option in the URL. If it doesn't
 		// find the user, return a 403 Forbidden status
 		var referrer *fest.User
-		referrer, err = h.UserService.GetByReferral(r.URL.Query().Get("ref"))
+		referrer, err = h.Services.User.GetByReferral(r.URL.Query().Get("ref"))
 		if err != nil {
 			return http.StatusForbidden, err
 		}
@@ -150,7 +147,7 @@ func (h *RegisterHandler) POST(w http.ResponseWriter, r *http.Request) (int, err
 			// we will keep the registration going because it's no user-fault and the
 			// refferer had invites available.
 			referrer.Invites--
-			err = h.UserService.Update(referrer, "Invites")
+			err = h.Services.User.Update(referrer, "Invites")
 		}()
 	}
 
@@ -162,7 +159,7 @@ func (h *RegisterHandler) POST(w http.ResponseWriter, r *http.Request) (int, err
 
 	// Checks if there is already an user with this email. If there is,
 	// return a 407 Conflict error.
-	if is, _ := isExistentUser(h.UserService, user.Email); is {
+	if is, _ := isExistentUser(h.Services.User, user.Email); is {
 		err = errors.New("Email already registred.")
 		return http.StatusConflict, err
 	}
@@ -177,7 +174,7 @@ func (h *RegisterHandler) POST(w http.ResponseWriter, r *http.Request) (int, err
 	}
 
 	// Inserts the user into the database
-	err = h.UserService.Create(user)
+	err = h.Services.User.Create(user)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -186,7 +183,7 @@ func (h *RegisterHandler) POST(w http.ResponseWriter, r *http.Request) (int, err
 	// get an error while sending the email. Why? Because the status response
 	// is directed to the user CREATION. The user may ask for the resending
 	// of the email if he needs to.
-	_, err = confirmationEmail(h.LinkService, user)
+	_, err = confirmationEmail(h.Services.Link, user)
 	return http.StatusCreated, err
 }
 

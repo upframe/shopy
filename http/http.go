@@ -8,6 +8,11 @@ import (
 	"github.com/upframe/fest"
 )
 
+// handler ...
+type handler struct {
+	Services *fest.Services
+}
+
 func checkErrors(w http.ResponseWriter, r *http.Request, code int, err error) {
 	if code != 0 {
 		w.WriteHeader(code)
@@ -65,5 +70,24 @@ func InjectSession(h http.Handler, us fest.UserService) http.Handler {
 		r = r.WithContext(ctx)
 
 		h.ServeHTTP(w, r)
+	})
+}
+
+// MustLogin ...
+func MustLogin(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		s := r.Context().Value("session").(*fest.Session)
+
+		if s.IsLoggedIn() {
+			h.ServeHTTP(w, r)
+			return
+		}
+
+		if r.Method == http.MethodGet {
+			http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
+			return
+		}
+
+		w.WriteHeader(http.StatusUnauthorized)
 	})
 }

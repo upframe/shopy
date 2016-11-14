@@ -8,10 +8,7 @@ import (
 )
 
 // LoginHandler ...
-type LoginHandler struct {
-	UserService fest.UserService
-	LinkService fest.LinkService
-}
+type LoginHandler handler
 
 func (h *LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var (
@@ -51,7 +48,7 @@ func (h *LoginHandler) POST(w http.ResponseWriter, r *http.Request) (int, error)
 
 	if r.Header.Get("Resend") == "true" {
 		// Obtains the user and checks for errors
-		user, err := h.UserService.GetByEmail(r.Header.Get("email"))
+		user, err := h.Services.User.GetByEmail(r.Header.Get("email"))
 		if err == sql.ErrNoRows {
 			return http.StatusNotFound, err
 		}
@@ -60,7 +57,7 @@ func (h *LoginHandler) POST(w http.ResponseWriter, r *http.Request) (int, error)
 			return http.StatusInternalServerError, err
 		}
 
-		return confirmationEmail(h.LinkService, user)
+		return confirmationEmail(h.Services.Link, user)
 	}
 
 	// Parses the form and checks for errors
@@ -79,7 +76,7 @@ func (h *LoginHandler) POST(w http.ResponseWriter, r *http.Request) (int, error)
 	}
 
 	// Obtains the user and checks for errors
-	user, err := h.UserService.GetByEmail(email)
+	user, err := h.Services.User.GetByEmail(email)
 	if err == sql.ErrNoRows {
 		return http.StatusNotFound, err
 	}

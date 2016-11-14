@@ -8,7 +8,7 @@ import (
 	"os"
 	"runtime"
 
-	handlers "github.com/upframe/fest/http"
+	h "github.com/upframe/fest/http"
 
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
@@ -106,77 +106,66 @@ func main() {
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	// Create services.
-	userService := &mysql.UserService{}
-	linkService := &mysql.LinkService{}
-	productService := &mysql.ProductService{}
-	promoService := &mysql.PromocodeService{}
-	//orderService := &mysql.OrderService{}
+	s := &fest.Services{
+		User:      &mysql.UserService{},
+		Link:      &mysql.LinkService{},
+		Product:   &mysql.ProductService{},
+		Promocode: &mysql.PromocodeService{},
+		// Order: &mysql.OrderService{}
+	}
 
 	r := mux.NewRouter()
 
-	r.Handle("/", &handlers.IndexHandler{
-		UserService: userService,
+	r.Handle("/", &h.IndexHandler{
+		Services: s,
 	})
 
-	r.Handle("/login", &handlers.LoginHandler{
-		UserService: userService,
-		LinkService: linkService,
+	r.Handle("/login", &h.LoginHandler{
+		Services: s,
 	})
 
-	r.Handle("/register", &handlers.RegisterHandler{
-		UserService: userService,
-		LinkService: linkService,
+	r.Handle("/register", &h.RegisterHandler{
+		Services: s,
 	})
 
-	r.Handle("/reset", &handlers.ResetHandler{
-		UserService: userService,
-		LinkService: linkService,
+	r.Handle("/reset", &h.ResetHandler{
+		Services: s,
 	})
 
-	r.Handle("/settings", &handlers.SettingsHandler{
-		UserService: userService,
+	r.Handle("/settings", h.MustLogin(&h.SettingsHandler{
+		Services: s,
+	}))
+
+	r.Handle("/store", &h.StoreHandler{
+		Services: s,
 	})
 
-	r.Handle("/store", &handlers.StoreHandler{
-		UserService:     userService,
-		ProductsService: productService,
+	r.Handle("/cart", h.MustLogin(&h.CartHandler{
+		Services: s,
+	}))
+
+	r.Handle("/cart/{id}", h.MustLogin(&h.CartItemHandler{
+		Services: s,
+	}))
+
+	r.Handle("/settings/deactivate", &h.DeactivateHandler{
+		Services: s,
 	})
 
-	r.Handle("/cart", &handlers.CartHandler{
-		UserService:    userService,
-		ProductService: productService,
+	r.Handle("/checkout/cancel", &h.CheckoutCancelHandler{
+		Services: s,
 	})
+	/* r.Handle("/checkout/confirm", h.MustLogin(&h.CheckoutConfirmHandler{
+		Services: s,
+	})) */
 
-	r.Handle("/cart/{id}", &handlers.CartItemHandler{
-		UserService:    userService,
-		ProductService: productService,
-	})
+	r.Handle("/checkout", h.MustLogin(&h.CheckoutHandler{
+		Services: s,
+	}))
 
-	r.Handle("/settings/deactivate", &handlers.DeactivateHandler{
-		UserService: userService,
-		LinkService: linkService,
-	})
-
-	r.Handle("/checkout/cancel", &handlers.CheckoutCancelHandler{
-		UserService: userService,
-	})
-	/* r.Handle("/checkout/confirm", &handlers.CheckoutConfirmHandler{
-		UserService:    userService,
-		ProductService: productService,
-		OrderService:   orderService,
-	}) */
-
-	r.Handle("/checkout", &handlers.CheckoutHandler{
-		UserService:      userService,
-		ProductService:   productService,
-		PromocodeService: promoService,
-	})
-
-	r.Handle("/coupon/validate", &handlers.ValidatePromocodeHandler{
-		UserService:      userService,
-		PromocodeService: promoService,
-	})
+	r.Handle("/coupon/validate", h.MustLogin(&h.ValidatePromocodeHandler{
+		Services: s,
+	}))
 
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("_assets/static/"))))
 
@@ -184,7 +173,7 @@ func main() {
 	api.HandleFunc("/user/:id", GetUser).Methods("GET") */
 
 	// Bind to a port and pass our router in
-	log.Fatal(http.ListenAndServe(":80", handlers.InjectSession(r, userService)))
+	log.Fatal(http.ListenAndServe(":80", h.InjectSession(r, s.User)))
 
 	// TODO: check csrf things
 }

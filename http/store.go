@@ -7,10 +7,7 @@ import (
 )
 
 // StoreHandler ...
-type StoreHandler struct {
-	ProductsService fest.ProductService
-	UserService     fest.UserService
-}
+type StoreHandler handler
 
 func (h *StoreHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var (
@@ -31,7 +28,7 @@ func (h *StoreHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (h *StoreHandler) GET(w http.ResponseWriter, r *http.Request) (int, error) {
 	s := r.Context().Value("session").(*fest.Session)
 
-	products, err := h.ProductsService.GetsWhere(0, 0, "name", "deactivated", "0")
+	products, err := h.Services.Product.GetsWhere(0, 0, "name", "deactivated", "0")
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}

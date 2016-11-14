@@ -11,10 +11,7 @@ import (
 )
 
 // DeactivateHandler ...
-type DeactivateHandler struct {
-	UserService fest.UserService
-	LinkService fest.LinkService
-}
+type DeactivateHandler handler
 
 func (h *DeactivateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var (
@@ -41,7 +38,7 @@ func (h *DeactivateHandler) GET(w http.ResponseWriter, r *http.Request) (int, er
 	}
 
 	// Fetches the link from the database
-	link, err := h.LinkService.Get(r.URL.Query().Get("hash"))
+	link, err := h.Services.Link.Get(r.URL.Query().Get("hash"))
 
 	// If the error is no rows, or the link is used, or it's expired or the path
 	// is incorrect, show a 404 Not Found page.
@@ -55,14 +52,14 @@ func (h *DeactivateHandler) GET(w http.ResponseWriter, r *http.Request) (int, er
 	}
 
 	// Deactivates the user and checks for error
-	err = h.UserService.Delete(link.User)
+	err = h.Services.User.Delete(link.User)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
 
 	// Marks the link as used and checks the errors
 	link.Used = true
-	err = h.LinkService.Update(link, "Used")
+	err = h.Services.Link.Update(link, "Used")
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -92,7 +89,7 @@ func (h *DeactivateHandler) POST(w http.ResponseWriter, r *http.Request) (int, e
 		Expires: &expires,
 	}
 
-	err := h.LinkService.Create(link)
+	err := h.Services.Link.Create(link)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}

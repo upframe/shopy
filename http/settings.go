@@ -11,9 +11,7 @@ import (
 )
 
 // SettingsHandler ...
-type SettingsHandler struct {
-	UserService fest.UserService
-}
+type SettingsHandler handler
 
 func (h *SettingsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var (
@@ -41,11 +39,7 @@ type settings struct {
 func (h *SettingsHandler) GET(w http.ResponseWriter, r *http.Request) (int, error) {
 	s := r.Context().Value("session").(*fest.Session)
 
-	if !s.IsLoggedIn() {
-		return Redirect(w, r, "/login")
-	}
-
-	user, err := h.UserService.Get(s.Values["UserID"].(int))
+	user, err := h.Services.User.Get(s.Values["UserID"].(int))
 	if err == sql.ErrNoRows {
 		return http.StatusNotFound, err
 	}
@@ -62,12 +56,6 @@ func (h *SettingsHandler) GET(w http.ResponseWriter, r *http.Request) (int, erro
 
 // POST ...
 func (h *SettingsHandler) POST(w http.ResponseWriter, r *http.Request) (int, error) {
-	s := r.Context().Value("session").(*fest.Session)
-
-	if !s.IsLoggedIn() {
-		return http.StatusBadRequest, fest.ErrNotLoggedIn
-	}
-
 	// Get the JSON information
 	rawBuffer := &bytes.Buffer{}
 	rawBuffer.ReadFrom(r.Body)
@@ -84,7 +72,7 @@ func (h *SettingsHandler) POST(w http.ResponseWriter, r *http.Request) (int, err
 	}
 
 	// Updates and checks for errors
-	err = h.UserService.Update(user, "FirstName", "LastName", "Email", "Address")
+	err = h.Services.User.Update(user, "FirstName", "LastName", "Email", "Address")
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}

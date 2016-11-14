@@ -10,10 +10,7 @@ import (
 )
 
 // CartHandler ...
-type CartHandler struct {
-	UserService    fest.UserService
-	ProductService fest.ProductService
-}
+type CartHandler handler
 
 func (h *CartHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var (
@@ -34,11 +31,7 @@ func (h *CartHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (h *CartHandler) GET(w http.ResponseWriter, r *http.Request) (int, error) {
 	s := r.Context().Value("session").(*fest.Session)
 
-	if !s.IsLoggedIn() {
-		return Redirect(w, r, "/login")
-	}
-
-	cart, err := s.GetCart(h.ProductService)
+	cart, err := s.GetCart(h.Services.Product)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -47,10 +40,7 @@ func (h *CartHandler) GET(w http.ResponseWriter, r *http.Request) (int, error) {
 }
 
 // CartItemHandler ...
-type CartItemHandler struct {
-	UserService    fest.UserService
-	ProductService fest.ProductService
-}
+type CartItemHandler handler
 
 func (h *CartItemHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var (
@@ -76,17 +66,13 @@ func (h *CartItemHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (h *CartItemHandler) POST(w http.ResponseWriter, r *http.Request) (int, error) {
 	s := r.Context().Value("session").(*fest.Session)
 
-	if !s.IsLoggedIn() {
-		return http.StatusUnauthorized, fest.ErrNotLoggedIn
-	}
-
 	id, err := strconv.Atoi(strings.Replace(r.URL.Path, "/cart/", "", -1))
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
 
 	// Gets the product, checks if it exists and checks for errors.
-	product, err := h.ProductService.Get(id)
+	product, err := h.Services.Product.Get(id)
 	if err == sql.ErrNoRows {
 		return http.StatusNotFound, err
 	}
@@ -124,10 +110,6 @@ func (h *CartItemHandler) POST(w http.ResponseWriter, r *http.Request) (int, err
 // DELETE ...
 func (h *CartItemHandler) DELETE(w http.ResponseWriter, r *http.Request) (int, error) {
 	s := r.Context().Value("session").(*fest.Session)
-
-	if !s.IsLoggedIn() {
-		return http.StatusUnauthorized, nil
-	}
 
 	id, err := strconv.Atoi(strings.Replace(r.URL.Path, "/cart/", "", 1))
 	if err != nil {

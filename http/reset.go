@@ -11,10 +11,7 @@ import (
 )
 
 // ResetHandler ...
-type ResetHandler struct {
-	UserService fest.UserService
-	LinkService fest.LinkService
-}
+type ResetHandler handler
 
 func (h *ResetHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var (
@@ -39,7 +36,7 @@ func (h *ResetHandler) GET(w http.ResponseWriter, r *http.Request) (int, error) 
 
 	if hash := r.URL.Query().Get("hash"); hash != "" {
 		// Fetches the link from the database
-		link, err := h.LinkService.Get(hash)
+		link, err := h.Services.Link.Get(hash)
 
 		// If the error is no rows, or the link is used, or it's expired or the path
 		// is incorrect, show a 404 Not Found page.
@@ -68,7 +65,7 @@ func (h *ResetHandler) POST(w http.ResponseWriter, r *http.Request) (int, error)
 	if hash := r.URL.Query().Get("hash"); hash != "" {
 		// Fetches the link from the database
 		var link *fest.Link
-		link, err = h.LinkService.Get(hash)
+		link, err = h.Services.Link.Get(hash)
 
 		// If the error is no rows, or the link is used, or it's expired or the path
 		// is incorrect, show a 404 Not Found page.
@@ -88,7 +85,7 @@ func (h *ResetHandler) POST(w http.ResponseWriter, r *http.Request) (int, error)
 
 		// SET USER PASSWORD AND UPDATE PWD HASH AND PWD SALT
 		var user *fest.User
-		user, err = h.UserService.Get(link.User)
+		user, err = h.Services.User.Get(link.User)
 		if err != nil {
 			return http.StatusInternalServerError, err
 		}
@@ -98,14 +95,14 @@ func (h *ResetHandler) POST(w http.ResponseWriter, r *http.Request) (int, error)
 			return http.StatusInternalServerError, err
 		}
 
-		err = h.UserService.Update(user, "PasswordHash", "PasswordSalt")
+		err = h.Services.User.Update(user, "PasswordHash", "PasswordSalt")
 		if err != nil {
 			return http.StatusInternalServerError, err
 		}
 
 		// SET LINK TO USED
 		link.Used = true
-		err = h.LinkService.Update(link, "Used")
+		err = h.Services.Link.Update(link, "Used")
 		if err != nil {
 			return http.StatusInternalServerError, err
 		}
@@ -122,7 +119,7 @@ func (h *ResetHandler) POST(w http.ResponseWriter, r *http.Request) (int, error)
 
 	// get user by email
 	var user *fest.User
-	user, err = h.UserService.GetByEmail(formEmail)
+	user, err = h.Services.User.GetByEmail(formEmail)
 	if err == sql.ErrNoRows {
 		return http.StatusNotFound, err
 	}
@@ -144,7 +141,7 @@ func (h *ResetHandler) POST(w http.ResponseWriter, r *http.Request) (int, error)
 		Expires: &expires,
 	}
 
-	err = h.LinkService.Create(link)
+	err = h.Services.Link.Create(link)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}

@@ -16,9 +16,7 @@ import (
 // TODO:
 
 // CheckoutCancelHandler ...
-type CheckoutCancelHandler struct {
-	UserService fest.UserService
-}
+type CheckoutCancelHandler handler
 
 func (h *CheckoutCancelHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var (
@@ -28,16 +26,6 @@ func (h *CheckoutCancelHandler) ServeHTTP(w http.ResponseWriter, r *http.Request
 	defer checkErrors(w, r, code, err)
 
 	s := r.Context().Value("session").(*fest.Session)
-
-	if !s.IsLoggedIn() {
-		if r.Method == http.MethodGet {
-			code, err = Redirect(w, r, "/login")
-			return
-		}
-
-		code, err = http.StatusUnauthorized, fest.ErrNotLoggedIn
-		return
-	}
 
 	if r.Method != http.MethodGet {
 		code = http.StatusNotImplemented
@@ -60,11 +48,7 @@ func (h *CheckoutCancelHandler) ServeHTTP(w http.ResponseWriter, r *http.Request
 }
 
 // CheckoutConfirmHandler ...
-type CheckoutConfirmHandler struct {
-	UserService    fest.UserService
-	ProductService fest.ProductService
-	OrderService   fest.OrderService
-}
+type CheckoutConfirmHandler handler
 
 func (h *CheckoutConfirmHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var (
@@ -74,16 +58,6 @@ func (h *CheckoutConfirmHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 	defer checkErrors(w, r, code, err)
 
 	s := r.Context().Value("session").(*fest.Session)
-
-	if !s.IsLoggedIn() {
-		if r.Method == http.MethodGet {
-			code, err = Redirect(w, r, "/login")
-			return
-		}
-
-		code, err = http.StatusUnauthorized, fest.ErrNotLoggedIn
-		return
-	}
 
 	if r.Method != http.MethodGet {
 		code = http.StatusNotImplemented
@@ -110,7 +84,7 @@ func (h *CheckoutConfirmHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	cart, err := s.GetCart(h.ProductService)
+	cart, err := s.GetCart(h.Services.Product)
 	if err != nil {
 		code = http.StatusInternalServerError
 		return
@@ -133,7 +107,7 @@ func (h *CheckoutConfirmHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 		o.PromocodeID.Int64 = int64(order.Promocode.ID)
 	}
 
-	err = h.OrderService.Create(o)
+	err = h.Services.Order.Create(o)
 	if err != nil {
 		code = http.StatusInternalServerError
 		return
@@ -143,13 +117,14 @@ func (h *CheckoutConfirmHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 
 	for _, product := range cart.Products {
 		o.Products = append(o.Products, &fest.OrderProduct{
-			OrderID:   o.ID,
-			ProductID: product.ID,
-			Quantity:  product.Quantity,
+			Product: &fest.Product{
+				ID: product.ID,
+			},
+			Quantity: product.Quantity,
 		})
 	}
 
-	err = h.OrderService.AddProducts(o)
+	err = h.Services.Order.AddProducts(o)
 	if err != nil {
 		code = http.StatusInternalServerError
 		return
@@ -170,11 +145,7 @@ func (h *CheckoutConfirmHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 }
 
 // CheckoutHandler ...
-type CheckoutHandler struct {
-	UserService      fest.UserService
-	ProductService   fest.ProductService
-	PromocodeService fest.PromocodeService
-}
+type CheckoutHandler handler
 
 func (h *CheckoutHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var (
@@ -197,11 +168,7 @@ func (h *CheckoutHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (h *CheckoutHandler) GET(w http.ResponseWriter, r *http.Request) (int, error) {
 	s := r.Context().Value("session").(*fest.Session)
 
-	if !s.IsLoggedIn() {
-		return Redirect(w, r, "/login")
-	}
-
-	cart, err := s.GetCart(h.ProductService)
+	cart, err := s.GetCart(h.Services.Product)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -223,17 +190,13 @@ func (h *CheckoutHandler) GET(w http.ResponseWriter, r *http.Request) (int, erro
 func (h *CheckoutHandler) POST(w http.ResponseWriter, r *http.Request) (int, error) {
 	s := r.Context().Value("session").(*fest.Session)
 
-	if !s.IsLoggedIn() {
-		return http.StatusUnauthorized, fest.ErrNotLoggedIn
-	}
-
 	// Parses the form and checks for errors
 	err := r.ParseForm()
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
 
-	cart, err := s.GetCart(h.ProductService)
+	cart, err := s.GetCart(h.Services.Product)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -265,7 +228,7 @@ func (h *CheckoutHandler) POST(w http.ResponseWriter, r *http.Request) (int, err
 	if promocode != "" {
 		// Gets the promocode and checks for errors
 		var promo *fest.Promocode
-		promo, err = h.PromocodeService.GetByCode(promocode)
+		promo, err = h.Services.Promocode.GetByCode(promocode)
 		if err == sql.ErrNoRows {
 			return http.StatusNotFound, nil
 		}
@@ -321,10 +284,7 @@ func (h *CheckoutHandler) POST(w http.ResponseWriter, r *http.Request) (int, err
 }
 
 // ValidatePromocodeHandler ...
-type ValidatePromocodeHandler struct {
-	UserService      fest.UserService
-	PromocodeService fest.PromocodeService
-}
+type ValidatePromocodeHandler handler
 
 func (h *ValidatePromocodeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var (
@@ -332,18 +292,6 @@ func (h *ValidatePromocodeHandler) ServeHTTP(w http.ResponseWriter, r *http.Requ
 		err  error
 	)
 	defer checkErrors(w, r, code, err)
-
-	s := r.Context().Value("session").(*fest.Session)
-
-	if !s.IsLoggedIn() {
-		if r.Method == http.MethodGet {
-			code, err = Redirect(w, r, "/login")
-			return
-		}
-
-		code, err = http.StatusUnauthorized, fest.ErrNotLoggedIn
-		return
-	}
 
 	if r.Method != http.MethodGet {
 		code = http.StatusNotImplemented
@@ -353,7 +301,7 @@ func (h *ValidatePromocodeHandler) ServeHTTP(w http.ResponseWriter, r *http.Requ
 	byt := new(bytes.Buffer)
 	byt.ReadFrom(r.Body)
 
-	promocode, err := h.PromocodeService.GetByCode(string(byt.Bytes()))
+	promocode, err := h.Services.Promocode.GetByCode(string(byt.Bytes()))
 	if err == sql.ErrNoRows {
 		code = http.StatusNotFound
 		return
