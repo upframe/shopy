@@ -32,10 +32,7 @@ func (h *LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // GET ...
 func (h *LoginHandler) GET(w http.ResponseWriter, r *http.Request) (int, error) {
-	s, err := GetSession(w, r, h.UserService)
-	if err != nil {
-		return http.StatusInternalServerError, err
-	}
+	s := r.Context().Value("session").(*fest.Session)
 
 	if s.IsLoggedIn() {
 		return Redirect(w, r, "/")
@@ -46,10 +43,7 @@ func (h *LoginHandler) GET(w http.ResponseWriter, r *http.Request) (int, error) 
 
 // POST ...
 func (h *LoginHandler) POST(w http.ResponseWriter, r *http.Request) (int, error) {
-	s, err := GetSession(w, r, h.UserService)
-	if err != nil {
-		return http.StatusInternalServerError, err
-	}
+	s := r.Context().Value("session").(*fest.Session)
 
 	if s.IsLoggedIn() {
 		return http.StatusBadRequest, fest.ErrAlreadyLoggedIn
@@ -57,8 +51,7 @@ func (h *LoginHandler) POST(w http.ResponseWriter, r *http.Request) (int, error)
 
 	if r.Header.Get("Resend") == "true" {
 		// Obtains the user and checks for errors
-		var user *fest.User
-		user, err = h.UserService.GetByEmail(r.Header.Get("email"))
+		user, err := h.UserService.GetByEmail(r.Header.Get("email"))
 		if err == sql.ErrNoRows {
 			return http.StatusNotFound, err
 		}
@@ -71,7 +64,7 @@ func (h *LoginHandler) POST(w http.ResponseWriter, r *http.Request) (int, error)
 	}
 
 	// Parses the form and checks for errors
-	err = r.ParseForm()
+	err := r.ParseForm()
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}

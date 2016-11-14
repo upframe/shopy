@@ -37,18 +37,13 @@ func (h *RegisterHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // GET ...
 func (h *RegisterHandler) GET(w http.ResponseWriter, r *http.Request) (int, error) {
-	s, err := GetSession(w, r, h.UserService)
-	if err != nil {
-		return http.StatusInternalServerError, err
-	}
-
+	s := r.Context().Value("session").(*fest.Session)
 	if s.IsLoggedIn() {
 		return Redirect(w, r, "/")
 	}
 
 	if r.URL.Query().Get("confirm") != "" {
-		var link *fest.Link
-		link, err = h.LinkService.Get(r.URL.Query().Get("confirm"))
+		link, err := h.LinkService.Get(r.URL.Query().Get("confirm"))
 
 		if err != nil || link.Used || link.Expires.Unix() < time.Now().Unix() || link.Path != "/register" {
 			return RenderHTML(w, s, nil, "invalid-link")
@@ -98,17 +93,14 @@ func (h *RegisterHandler) GET(w http.ResponseWriter, r *http.Request) (int, erro
 
 // POST ...
 func (h *RegisterHandler) POST(w http.ResponseWriter, r *http.Request) (int, error) {
-	s, err := GetSession(w, r, h.UserService)
-	if err != nil {
-		return http.StatusInternalServerError, err
-	}
+	s := r.Context().Value("session").(*fest.Session)
 
 	if s.IsLoggedIn() {
 		return http.StatusBadRequest, nil
 	}
 
 	// Parses the form and checks for errors
-	err = r.ParseForm()
+	err := r.ParseForm()
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}

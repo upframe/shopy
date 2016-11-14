@@ -29,10 +29,7 @@ func (h *StoreHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // GET ...
 func (h *StoreHandler) GET(w http.ResponseWriter, r *http.Request) (int, error) {
-	s, err := GetSession(w, r, h.UserService)
-	if err != nil {
-		return http.StatusInternalServerError, err
-	}
+	s := r.Context().Value("session").(*fest.Session)
 
 	products, err := h.ProductsService.GetsWhere(0, 0, "name", "deactivated", "0")
 	if err != nil {

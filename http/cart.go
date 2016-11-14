@@ -32,10 +32,7 @@ func (h *CartHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // GET ...
 func (h *CartHandler) GET(w http.ResponseWriter, r *http.Request) (int, error) {
-	s, err := GetSession(w, r, h.UserService)
-	if err != nil {
-		return http.StatusInternalServerError, err
-	}
+	s := r.Context().Value("session").(*fest.Session)
 
 	if !s.IsLoggedIn() {
 		return Redirect(w, r, "/login")
@@ -77,10 +74,7 @@ func (h *CartItemHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // POST ...
 func (h *CartItemHandler) POST(w http.ResponseWriter, r *http.Request) (int, error) {
-	s, err := GetSession(w, r, h.UserService)
-	if err != nil {
-		return http.StatusInternalServerError, err
-	}
+	s := r.Context().Value("session").(*fest.Session)
 
 	if !s.IsLoggedIn() {
 		return http.StatusUnauthorized, fest.ErrNotLoggedIn
@@ -129,10 +123,7 @@ func (h *CartItemHandler) POST(w http.ResponseWriter, r *http.Request) (int, err
 
 // DELETE ...
 func (h *CartItemHandler) DELETE(w http.ResponseWriter, r *http.Request) (int, error) {
-	s, err := GetSession(w, r, h.UserService)
-	if err != nil {
-		return http.StatusInternalServerError, err
-	}
+	s := r.Context().Value("session").(*fest.Session)
 
 	if !s.IsLoggedIn() {
 		return http.StatusUnauthorized, nil

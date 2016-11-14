@@ -35,10 +35,7 @@ func (h *ResetHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // GET ...
 func (h *ResetHandler) GET(w http.ResponseWriter, r *http.Request) (int, error) {
-	s, err := GetSession(w, r, h.UserService)
-	if err != nil {
-		return http.StatusInternalServerError, err
-	}
+	s := r.Context().Value("session").(*fest.Session)
 
 	if hash := r.URL.Query().Get("hash"); hash != "" {
 		// Fetches the link from the database

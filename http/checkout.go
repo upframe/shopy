@@ -27,11 +27,7 @@ func (h *CheckoutCancelHandler) ServeHTTP(w http.ResponseWriter, r *http.Request
 	)
 	defer checkErrors(w, r, code, err)
 
-	s, err := GetSession(w, r, h.UserService)
-	if err != nil {
-		code = http.StatusInternalServerError
-		return
-	}
+	s := r.Context().Value("session").(*fest.Session)
 
 	if !s.IsLoggedIn() {
 		if r.Method == http.MethodGet {
@@ -77,11 +73,7 @@ func (h *CheckoutConfirmHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 	)
 	defer checkErrors(w, r, code, err)
 
-	s, err := GetSession(w, r, h.UserService)
-	if err != nil {
-		code = http.StatusInternalServerError
-		return
-	}
+	s := r.Context().Value("session").(*fest.Session)
 
 	if !s.IsLoggedIn() {
 		if r.Method == http.MethodGet {
@@ -203,10 +195,7 @@ func (h *CheckoutHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // GET ...
 func (h *CheckoutHandler) GET(w http.ResponseWriter, r *http.Request) (int, error) {
-	s, err := GetSession(w, r, h.UserService)
-	if err != nil {
-		return http.StatusInternalServerError, err
-	}
+	s := r.Context().Value("session").(*fest.Session)
 
 	if !s.IsLoggedIn() {
 		return Redirect(w, r, "/login")
@@ -232,17 +221,14 @@ func (h *CheckoutHandler) GET(w http.ResponseWriter, r *http.Request) (int, erro
 
 // POST ...
 func (h *CheckoutHandler) POST(w http.ResponseWriter, r *http.Request) (int, error) {
-	s, err := GetSession(w, r, h.UserService)
-	if err != nil {
-		return http.StatusInternalServerError, err
-	}
+	s := r.Context().Value("session").(*fest.Session)
 
 	if !s.IsLoggedIn() {
 		return http.StatusUnauthorized, fest.ErrNotLoggedIn
 	}
 
 	// Parses the form and checks for errors
-	err = r.ParseForm()
+	err := r.ParseForm()
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -347,11 +333,7 @@ func (h *ValidatePromocodeHandler) ServeHTTP(w http.ResponseWriter, r *http.Requ
 	)
 	defer checkErrors(w, r, code, err)
 
-	s, err := GetSession(w, r, h.UserService)
-	if err != nil {
-		code = http.StatusInternalServerError
-		return
-	}
+	s := r.Context().Value("session").(*fest.Session)
 
 	if !s.IsLoggedIn() {
 		if r.Method == http.MethodGet {

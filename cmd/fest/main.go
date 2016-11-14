@@ -111,7 +111,7 @@ func main() {
 	linkService := &mysql.LinkService{}
 	productService := &mysql.ProductService{}
 	promoService := &mysql.PromocodeService{}
-	orderService := &mysql.OrderService{}
+	//orderService := &mysql.OrderService{}
 
 	r := mux.NewRouter()
 
@@ -161,11 +161,11 @@ func main() {
 	r.Handle("/checkout/cancel", &handlers.CheckoutCancelHandler{
 		UserService: userService,
 	})
-	r.Handle("/checkout/confirm", &handlers.CheckoutConfirmHandler{
+	/* r.Handle("/checkout/confirm", &handlers.CheckoutConfirmHandler{
 		UserService:    userService,
 		ProductService: productService,
 		OrderService:   orderService,
-	})
+	}) */
 
 	r.Handle("/checkout", &handlers.CheckoutHandler{
 		UserService:      userService,
@@ -184,7 +184,7 @@ func main() {
 	api.HandleFunc("/user/:id", GetUser).Methods("GET") */
 
 	// Bind to a port and pass our router in
-	log.Fatal(http.ListenAndServe(":80", r))
+	log.Fatal(http.ListenAndServe(":80", handlers.InjectSession(r, userService)))
 
 	// TODO: check csrf things
 }

@@ -73,10 +73,7 @@ func (h *DeactivateHandler) GET(w http.ResponseWriter, r *http.Request) (int, er
 
 // POST ...
 func (h *DeactivateHandler) POST(w http.ResponseWriter, r *http.Request) (int, error) {
-	s, err := GetSession(w, r, h.UserService)
-	if err != nil {
-		return http.StatusInternalServerError, err
-	}
+	s := r.Context().Value("session").(*fest.Session)
 
 	if !s.IsLoggedIn() {
 		return http.StatusBadRequest, fest.ErrNotLoggedIn
@@ -95,7 +92,7 @@ func (h *DeactivateHandler) POST(w http.ResponseWriter, r *http.Request) (int, e
 		Expires: &expires,
 	}
 
-	err = h.LinkService.Create(link)
+	err := h.LinkService.Create(link)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}

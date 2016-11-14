@@ -39,10 +39,7 @@ type settings struct {
 
 // GET ...
 func (h *SettingsHandler) GET(w http.ResponseWriter, r *http.Request) (int, error) {
-	s, err := GetSession(w, r, h.UserService)
-	if err != nil {
-		return http.StatusInternalServerError, err
-	}
+	s := r.Context().Value("session").(*fest.Session)
 
 	if !s.IsLoggedIn() {
 		return Redirect(w, r, "/login")
@@ -65,10 +62,7 @@ func (h *SettingsHandler) GET(w http.ResponseWriter, r *http.Request) (int, erro
 
 // POST ...
 func (h *SettingsHandler) POST(w http.ResponseWriter, r *http.Request) (int, error) {
-	s, err := GetSession(w, r, h.UserService)
-	if err != nil {
-		return http.StatusInternalServerError, err
-	}
+	s := r.Context().Value("session").(*fest.Session)
 
 	if !s.IsLoggedIn() {
 		return http.StatusBadRequest, fest.ErrNotLoggedIn
@@ -80,7 +74,7 @@ func (h *SettingsHandler) POST(w http.ResponseWriter, r *http.Request) (int, err
 
 	// Parses the JSON into a user object and checks for errors
 	user := &fest.User{}
-	err = json.Unmarshal(rawBuffer.Bytes(), user)
+	err := json.Unmarshal(rawBuffer.Bytes(), user)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
