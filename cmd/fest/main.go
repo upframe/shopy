@@ -152,9 +152,7 @@ func main() {
 		Services: s,
 	})
 
-	r.Handle("/checkout/cancel", &h.CheckoutCancelHandler{
-		Services: s,
-	})
+	r.Handle("/checkout/cancel", &h.CheckoutCancelHandler{Services: s})
 	/* r.Handle("/checkout/confirm", h.MustLogin(&h.CheckoutConfirmHandler{
 		Services: s,
 	})) */
@@ -168,6 +166,10 @@ func main() {
 	}))
 
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("_assets/static/"))))
+
+	api := r.PathPrefix("/api").Subrouter()
+	api.NotFoundHandler = &h.NotFoundAPI{}
+	api.Handle("/promocode/{id:[0-9]+}", &h.PromocodeAPI{Services: s})
 
 	/* api := r.PathPrefix("/api").Subrouter()
 	api.HandleFunc("/user/:id", GetUser).Methods("GET") */
