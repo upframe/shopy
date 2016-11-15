@@ -58,7 +58,10 @@ func Serve(c *fest.Config) {
 	api.HandleFunc("/promocode", Inject(MustAdmin(APIPromocodePost), c)).Methods("POST")
 	api.HandleFunc("/user", Inject(MustAdmin(APIUserPost), c)).Methods("POST")
 
-	// TODO: PUT
+	api.HandleFunc("/order/{id:[0-9]+}", Inject(MustAdmin(APIOrderPut), c)).Methods("PUT")
+	api.HandleFunc("/product/{id:[0-9]+}", Inject(MustAdmin(APIProductPut), c)).Methods("PUT")
+	api.HandleFunc("/promocode/{id:[0-9]+}", Inject(MustAdmin(APIPromocodePut), c)).Methods("PUT")
+	api.HandleFunc("/user/{id:[0-9]+}", Inject(MustAdmin(APIUserPut), c)).Methods("PUT")
 
 	api.HandleFunc("/order/{id:[0-9]+}", Inject(MustAdmin(APIOrderDelete), c)).Methods("DELETE")
 	api.HandleFunc("/product/{id:[0-9]+}", Inject(MustAdmin(APIProductDelete), c)).Methods("DELETE")

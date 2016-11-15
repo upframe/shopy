@@ -58,6 +58,42 @@ func APIOrderPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, 
 	return 0, nil
 }
 
+// APIOrderPut ...
+func APIOrderPut(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
+	id, err := strconv.Atoi(mux.Vars(r)["id"])
+	if err != nil {
+		return http.StatusNotFound, nil
+	}
+
+	o := &fest.Order{}
+
+	// Get the JSON information
+	rawBuffer := new(bytes.Buffer)
+	rawBuffer.ReadFrom(r.Body)
+
+	// Parses the JSON into the promocode object and checks for errors
+	err = json.Unmarshal(rawBuffer.Bytes(), o)
+	if err != nil {
+		return http.StatusBadRequest, err
+	}
+
+	if o.ID == 0 {
+		o.ID = id
+	}
+
+	fields, err := topLevelKeys(rawBuffer.Bytes())
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	err = c.Services.Order.Update(o, fields...)
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	return http.StatusOK, nil
+}
+
 // APIOrderDelete  ...
 func APIOrderDelete(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
 	id, err := strconv.Atoi(mux.Vars(r)["id"])

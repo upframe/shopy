@@ -39,6 +39,10 @@ func updateQuery(table, where string, fields []string) string {
 
 	// Add the fields that we are going to update to the queyr
 	for i := range fields {
+		if fields[i] == "ID" || fields[i] == "id" {
+			continue
+		}
+
 		if i == len(fields)-1 {
 			query += fields[i] + "=:" + fields[i]
 		} else {
