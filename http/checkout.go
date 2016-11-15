@@ -2,7 +2,6 @@ package http
 
 import (
 	"database/sql"
-	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -156,7 +155,6 @@ func CheckoutPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, 
 
 	// Gets the promocode
 	promocode := r.FormValue("promocode")
-	fmt.Println(promocode)
 
 	if promocode != "" {
 		// Gets the promocode and checks for errors

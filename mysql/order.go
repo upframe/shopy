@@ -10,6 +10,11 @@ import (
 	"github.com/upframe/fest"
 )
 
+// OrderService ...
+type OrderService struct {
+	DB *sqlx.DB
+}
+
 var ordersMap = map[string]string{
 	"ID":                    "o.id",
 	"UserID":                "o.user_id",
@@ -23,28 +28,6 @@ var ordersMap = map[string]string{
 	"Promocode.Discount":    "p.discount",
 	"Promocode.Percentage":  "p.percentage",
 	"Promocode.Deactivated": "p.deactivated",
-}
-
-type order struct {
-	ID          int            `db:"id"`
-	UserID      int            `db:"user_id"`
-	PromocodeID fest.NullInt64 `db:"promocode_id"`
-	PayPal      string         `db:"paypal"`
-	Value       int            `db:"value"`
-	Status      string         `db:"status"`
-	Credits     int            `db:"credits"`
-}
-
-type orderProduct struct {
-	ID        int64 `db:"id"`
-	OrderID   int64 `db:"order_id"`
-	ProductID int64 `db:"product_id"`
-	Quantity  int   `db:"quantity"`
-}
-
-// OrderService ...
-type OrderService struct {
-	DB *sqlx.DB
 }
 
 // Get ...
@@ -176,8 +159,55 @@ func (s *OrderService) GetsWhere(first, limit int, order, where, sth string) ([]
 
 // Create ...
 func (s *OrderService) Create(o *fest.Order) error {
-	// TODO: add products and relationships
-	return errors.New("Not implemented")
+	var (
+		res sql.Result
+		err error
+	)
+
+	if o.Promocode == nil {
+		res, err = s.DB.Exec(
+			"INSERT INTO orders (`user_id`, `value`, `status`, `paypal`) VALUES (?, ?, ?, ?)",
+			o.UserID,
+			o.Value,
+			o.Status,
+			o.PayPal,
+		)
+	} else {
+		res, err = s.DB.Exec(
+			"INSERT INTO orders (`user_id`, `promocode_id`, `value`, `status`, `paypal`) VALUES (?, ?, ?, ?, ?)",
+			o.UserID,
+			o.Promocode.ID,
+			o.Value,
+			o.Status,
+			o.PayPal,
+		)
+	}
+
+	if err != nil {
+		return err
+	}
+
+	id, err := res.LastInsertId()
+	if err != nil {
+		return err
+	}
+
+	o.ID = int(id)
+
+	if len(o.Products) == 0 {
+		return nil
+	}
+
+	query := "INSERT INTO orders_products (order_id, product_id, quantity) VALUES (?, ?, ?)"
+	args := []interface{}{o.ID, o.Products[0].ID, o.Products[0].Quantity}
+
+	for i := 1; i < len(o.Products); i++ {
+		query += ", (?, ?, ?)"
+		args = append(args, o.ID, o.Products[i].ID, o.Products[i].Quantity)
+	}
+
+	_, err = s.DB.Exec(query, args)
+	return err
 }
 
 // Update ...

@@ -12,6 +12,11 @@ type Order struct {
 	Products  []*OrderProduct
 }
 
+const (
+	OrderWaitingPayment = "Waiting For Payment"
+	OrderAccepted       = "Accepted"
+)
+
 // OrderProduct ...
 type OrderProduct struct {
 	ID       int
