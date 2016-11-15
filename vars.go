@@ -26,8 +26,12 @@ var (
 type Config struct {
 	DefaultInvites int
 	InviteOnly     bool
+	Port           string
 	BaseAddress    string
 	Templates      string
+	Domain         string
+	Scheme         string
+	Assets         string
 	Store          *sessions.CookieStore
 	PayPal         *paypalsdk.Client
 	Logger         *log.Logger

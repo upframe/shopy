@@ -1,25 +1,47 @@
 package main
 
+import (
+	"encoding/json"
+	"os"
+)
+
 type config struct {
-	Development    bool   `json:"Development"`
-	Key            string `json:"Key"`
-	InviteOnly     bool   `json:"InviteOnly"`
-	DefaultInvites int    `json:"BaseInvites"`
+	Development    bool
+	Key            string
+	Domain         string
+	Port           int
+	Scheme         string
+	Assets         string
+	InviteOnly     bool
+	DefaultInvites int
 	Database       struct {
-		User     string `json:"User"`
-		Password string `json:"Password"`
-		Host     string `json:"Host"`
-		Port     string `json:"Port"`
-		Name     string `json:"Name"`
-	} `json:"Database"`
+		User     string
+		Password string
+		Host     string
+		Port     string
+		Name     string
+	}
 	SMTP struct {
-		User     string `json:"User"`
-		Password string `json:"Password"`
-		Host     string `json:"Host"`
-		Port     string `json:"Port"`
-	} `json:"SMTP"`
+		User     string
+		Password string
+		Host     string
+		Port     string
+	}
 	PayPal struct {
-		Client string `json:"Client"`
-		Secret string `json:"Secret"`
-	} `json:"PayPal"`
+		Client string
+		Secret string
+	}
+}
+
+func configFile(path string) (*config, error) {
+	file := &config{}
+
+	configFile, err := os.Open("config.json")
+	if err != nil {
+		return file, err
+	}
+
+	jsonParser := json.NewDecoder(configFile)
+	err = jsonParser.Decode(&file)
+	return file, nil
 }

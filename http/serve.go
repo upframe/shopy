@@ -12,8 +12,7 @@ import (
 func Serve(c *fest.Config) {
 	r := mux.NewRouter()
 
-	// TODO: this url should come from config
-	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("_assets/static/"))))
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(c.Assets+"static/"))))
 
 	r.HandleFunc("/", Inject(IndexGet, c)).Methods("GET")
 	r.HandleFunc("/login", Inject(LoginGet, c)).Methods("GET")
@@ -68,7 +67,7 @@ func Serve(c *fest.Config) {
 	api.HandleFunc("/user/{id:[0-9]+}", Inject(MustAdmin(APIUserDelete), c)).Methods("DELETE")
 
 	// TODO :check CSRF
-	log.Fatal(http.ListenAndServe(":80", r))
+	log.Fatal(http.ListenAndServe(c.Domain+":"+c.Port, r))
 }
 
 // logout resets the session values and saves the cookie

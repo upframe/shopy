@@ -1,11 +1,10 @@
 package main
 
 import (
-	"encoding/gob"
-	"encoding/json"
 	"log"
 	"os"
 	"runtime"
+	"strconv"
 
 	"github.com/gorilla/sessions"
 	"github.com/upframe/fest"
@@ -14,51 +13,57 @@ import (
 	"github.com/upframe/fest/mysql"
 )
 
-func init() {
-	// Regist types so they can be used on Cookies
-	gob.Register(fest.CartCookie{})
-	gob.Register(fest.OrderCookie{})
-}
-
 func main() {
-	// TODO: admin
-	// TODO: api
-	// TODO: clean
-
+	// Execute with all of the CPUs available
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	file := &config{}
-	// then config file settings
-
-	configFile, err := os.Open("config.json")
-	if err != nil {
-		log.Fatal("opening config file", err.Error())
+	path := "config.json"
+	if len(os.Args) > 1 {
+		path = os.Args[1]
 	}
 
-	jsonParser := json.NewDecoder(configFile)
-	if err = jsonParser.Decode(&file); err != nil {
-		log.Fatal("parsing config file", err.Error())
+	conf, err := configFile(path)
+	if err != nil {
+		panic(err)
 	}
 
 	// Connects to the database and checks for an error
 	db, err := mysql.InitDB(
-		file.Database.User,
-		file.Database.Password,
-		file.Database.Host,
-		file.Database.Port,
-		file.Database.Name,
+		conf.Database.User,
+		conf.Database.Password,
+		conf.Database.Host,
+		conf.Database.Port,
+		conf.Database.Name,
 	)
 
 	if err != nil {
 		panic(err)
 	}
 
+	// Configures the email
+	// TODO: Email... global or a struct inside config?
+	email.Templates = conf.Assets + "templates/email/"
+	email.InitSMTP(conf.SMTP.User, conf.SMTP.Password, conf.SMTP.Host, conf.SMTP.Port)
+
+	// Configures PayPal
+	paypal, err := fest.InitPayPal(conf.PayPal.Client, conf.PayPal.Secret, conf.Development)
+
+	if err != nil {
+		panic(err)
+	}
+
 	c := &fest.Config{
-		InviteOnly:     file.InviteOnly,
-		DefaultInvites: file.DefaultInvites,
-		BaseAddress:    "http://localhost",
-		Templates:      "_assets/templates/",
+		Domain:         conf.Domain,
+		Scheme:         conf.Scheme,
+		Port:           strconv.Itoa(conf.Port),
+		Assets:         conf.Assets,
+		InviteOnly:     conf.InviteOnly,
+		DefaultInvites: conf.DefaultInvites,
+		BaseAddress:    conf.Scheme + "//" + conf.Domain,
+		Templates:      conf.Assets + "templates/",
 		Logger:         log.New(os.Stdout, "", log.LstdFlags),
+		PayPal:         paypal,
+		Store:          sessions.NewCookieStore([]byte(conf.Key)),
 		Services: &fest.Services{
 			User:      &mysql.UserService{DB: db},
 			Link:      &mysql.LinkService{DB: db},
@@ -68,29 +73,14 @@ func main() {
 		},
 	}
 
-	email.Templates = "_assets/templates/email/"
-
-	// Creates the new cookie session;
-	c.Store = sessions.NewCookieStore([]byte(file.Key))
+	// Define the Store options
 	c.Store.Options = &sessions.Options{
 		Path:     "/",
 		MaxAge:   3600 * 3,
-		Secure:   !file.Development,
+		Secure:   conf.Scheme == "https",
 		HttpOnly: true,
-		Domain:   "localhost",
+		Domain:   conf.Domain,
 	}
-
-	// Configures the email
-	email.InitSMTP(file.SMTP.User, file.SMTP.Password, file.SMTP.Host, file.SMTP.Port)
-
-	// Configures PayPal
-	paypal, err := fest.InitPayPal(file.PayPal.Client, file.PayPal.Secret, file.Development)
-
-	if err != nil {
-		panic(err)
-	}
-
-	c.PayPal = paypal
 
 	h.Serve(c)
 }
