@@ -10,8 +10,6 @@ import (
 	"github.com/upframe/fest"
 )
 
-// TODO:
-
 // CheckoutCancelGet ...
 func CheckoutCancelGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
 	s := r.Context().Value("session").(*fest.Session)
@@ -51,34 +49,13 @@ func CheckoutConfirmGet(w http.ResponseWriter, r *http.Request, c *fest.Config) 
 		return http.StatusInternalServerError, err
 	}
 
-	cart, err := s.GetCart(c.Services.Product)
+	order, err := c.Services.Order.GetByPayPal(executeResult.ID)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
 
-	order := s.Values["Order"].(fest.OrderCookie)
-
-	o := &fest.Order{
-		UserID:    s.User.ID,
-		PayPal:    paymentID,
-		Value:     order.Total,
-		Status:    executeResult.State,
-		Promocode: &fest.Promocode{},
-		Products:  []*fest.OrderProduct{},
-	}
-
-	if order.Promocode.Code != "" {
-		o.Promocode.ID = order.Promocode.ID
-	}
-
-	for _, product := range cart.Products {
-		o.Products = append(o.Products, &fest.OrderProduct{
-			ID:       product.ID,
-			Quantity: product.Quantity,
-		})
-	}
-
-	err = c.Services.Order.Create(o)
+	order.Status = executeResult.State
+	err = c.Services.Order.Update(order, "Status")
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -133,33 +110,43 @@ func CheckoutPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, 
 		return http.StatusInternalServerError, err
 	}
 
-	order := fest.OrderCookie{}
-	order.Total = cart.GetTotal()
-
-	// Obtain the credits and discount them
-	credits := r.FormValue("credits")
-	if len(credits) == 0 {
-		credits = "0"
+	order := &fest.Order{
+		UserID:   s.User.ID,
+		Status:   fest.OrderWaitingPayment,
+		Products: []*fest.OrderProduct{},
+		Value:    cart.GetTotal(),
 	}
 
-	order.Credits, err = strconv.Atoi(credits)
+	for _, product := range cart.Products {
+		order.Products = append(order.Products, &fest.OrderProduct{
+			ID:       product.ID,
+			Quantity: product.Quantity,
+		})
+	}
+
+	// Obtain the credits and discount them
+	text := r.FormValue("credits")
+	if len(text) == 0 {
+		text = "0"
+	}
+
+	credits, err := strconv.Atoi(text)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
 
-	if s.User.Credit < order.Credits || order.Credits > order.Total {
+	if s.User.Credit < credits || credits > order.Value {
 		return http.StatusBadRequest, nil
 	}
 
-	order.Total -= order.Credits
+	order.Value -= credits
 
 	// Gets the promocode
 	promocode := r.FormValue("promocode")
 
 	if promocode != "" {
 		// Gets the promocode and checks for errors
-		var promo *fest.Promocode
-		promo, err = c.Services.Promocode.GetByCode(promocode)
+		order.Promocode, err = c.Services.Promocode.GetByCode(promocode)
 		if err == sql.ErrNoRows {
 			return http.StatusNotFound, nil
 		}
@@ -168,26 +155,19 @@ func CheckoutPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, 
 			return http.StatusInternalServerError, err
 		}
 
-		order.Promocode.Code = promo.Code
-		order.Promocode.ID = promo.ID
-		if time.Now().Unix() > promo.Expires.Unix() {
+		if time.Now().Unix() > order.Promocode.Expires.Unix() {
 			return http.StatusGone, nil
 		}
 
-		if promo.Percentage {
-			order.Promocode.DiscountAmount = (promo.Discount * order.Total) / 100
+		var discount int
+
+		if order.Promocode.Percentage {
+			discount = (order.Promocode.Discount * order.Value) / 100
 		} else {
-			order.Promocode.DiscountAmount = promo.Discount
+			discount = order.Promocode.Discount
 		}
 
-		order.Total -= order.Promocode.DiscountAmount
-	}
-
-	// Saves the cookie
-	s.Values["Order"] = order
-	err = s.Save(r, w)
-	if err != nil {
-		return http.StatusInternalServerError, err
+		order.Value -= discount
 	}
 
 	_, err = c.PayPal.GetAccessToken()
@@ -196,7 +176,7 @@ func CheckoutPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, 
 	}
 
 	amount := paypalsdk.Amount{
-		Total:    displayCents(order.Total),
+		Total:    displayCents(order.Value),
 		Currency: "EUR",
 	}
 
@@ -208,6 +188,13 @@ func CheckoutPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, 
 	)
 
 	if err != nil || p.ID == "" {
+		return http.StatusInternalServerError, err
+	}
+
+	order.PayPal = p.ID
+
+	err = c.Services.Order.Create(order)
+	if err != nil {
 		return http.StatusInternalServerError, err
 	}
 

@@ -2,7 +2,6 @@ package mysql
 
 import (
 	"database/sql"
-	"errors"
 	"strconv"
 	"time"
 
@@ -20,8 +19,8 @@ var ordersMap = map[string]string{
 	"UserID":                "o.user_id",
 	"PayPal":                "o.paypal",
 	"Value":                 "o.value",
-	"Status":                "o.Status",
-	"Credits":               "o.Credits",
+	"Status":                "o.status",
+	"Credits":               "o.credits",
 	"Promocode.ID":          "p.id",
 	"Promocode.Code":        "p.code",
 	"Promocode.Expires":     "p.expires",
@@ -33,6 +32,20 @@ var ordersMap = map[string]string{
 // Get ...
 func (s *OrderService) Get(id int) (*fest.Order, error) {
 	orders, err := s.GetsWhere(0, 0, "ID", "ID", strconv.Itoa(id))
+	if err != nil {
+		return &fest.Order{}, err
+	}
+
+	if len(orders) == 0 {
+		return &fest.Order{}, sql.ErrNoRows
+	}
+
+	return orders[0], nil
+}
+
+// GetByPayPal ...
+func (s *OrderService) GetByPayPal(token string) (*fest.Order, error) {
+	orders, err := s.GetsWhere(0, 0, "ID", "PayPal", token)
 	if err != nil {
 		return &fest.Order{}, err
 	}
@@ -206,18 +219,67 @@ func (s *OrderService) Create(o *fest.Order) error {
 		args = append(args, o.ID, o.Products[i].ID, o.Products[i].Quantity)
 	}
 
-	_, err = s.DB.Exec(query, args)
+	_, err = s.DB.Exec(query, args...)
 	return err
+}
+
+var ordersUpdateMap = map[string]string{
+	"ID":          "id",
+	"UserID":      "user_id",
+	"PayPal":      "paypal",
+	"Value":       "value",
+	"Status":      "status",
+	"Credits":     "credits",
+	"PromocodeID": "promocode_id",
+}
+
+type updateOrder struct {
+	ID          int           `db:"id"`
+	UserID      int           `db:"user_id"`
+	PromocodeID sql.NullInt64 `db:"promocode_id"`
+	PayPal      string        `db:"paypal"`
+	Status      string        `db:"status"`
+	Value       int           `db:"value"`
+	Credits     int           `db:"credits"`
 }
 
 // Update ...
 func (s *OrderService) Update(o *fest.Order, fields ...string) error {
-	// TODO: check if products or promocode to update
-	return errors.New("Not implemented")
+	for i := range fields {
+		if fields[i] == "Promocode" {
+			fields[i] = "PromocodeID"
+		}
+	}
+
+	obj := &updateOrder{
+		ID:          o.ID,
+		UserID:      o.UserID,
+		PromocodeID: sql.NullInt64{Valid: false},
+		PayPal:      o.PayPal,
+		Status:      o.Status,
+		Value:       o.Value,
+		Credits:     o.Credits,
+	}
+
+	if o.Promocode != nil {
+		obj.PromocodeID.Valid = true
+		obj.PromocodeID.Int64 = int64(o.Promocode.ID)
+	}
+
+	_, err := s.DB.NamedExec(updateQuery("orders", "id", fieldsToColumns(ordersUpdateMap, fields...)), obj)
+	// NOTE: we don't allow the code to update the Products. If there is some
+	// problem with an order, it should be cancealed and new one should
+	// be created.
+	return err
 }
 
 // Delete ...
 func (s *OrderService) Delete(id int) error {
-	// TODO: just disable or change STATUS to 'CAnceled'
-	return errors.New("Not implemented")
+	o, err := s.Get(id)
+	if err != nil {
+		return err
+	}
+
+	o.Status = fest.OrderCanceled
+	return s.Update(o, "Status")
 }

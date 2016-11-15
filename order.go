@@ -13,8 +13,11 @@ type Order struct {
 }
 
 const (
-	OrderWaitingPayment = "Waiting For Payment"
-	OrderAccepted       = "Accepted"
+	OrderWaitingPayment = "pending"
+	OrderApproved       = "approved"
+	OrderCreated        = "created"
+	OrderFailed         = "failed"
+	OrderCanceled       = "canceled"
 )
 
 // OrderProduct ...
@@ -27,6 +30,7 @@ type OrderProduct struct {
 // OrderService ...
 type OrderService interface {
 	Get(id int) (*Order, error)
+	GetByPayPal(token string) (*Order, error)
 	Gets(first, limit int, order string) ([]*Order, error)
 	GetsWhere(first, limit int, order, where, sth string) ([]*Order, error)
 

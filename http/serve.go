@@ -42,6 +42,8 @@ func Serve(c *fest.Config) {
 	r.HandleFunc("/checkout/cancel", Inject(MustLogin(CheckoutCancelGet), c)).Methods("GET")
 	r.HandleFunc("/checkout/confirm", Inject(MustLogin(CheckoutConfirmGet), c)).Methods("GET")
 
+	r.HandleFunc("/logout", Inject(logout, c))
+
 	api := r.PathPrefix("/api").Subrouter()
 
 	api.HandleFunc("/order/{id:[0-9]+}", Inject(APIOrderGet, c)).Methods("GET")
@@ -55,4 +57,21 @@ func Serve(c *fest.Config) {
 	// TODO :check CSRF
 	log.Fatal(http.ListenAndServe(":80", r))
 
+}
+
+// logout resets the session values and saves the cookie
+func logout(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
+	s := r.Context().Value("session").(*fest.Session)
+
+	// Reset the session values
+	s.Values = map[interface{}]interface{}{}
+	s.Values["IsLoggedIn"] = false
+
+	// Saves the session and checks for error
+	err := s.Save(r, w)
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	return Redirect(w, r, "/")
 }
