@@ -62,26 +62,17 @@ func CheckoutConfirmGet(w http.ResponseWriter, r *http.Request, c *fest.Config) 
 	order := s.Values["Order"].(fest.OrderCookie)
 
 	o := &fest.Order{
-		UserID:      s.User.ID,
-		PayPalID:    paymentID,
-		Value:       order.Total,
-		Status:      executeResult.State,
-		PromocodeID: fest.NullInt64{},
+		UserID:    s.User.ID,
+		PayPal:    paymentID,
+		Value:     order.Total,
+		Status:    executeResult.State,
+		Promocode: &fest.Promocode{},
+		Products:  []*fest.OrderProduct{},
 	}
 
-	if order.Promocode.Code == "" {
-		o.PromocodeID.Valid = false
-	} else {
-		o.PromocodeID.Valid = true
-		o.PromocodeID.Int64 = int64(order.Promocode.ID)
+	if order.Promocode.Code != "" {
+		o.Promocode.ID = order.Promocode.ID
 	}
-
-	err = c.Services.Order.Create(o)
-	if err != nil {
-		return http.StatusInternalServerError, err
-	}
-
-	o.Products = []*fest.OrderProduct{}
 
 	for _, product := range cart.Products {
 		o.Products = append(o.Products, &fest.OrderProduct{
@@ -92,7 +83,7 @@ func CheckoutConfirmGet(w http.ResponseWriter, r *http.Request, c *fest.Config) 
 		})
 	}
 
-	err = c.Services.Order.AddProducts(o)
+	err = c.Services.Order.Create(o)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}

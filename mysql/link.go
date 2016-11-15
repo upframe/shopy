@@ -32,6 +32,8 @@ func (s *LinkService) Gets(first, limit int, order string) ([]*fest.Link, error)
 	links := []*fest.Link{}
 	var err error
 
+	order = fieldsToColumns(linkMap, order)[0]
+
 	if limit == 0 {
 		err = s.DB.Select(&links, "SELECT * FROM links ORDER BY ?", order)
 	} else {

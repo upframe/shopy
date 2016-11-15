@@ -5,45 +5,12 @@ import (
 	"net/http"
 )
 
-type apiMessage struct {
-	Code    int
-	Message string
-	Error   error `json:"-"`
-}
-
-/*
-// NotFoundAPI ...
-type NotFoundAPI handler
-
-func (h *NotFoundAPI) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	data, err := json.MarshalIndent(&apiMessage{
-		Code:    http.StatusNotFound,
-		Message: http.StatusText(http.StatusNotFound),
-	}, "", "\t")
+func apiPrint(w http.ResponseWriter, o interface{}) (int, error) {
+	data, err := json.MarshalIndent(o, "", "\t")
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		return http.StatusInternalServerError, err
 	}
 
-	w.WriteHeader(http.StatusNotFound)
 	w.Write(data)
-} */
-
-func apiErrors(w http.ResponseWriter, r *http.Request, err *apiMessage) {
-	if err.Error != nil {
-		err.Message = err.Error.Error()
-	}
-
-	if err.Error == nil && err.Code != 0 {
-		err.Message = http.StatusText(err.Code)
-	}
-
-	if err.Code != 0 {
-		data, e := json.MarshalIndent(err, "", "\t")
-		if e != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-		}
-
-		w.WriteHeader(err.Code)
-		w.Write(data)
-	}
+	return 0, nil
 }

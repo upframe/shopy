@@ -40,6 +40,8 @@ func (s *PromocodeService) Gets(first, limit int, order string) ([]*fest.Promoco
 	promocodes := []*fest.Promocode{}
 	var err error
 
+	order = fieldsToColumns(promocodeMap, order)[0]
+
 	if limit == 0 {
 		err = s.DB.Select(&promocodes, "SELECT * FROM promocodes ORDER BY ?", order)
 	} else {

@@ -32,6 +32,8 @@ func (s *ProductService) Gets(first, limit int, order string) ([]*fest.Product, 
 	products := []*fest.Product{}
 	var err error
 
+	order = fieldsToColumns(productMap, order)[0]
+
 	if limit == 0 {
 		err = s.DB.Select(&products, "SELECT * FROM products ORDER BY ?", order)
 	} else {
@@ -46,6 +48,9 @@ func (s *ProductService) GetsWhere(first, limit int, order, where, sth string) (
 	products := []*fest.Product{}
 	var err error
 
+	where = fieldsToColumns(productMap, where)[0]
+	order = fieldsToColumns(productMap, order)[0]
+
 	if limit == 0 {
 		err = s.DB.Select(&products, "SELECT * FROM products WHERE "+where+"=? ORDER BY ?", sth, order)
 	} else {
@@ -59,6 +64,9 @@ func (s *ProductService) GetsWhere(first, limit int, order, where, sth string) (
 func (s *ProductService) GetsWhereIn(first, limit int, order, where, in string) ([]*fest.Product, error) {
 	products := []*fest.Product{}
 	var err error
+
+	where = fieldsToColumns(productMap, where)[0]
+	order = fieldsToColumns(productMap, order)[0]
 
 	if limit == 0 {
 		err = s.DB.Select(&products, "SELECT * FROM products WHERE "+where+" IN "+in+" ORDER BY ?", order)

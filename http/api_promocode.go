@@ -2,7 +2,6 @@ package http
 
 import (
 	"database/sql"
-	"encoding/json"
 	"net/http"
 	"strconv"
 
@@ -12,93 +11,28 @@ import (
 
 // APIPromocodeGet ...
 func APIPromocodeGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	id, err := strconv.Atoi(mux.Vars(r)["id"])
+	var p *fest.Promocode
+	code := mux.Vars(r)["id"]
+	id, err := strconv.Atoi(code)
+
 	if err != nil {
-		return http.StatusInternalServerError, err
+		p, err = c.Services.Promocode.GetByCode(code)
+	} else {
+		s := r.Context().Value("session").(*fest.Session)
+		if !s.IsAdmin() {
+			return http.StatusForbidden, nil
+		}
+
+		p, err = c.Services.Promocode.Get(id)
 	}
 
-	p, err := c.Services.Promocode.Get(id)
 	if err == sql.ErrNoRows {
-		return http.StatusNotFound, err
+		return http.StatusNotFound, nil
 	}
 
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
 
-	data, err := json.MarshalIndent(p, "", "\t")
-	if err != nil {
-		return http.StatusInternalServerError, err
-	}
-
-	w.Write(data)
-	return http.StatusOK, nil
+	return apiPrint(w, p)
 }
-
-/*
-// PromocodeAPI ...
-type PromocodeAPI handler
-
-func (h *PromocodeAPI) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	var (
-		code int
-		err  error
-	)
-	defer apiErrors(w, r, &code, err)
-
-	switch r.Method {
-	case http.MethodGet:
-		code, err = h.GET(w, r)
-	case http.MethodPost:
-		code, err = h.POST(w, r)
-	case http.MethodPut:
-		code, err = h.PUT(w, r)
-	case http.MethodDelete:
-		code, err = h.DELETE(w, r)
-	default:
-		code, err = http.StatusNotImplemented, nil
-	}
-}
-
-// GET ...
-func (h *PromocodeAPI) GET(w http.ResponseWriter, r *http.Request) (int, error) {
-	id, err := strconv.Atoi(mux.Vars(r)["id"])
-	if err != nil {
-		return http.StatusInternalServerError, err
-	}
-
-	p, err := c.Services.Promocode.Get(id)
-	if err == sql.ErrNoRows {
-		return http.StatusNotFound, err
-	}
-
-	if err != nil {
-		return http.StatusInternalServerError, err
-	}
-
-	data, err := json.MarshalIndent(p, "", "\t")
-	if err != nil {
-		return http.StatusInternalServerError, err
-	}
-
-	w.Write(data)
-	return 0, nil
-}
-
-// POST ...
-func (h *PromocodeAPI) POST(w http.ResponseWriter, r *http.Request) (int, error) {
-
-	return 0, nil
-}
-
-// PUT ...
-func (h *PromocodeAPI) PUT(w http.ResponseWriter, r *http.Request) (int, error) {
-
-	return 0, nil
-}
-
-// DELETE ...
-func (h *PromocodeAPI) DELETE(w http.ResponseWriter, r *http.Request) (int, error) {
-
-	return 0, nil
-} */

@@ -56,6 +56,8 @@ func (s *UserService) Gets(first, limit int, order string) ([]*fest.User, error)
 	users := []*fest.User{}
 	var err error
 
+	order = fieldsToColumns(userMap, order)[0]
+
 	if limit == 0 {
 		err = s.DB.Select(&users, "SELECT * FROM users ORDER BY ?", order)
 	} else {

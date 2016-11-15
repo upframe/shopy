@@ -2,6 +2,7 @@ package http
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/upframe/fest"
 )
@@ -14,7 +15,7 @@ func OrdersGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, err
 		return Redirect(w, r, "/login")
 	}
 
-	data, err := c.Services.Order.GetByUser(s.Values["UserID"].(int))
+	data, err := c.Services.Order.GetsWhere(0, 0, "ID", "UserID", strconv.Itoa(s.Values["UserID"].(int)))
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
