@@ -54,14 +54,14 @@ func Serve(c *fest.Config) {
 	api.HandleFunc("/user/{id:[0-9]+}", Inject(MustLogin(APIUserGet), c)).Methods("GET")
 
 	api.HandleFunc("/order", Inject(MustAdmin(APIOrderPost), c)).Methods("POST")
-	api.HandleFunc("/product", Inject(APIProductPost, c)).Methods("POST")
+	api.HandleFunc("/product", Inject(MustAdmin(APIProductPost), c)).Methods("POST")
 	api.HandleFunc("/promocode", Inject(MustAdmin(APIPromocodePost), c)).Methods("POST")
 	api.HandleFunc("/user", Inject(MustAdmin(APIUserPost), c)).Methods("POST")
 
 	// TODO: PUT
 
 	api.HandleFunc("/order/{id:[0-9]+}", Inject(MustAdmin(APIOrderDelete), c)).Methods("DELETE")
-	api.HandleFunc("/product/{id:[0-9]+}", Inject(APIProductDelete, c)).Methods("DELETE")
+	api.HandleFunc("/product/{id:[0-9]+}", Inject(MustAdmin(APIProductDelete), c)).Methods("DELETE")
 	api.HandleFunc("/promocode/{id:[0-9]+}", Inject(MustAdmin(APIPromocodeDelete), c)).Methods("DELETE")
 	api.HandleFunc("/user/{id:[0-9]+}", Inject(MustAdmin(APIUserDelete), c)).Methods("DELETE")
 
