@@ -48,7 +48,7 @@ func (s Session) GetCart(service ProductService) (*Cart, error) {
 	}
 
 	ids = strings.TrimSuffix(ids, ", ") + ")"
-	products, err := service.GetsWhereIn(0, 0, "id", "id", ids)
+	products, err := service.GetsWhereIn(0, 0, "ID", "ID", ids)
 	if err != nil {
 		return nil, err
 	}

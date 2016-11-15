@@ -1,9 +1,7 @@
 package http
 
 import (
-	"bytes"
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -76,9 +74,7 @@ func CheckoutConfirmGet(w http.ResponseWriter, r *http.Request, c *fest.Config) 
 
 	for _, product := range cart.Products {
 		o.Products = append(o.Products, &fest.OrderProduct{
-			Product: &fest.Product{
-				ID: product.ID,
-			},
+			ID:       product.ID,
 			Quantity: product.Quantity,
 		})
 	}
@@ -218,38 +214,4 @@ func CheckoutPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, 
 	}
 
 	return Redirect(w, r, p.Links[1].Href)
-}
-
-// ValidatePromocodeGet ...
-func ValidatePromocodeGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	byt := new(bytes.Buffer)
-	byt.ReadFrom(r.Body)
-
-	promocode, err := c.Services.Promocode.GetByCode(string(byt.Bytes()))
-	if err == sql.ErrNoRows {
-		return http.StatusNotFound, err
-	}
-	if err != nil {
-		return http.StatusInternalServerError, err
-	}
-
-	if time.Now().Unix() > promocode.Expires.Unix() {
-		return http.StatusNotFound, err
-	}
-
-	res := map[string]interface{}{}
-	res["Discount"] = promocode.Discount
-	res["Percentage"] = promocode.Percentage
-
-	marsh, err := json.MarshalIndent(res, "", "")
-	if err != nil {
-		return http.StatusInternalServerError, err
-	}
-
-	w.Header().Set("Content-Type", "applicaion/json; charset=utf-8")
-	if _, err := w.Write(marsh); err != nil {
-		return http.StatusInternalServerError, err
-	}
-
-	return http.StatusOK, nil
 }

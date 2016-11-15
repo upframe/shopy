@@ -35,29 +35,12 @@ func Serve(c *fest.Config) {
 	r.HandleFunc("/cart/{id:[0-9]+}", Inject(MustLogin(CartItemPost), c)).Methods("POST")
 	r.HandleFunc("/cart/{id:[0-9]+}", Inject(MustLogin(CartItemDelete), c)).Methods("DELETE")
 
-	/*
+	r.HandleFunc("/orders", Inject(MustLogin(OrdersGet), c)).Methods("GET")
 
-	   r.Handle("/checkout/cancel", &CheckoutCancelHandler{Services: s})
-	   /* r.Handle("/checkout/confirm", MustLogin(&CheckoutConfirmHandler{
-	       Services: s,
-	   })) */
-
-	/* 	r.Handle("/checkout", MustLogin(&CheckoutHandler{
-	    Services: s,
-	}))
-
-	r.Handle("/coupon/validate", MustLogin(&ValidatePromocodeHandler{
-	    Services: s,
-	}))
-
-	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("_assets/static/"))))
-
-	api := r.PathPrefix("/api").Subrouter()
-	api.NotFoundHandler = &NotFoundAPI{}
-
-	api.HandleFunc("/promocode/{id:[0-9]+}", APIPromocodeGET(c, s)).Methods("GET")
-
-	*/
+	r.HandleFunc("/checkout", Inject(MustLogin(CheckoutGet), c)).Methods("GET")
+	r.HandleFunc("/checkout", Inject(MustLogin(CheckoutPost), c)).Methods("POST")
+	r.HandleFunc("/checkout/cancel", Inject(MustLogin(CheckoutCancelGet), c)).Methods("GET")
+	r.HandleFunc("/checkout/confirm", Inject(MustLogin(CheckoutConfirmGet), c)).Methods("GET")
 
 	api := r.PathPrefix("/api").Subrouter()
 

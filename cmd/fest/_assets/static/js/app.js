@@ -80,8 +80,8 @@ function validateCoupon(e) {
     }
 
     let request = new XMLHttpRequest();
-    request.open("POST", "/coupon/validate", true);
-    request.send(this.value);
+    request.open("GET", "/api/promocode/" + this.value, true);
+    request.send();
     request.onreadystatechange = function() {
         if (request.readyState == 4) {
             switch (request.status) {

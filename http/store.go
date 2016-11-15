@@ -10,7 +10,7 @@ import (
 func StoreGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
 	s := r.Context().Value("session").(*fest.Session)
 
-	products, err := c.Services.Product.GetsWhere(0, 0, "Name", "deactivated", "0")
+	products, err := c.Services.Product.GetsWhere(0, 0, "Name", "Deactivated", "0")
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}

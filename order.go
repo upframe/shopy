@@ -14,7 +14,8 @@ type Order struct {
 
 // OrderProduct ...
 type OrderProduct struct {
-	*Product
+	ID       int
+	Name     string
 	Quantity int `db:"quantity"`
 }
 

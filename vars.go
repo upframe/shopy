@@ -19,6 +19,7 @@ const (
 var (
 	ErrAlreadyLoggedIn = errors.New("The user is already logged in.")
 	ErrNotLoggedIn     = errors.New("The user is not logged in.")
+	ErrNotFound        = errors.New("Not found.")
 )
 
 // Config ...
