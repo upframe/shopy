@@ -17,7 +17,7 @@ func (h *PromocodeAPI) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		code int
 		err  error
 	)
-	defer apiErrors(w, r, &code, &err)
+	defer apiErrors(w, r, &code, err)
 
 	switch r.Method {
 	case http.MethodGet:

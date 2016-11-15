@@ -1,9 +1,14 @@
 package mysql
 
-import "github.com/upframe/fest"
+import (
+	"github.com/jmoiron/sqlx"
+	"github.com/upframe/fest"
+)
 
 // ProductService ...
-type ProductService struct{}
+type ProductService struct {
+	DB *sqlx.DB
+}
 
 var productMap = map[string]string{
 	"ID":          "id",
@@ -17,7 +22,7 @@ var productMap = map[string]string{
 // Get ...
 func (s *ProductService) Get(id int) (*fest.Product, error) {
 	product := &fest.Product{}
-	err := db.Get(product, "SELECT * FROM products WHERE id=?", id)
+	err := s.DB.Get(product, "SELECT * FROM products WHERE id=?", id)
 
 	return product, err
 }
@@ -28,9 +33,9 @@ func (s *ProductService) Gets(first, limit int, order string) ([]*fest.Product, 
 	var err error
 
 	if limit == 0 {
-		err = db.Select(&products, "SELECT * FROM products ORDER BY ?", order)
+		err = s.DB.Select(&products, "SELECT * FROM products ORDER BY ?", order)
 	} else {
-		err = db.Select(&products, "SELECT * FROM products ORDER BY ? LIMIT ? OFFSET ?", order, limit, first)
+		err = s.DB.Select(&products, "SELECT * FROM products ORDER BY ? LIMIT ? OFFSET ?", order, limit, first)
 	}
 
 	return products, err
@@ -42,9 +47,9 @@ func (s *ProductService) GetsWhere(first, limit int, order, where, sth string) (
 	var err error
 
 	if limit == 0 {
-		err = db.Select(&products, "SELECT * FROM products WHERE "+where+"=? ORDER BY ?", sth, order)
+		err = s.DB.Select(&products, "SELECT * FROM products WHERE "+where+"=? ORDER BY ?", sth, order)
 	} else {
-		err = db.Select(&products, "SELECT * FROM products WHERE "+where+"=? ORDER BY ? LIMIT ? OFFSET ?", sth, order, limit, first)
+		err = s.DB.Select(&products, "SELECT * FROM products WHERE "+where+"=? ORDER BY ? LIMIT ? OFFSET ?", sth, order, limit, first)
 	}
 
 	return products, err
@@ -56,9 +61,9 @@ func (s *ProductService) GetsWhereIn(first, limit int, order, where, in string) 
 	var err error
 
 	if limit == 0 {
-		err = db.Select(&products, "SELECT * FROM products WHERE "+where+" IN "+in+" ORDER BY ?", order)
+		err = s.DB.Select(&products, "SELECT * FROM products WHERE "+where+" IN "+in+" ORDER BY ?", order)
 	} else {
-		err = db.Select(&products, "SELECT * FROM products WHERE "+where+" IN "+in+" ORDER BY ? LIMIT ? OFFSET ?", order, limit, first)
+		err = s.DB.Select(&products, "SELECT * FROM products WHERE "+where+" IN "+in+" ORDER BY ? LIMIT ? OFFSET ?", order, limit, first)
 	}
 
 	return products, err
@@ -70,7 +75,7 @@ func (s *ProductService) Create(p *fest.Product) error {
 		return nil
 	}
 
-	res, err := db.NamedExec(insertQuery("products", getAllColumns(productMap)), p)
+	res, err := s.DB.NamedExec(insertQuery("products", getAllColumns(productMap)), p)
 	if err != nil {
 		return err
 	}
@@ -82,7 +87,7 @@ func (s *ProductService) Create(p *fest.Product) error {
 
 // Update ...
 func (s *ProductService) Update(p *fest.Product, fields ...string) error {
-	_, err := db.NamedExec(updateQuery("products", "id", fieldsToColumns(productMap, fields...)), p)
+	_, err := s.DB.NamedExec(updateQuery("products", "id", fieldsToColumns(productMap, fields...)), p)
 	return err
 }
 

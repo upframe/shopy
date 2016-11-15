@@ -2,6 +2,7 @@ package fest
 
 import (
 	"errors"
+	"log"
 
 	"github.com/gorilla/sessions"
 	"github.com/logpacker/PayPal-Go-SDK"
@@ -27,6 +28,26 @@ var (
 	Store       *sessions.CookieStore
 	PayPal      *paypalsdk.Client
 )
+
+// Config ...
+type Config struct {
+	DefaultInvites int
+	InviteOnly     bool
+	BaseAddress    string
+	Templates      string
+	Store          *sessions.CookieStore
+	PayPal         *paypalsdk.Client
+	Logger         *log.Logger
+}
+
+// Services ...
+type Services struct {
+	Order     OrderService
+	Product   ProductService
+	Promocode PromocodeService
+	User      UserService
+	Link      LinkService
+}
 
 // InitPayPal configures the paypal client variable
 func InitPayPal(client, secret string, development bool) error {

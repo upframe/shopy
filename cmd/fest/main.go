@@ -45,6 +45,14 @@ func init() {
 	// Regist types so they can be used on Cookies
 	gob.Register(fest.CartCookie{})
 	gob.Register(fest.OrderCookie{})
+}
+
+func main() {
+	// TODO: admin
+	// TODO: api
+	// TODO: clean
+
+	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	c := &config{}
 	// then config file settings
@@ -81,7 +89,7 @@ func init() {
 	email.InitSMTP(c.SMTP.User, c.SMTP.Password, c.SMTP.Host, c.SMTP.Port)
 
 	// Connects to the database and checks for an error
-	err = mysql.InitDB(
+	db, err := mysql.InitDB(
 		c.Database.User,
 		c.Database.Password,
 		c.Database.Host,
@@ -97,20 +105,12 @@ func init() {
 	if fest.InitPayPal(c.PayPal.Client, c.PayPal.Secret, c.Development) != nil {
 		panic(err)
 	}
-}
-
-func main() {
-	// TODO: admin
-	// TODO: api
-	// TODO: clean
-
-	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	s := &fest.Services{
-		User:      &mysql.UserService{},
-		Link:      &mysql.LinkService{},
-		Product:   &mysql.ProductService{},
-		Promocode: &mysql.PromocodeService{},
+		User:      &mysql.UserService{DB: db},
+		Link:      &mysql.LinkService{DB: db},
+		Product:   &mysql.ProductService{DB: db},
+		Promocode: &mysql.PromocodeService{DB: db},
 		// Order: &mysql.OrderService{}
 	}
 

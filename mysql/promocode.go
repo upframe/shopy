@@ -1,11 +1,14 @@
 package mysql
 
 import (
+	"github.com/jmoiron/sqlx"
 	"github.com/upframe/fest"
 )
 
 // PromocodeService ...
-type PromocodeService struct{}
+type PromocodeService struct {
+	DB *sqlx.DB
+}
 
 var promocodeMap = map[string]string{
 	"ID":          "id",
@@ -19,7 +22,7 @@ var promocodeMap = map[string]string{
 // Get ...
 func (s *PromocodeService) Get(id int) (*fest.Promocode, error) {
 	promocode := &fest.Promocode{}
-	err := db.Get(promocode, "SELECT * FROM promocodes WHERE id=?", id)
+	err := s.DB.Get(promocode, "SELECT * FROM promocodes WHERE id=?", id)
 
 	return promocode, err
 }
@@ -27,7 +30,7 @@ func (s *PromocodeService) Get(id int) (*fest.Promocode, error) {
 // GetByCode ...
 func (s *PromocodeService) GetByCode(code string) (*fest.Promocode, error) {
 	promocode := &fest.Promocode{}
-	err := db.Get(promocode, "SELECT * FROM promocodes WHERE code=?", code)
+	err := s.DB.Get(promocode, "SELECT * FROM promocodes WHERE code=?", code)
 
 	return promocode, err
 }
@@ -38,9 +41,9 @@ func (s *PromocodeService) Gets(first, limit int, order string) ([]*fest.Promoco
 	var err error
 
 	if limit == 0 {
-		err = db.Select(&promocodes, "SELECT * FROM promocodes ORDER BY ?", order)
+		err = s.DB.Select(&promocodes, "SELECT * FROM promocodes ORDER BY ?", order)
 	} else {
-		err = db.Select(&promocodes, "SELECT * FROM promocodes ORDER BY ? LIMIT ? OFFSET ?", order, limit, first)
+		err = s.DB.Select(&promocodes, "SELECT * FROM promocodes ORDER BY ? LIMIT ? OFFSET ?", order, limit, first)
 	}
 
 	return promocodes, err
@@ -52,7 +55,7 @@ func (s *PromocodeService) Create(p *fest.Promocode) error {
 		return nil
 	}
 
-	res, err := db.NamedExec(insertQuery("promocodes", getAllColumns(promocodeMap)), p)
+	res, err := s.DB.NamedExec(insertQuery("promocodes", getAllColumns(promocodeMap)), p)
 	if err != nil {
 		return err
 	}
@@ -64,7 +67,7 @@ func (s *PromocodeService) Create(p *fest.Promocode) error {
 
 // Update ...
 func (s *PromocodeService) Update(p *fest.Promocode, fields ...string) error {
-	_, err := db.NamedExec(updateQuery("promocodes", "id", fieldsToColumns(promocodeMap, fields...)), p)
+	_, err := s.DB.NamedExec(updateQuery("promocodes", "id", fieldsToColumns(promocodeMap, fields...)), p)
 	return err
 }
 

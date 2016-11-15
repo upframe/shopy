@@ -1,11 +1,14 @@
 package mysql
 
 import (
+	"github.com/jmoiron/sqlx"
 	"github.com/upframe/fest"
 )
 
 // LinkService ...
-type LinkService struct{}
+type LinkService struct {
+	DB *sqlx.DB
+}
 
 var linkMap = map[string]string{
 	"Hash":    "hash",
@@ -19,7 +22,7 @@ var linkMap = map[string]string{
 // Get ...
 func (s *LinkService) Get(hash string) (*fest.Link, error) {
 	link := &fest.Link{}
-	err := db.Get(link, "SELECT * FROM links WHERE hash=?", hash)
+	err := s.DB.Get(link, "SELECT * FROM links WHERE hash=?", hash)
 
 	return link, err
 }
@@ -30,9 +33,9 @@ func (s *LinkService) Gets(first, limit int, order string) ([]*fest.Link, error)
 	var err error
 
 	if limit == 0 {
-		err = db.Select(&links, "SELECT * FROM links ORDER BY ?", order)
+		err = s.DB.Select(&links, "SELECT * FROM links ORDER BY ?", order)
 	} else {
-		err = db.Select(&links, "SELECT * FROM links ORDER BY ? LIMIT ? OFFSET ?", order, limit, first)
+		err = s.DB.Select(&links, "SELECT * FROM links ORDER BY ? LIMIT ? OFFSET ?", order, limit, first)
 	}
 
 	return links, err
@@ -40,13 +43,13 @@ func (s *LinkService) Gets(first, limit int, order string) ([]*fest.Link, error)
 
 // Create ...
 func (s *LinkService) Create(l *fest.Link) error {
-	_, err := db.NamedExec(insertQuery("links", getAllColumns(linkMap)), l)
+	_, err := s.DB.NamedExec(insertQuery("links", getAllColumns(linkMap)), l)
 	return err
 }
 
 // Update ...
 func (s *LinkService) Update(l *fest.Link, fields ...string) error {
-	_, err := db.NamedExec(updateQuery("links", "hash", fieldsToColumns(linkMap, fields...)), l)
+	_, err := s.DB.NamedExec(updateQuery("links", "hash", fieldsToColumns(linkMap, fields...)), l)
 	return err
 }
 

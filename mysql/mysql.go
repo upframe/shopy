@@ -1,7 +1,6 @@
 package mysql
 
 import (
-	"net/http"
 
 	// Import driver
 	_ "github.com/go-sql-driver/mysql"
@@ -9,25 +8,26 @@ import (
 	"github.com/upframe/fest"
 )
 
-var db *sqlx.DB
-
 // InitDB establishes a connection with the database
-func InitDB(user, pass, host, port, name string) error {
-	var err error
+func InitDB(user, pass, host, port, name string) (*sqlx.DB, error) {
+	var (
+		err error
+		db  *sqlx.DB
+	)
 
 	// Prepares the connection with the database
 	db, err = sqlx.Open("mysql", user+":"+pass+"@tcp("+host+":"+port+")/"+name+"?parseTime=true")
 	if err != nil {
-		return err
+		return db, err
 	}
 
 	// Pings the database to check if the connection is OK
 	err = db.Ping()
 	if err != nil {
-		return err
+		return db, err
 	}
 
-	return nil
+	return db, nil
 }
 
 // updateQuery buils an update query string based on the table, the 'where' filter,
@@ -76,6 +76,8 @@ func insertQuery(table string, fields []string) string {
 	return query
 }
 
+// fieldsToColumns converts a struct field name defined in the domain package
+// (fest) to its name on the database using a map.
 func fieldsToColumns(m map[string]string, fields ...string) []string {
 	columns := []string{}
 
@@ -90,6 +92,7 @@ func fieldsToColumns(m map[string]string, fields ...string) []string {
 	return columns
 }
 
+// getAllColumns gets all of the columns of the database from the map.
 func getAllColumns(m map[string]string) []string {
 	columns := []string{}
 
@@ -100,9 +103,10 @@ func getAllColumns(m map[string]string) []string {
 	return columns
 }
 
+/*
 // GetTableRecords gets the number of records in a table
 func GetTableRecords(table string) (int, error) {
-	rows, err := db.Query("SELECT COUNT(*) FROM " + table)
+	rows, err := s.DB.Query("SELECT COUNT(*) FROM " + table)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -118,3 +122,4 @@ func GetTableRecords(table string) (int, error) {
 
 	return count, nil
 }
+*/

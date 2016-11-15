@@ -1,11 +1,14 @@
 package mysql
 
 import (
+	"github.com/jmoiron/sqlx"
 	"github.com/upframe/fest"
 )
 
 // UserService ...
-type UserService struct{}
+type UserService struct {
+	DB *sqlx.DB
+}
 
 var userMap = map[string]string{
 	"ID":           "id",
@@ -27,7 +30,7 @@ var userMap = map[string]string{
 // Get ...
 func (s *UserService) Get(id int) (*fest.User, error) {
 	user := &fest.User{}
-	err := db.Get(user, "SELECT * FROM users WHERE id=?", id)
+	err := s.DB.Get(user, "SELECT * FROM users WHERE id=?", id)
 
 	return user, err
 }
@@ -35,7 +38,7 @@ func (s *UserService) Get(id int) (*fest.User, error) {
 // GetByEmail ...
 func (s *UserService) GetByEmail(email string) (*fest.User, error) {
 	user := &fest.User{}
-	err := db.Get(user, "SELECT * FROM users WHERE email=?", email)
+	err := s.DB.Get(user, "SELECT * FROM users WHERE email=?", email)
 
 	return user, err
 }
@@ -43,7 +46,7 @@ func (s *UserService) GetByEmail(email string) (*fest.User, error) {
 // GetByReferral ...
 func (s *UserService) GetByReferral(referral string) (*fest.User, error) {
 	user := &fest.User{}
-	err := db.Get(user, "SELECT * FROM users WHERE referral=?", referral)
+	err := s.DB.Get(user, "SELECT * FROM users WHERE referral=?", referral)
 
 	return user, err
 }
@@ -54,9 +57,9 @@ func (s *UserService) Gets(first, limit int, order string) ([]*fest.User, error)
 	var err error
 
 	if limit == 0 {
-		err = db.Select(&users, "SELECT * FROM users ORDER BY ?", order)
+		err = s.DB.Select(&users, "SELECT * FROM users ORDER BY ?", order)
 	} else {
-		err = db.Select(&users, "SELECT * FROM users ORDER BY ? LIMIT ? OFFSET ?", order, limit, first)
+		err = s.DB.Select(&users, "SELECT * FROM users ORDER BY ? LIMIT ? OFFSET ?", order, limit, first)
 	}
 
 	return users, err
@@ -68,7 +71,7 @@ func (s *UserService) Create(u *fest.User) error {
 		return nil
 	}
 
-	res, err := db.NamedExec(insertQuery("users", getAllColumns(userMap)), u)
+	res, err := s.DB.NamedExec(insertQuery("users", getAllColumns(userMap)), u)
 	if err != nil {
 		return err
 	}
@@ -80,7 +83,7 @@ func (s *UserService) Create(u *fest.User) error {
 
 // Update ...
 func (s *UserService) Update(u *fest.User, fields ...string) error {
-	_, err := db.NamedExec(updateQuery("users", "id", fieldsToColumns(userMap, fields...)), u)
+	_, err := s.DB.NamedExec(updateQuery("users", "id", fieldsToColumns(userMap, fields...)), u)
 	return err
 }
 
