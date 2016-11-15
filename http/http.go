@@ -99,7 +99,7 @@ func MustLogin(h FestHandler) FestHandler {
 			return h(w, r, c)
 		}
 
-		if r.Method == http.MethodGet {
+		if r.Method == http.MethodGet && !strings.HasPrefix(r.URL.Path, "/api") {
 			return Redirect(w, r, "/login")
 		}
 
