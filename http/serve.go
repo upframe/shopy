@@ -44,10 +44,9 @@ func Serve(c *fest.Config) {
 
 	r.HandleFunc("/logout", Inject(logout, c))
 
-	api := r.PathPrefix("/api").Subrouter()
-
 	// Users can only access their own orders and their own user information. Admins
 	// can access everything.
+	api := r.PathPrefix("/api").Subrouter()
 	api.HandleFunc("/order/{id:[0-9]+}", Inject(MustLogin(APIOrderGet), c)).Methods("GET")
 	api.HandleFunc("/product/{id:[0-9]+}", Inject(MustAdmin(APIProductGet), c)).Methods("GET")
 	api.HandleFunc("/promocode/{id}", Inject(MustLogin(APIPromocodeGet), c)).Methods("GET")
@@ -68,7 +67,6 @@ func Serve(c *fest.Config) {
 	api.HandleFunc("/promocode/{id:[0-9]+}", Inject(MustAdmin(APIPromocodeDelete), c)).Methods("DELETE")
 	api.HandleFunc("/user/{id:[0-9]+}", Inject(MustAdmin(APIUserDelete), c)).Methods("DELETE")
 
-	// Bind to a port and pass our router in
 	// TODO :check CSRF
 	log.Fatal(http.ListenAndServe(":80", r))
 }
