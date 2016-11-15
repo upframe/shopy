@@ -15,5 +15,5 @@ func StoreGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, erro
 		return http.StatusInternalServerError, err
 	}
 
-	return RenderHTML(w, c, s, products, "store")
+	return Render(w, c, s, products, "store")
 }

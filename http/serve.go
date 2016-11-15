@@ -12,7 +12,7 @@ import (
 func Serve(c *fest.Config) {
 	r := mux.NewRouter()
 
-	// TODO:
+	// TODO: this url should come from config
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("_assets/static/"))))
 
 	r.HandleFunc("/", Inject(IndexGet, c)).Methods("GET")

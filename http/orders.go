@@ -20,5 +20,5 @@ func OrdersGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, err
 		return http.StatusInternalServerError, err
 	}
 
-	return RenderHTML(w, c, s, data, "orders")
+	return Render(w, c, s, data, "orders")
 }

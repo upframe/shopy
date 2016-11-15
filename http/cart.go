@@ -18,7 +18,7 @@ func CartGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error
 		return http.StatusInternalServerError, err
 	}
 
-	return RenderHTML(w, c, s, cart, "cart")
+	return Render(w, c, s, cart, "cart")
 }
 
 // CartItemPost ...

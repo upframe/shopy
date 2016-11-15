@@ -92,7 +92,7 @@ func CheckoutGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, e
 
 	}
 
-	return RenderHTML(w, c, s, cart, "checkout")
+	return Render(w, c, s, cart, "checkout")
 }
 
 // CheckoutPost ...

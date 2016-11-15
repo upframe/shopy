@@ -28,7 +28,7 @@ func SettingsGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, e
 		return http.StatusInternalServerError, err
 	}
 
-	return RenderHTML(w, c, s, settings{
+	return Render(w, c, s, settings{
 		User:    user,
 		BaseURL: c.BaseAddress,
 	}, "settings")

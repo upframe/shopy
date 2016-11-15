@@ -15,7 +15,7 @@ func LoginGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, erro
 		return Redirect(w, r, "/")
 	}
 
-	return RenderHTML(w, c, s, nil, "login")
+	return Render(w, c, s, nil, "login")
 }
 
 // LoginPost ...

@@ -23,7 +23,7 @@ func RegisterGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, e
 		link, err := c.Services.Link.Get(r.URL.Query().Get("confirm"))
 
 		if err != nil || link.Used || link.Expires.Unix() < time.Now().Unix() || link.Path != "/register" {
-			return RenderHTML(w, c, s, nil, "invalid-link")
+			return Render(w, c, s, nil, "invalid-link")
 		}
 
 		user, err := c.Services.User.Get(link.User)
@@ -55,17 +55,17 @@ func RegisterGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, e
 		// is invitation only
 		if err != nil {
 			log.Println(err)
-			return RenderHTML(w, c, s, nil, "register/invite")
+			return Render(w, c, s, nil, "register/invite")
 		}
 
 		// If the user exists, but doesn't have invites, show that information
 		if referrer.Invites < 1 {
-			return RenderHTML(w, c, s, referrer, "register/gone")
+			return Render(w, c, s, referrer, "register/gone")
 		}
 	}
 
 	// Otherwise, show the registration page
-	return RenderHTML(w, c, s, nil, "register/form")
+	return Render(w, c, s, nil, "register/form")
 }
 
 // RegisterPost ...

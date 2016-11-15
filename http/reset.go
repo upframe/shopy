@@ -29,10 +29,10 @@ func ResetGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, erro
 			return http.StatusInternalServerError, err
 		}
 
-		return RenderHTML(w, c, s, link.User, "reset/form")
+		return Render(w, c, s, link.User, "reset/form")
 	}
 
-	return RenderHTML(w, c, s, nil, "reset/email")
+	return Render(w, c, s, nil, "reset/email")
 }
 
 // ResetPost ...
