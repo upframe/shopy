@@ -12,53 +12,33 @@ import (
 	"github.com/upframe/fest/email"
 )
 
-// RegisterHandler ...
-type RegisterHandler handler
-
-func (h *RegisterHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	var (
-		code int
-		err  error
-	)
-	defer checkErrors(w, r, code, err)
-
-	switch r.Method {
-	case http.MethodGet:
-		code, err = h.GET(w, r)
-	case http.MethodPost:
-		code, err = h.POST(w, r)
-	default:
-		code, err = http.StatusNotImplemented, nil
-	}
-}
-
-// GET ...
-func (h *RegisterHandler) GET(w http.ResponseWriter, r *http.Request) (int, error) {
+// RegisterGet ...
+func RegisterGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
 	s := r.Context().Value("session").(*fest.Session)
 	if s.IsLoggedIn() {
 		return Redirect(w, r, "/")
 	}
 
 	if r.URL.Query().Get("confirm") != "" {
-		link, err := h.Services.Link.Get(r.URL.Query().Get("confirm"))
+		link, err := c.Services.Link.Get(r.URL.Query().Get("confirm"))
 
 		if err != nil || link.Used || link.Expires.Unix() < time.Now().Unix() || link.Path != "/register" {
-			return RenderHTML(w, s, nil, "invalid-link")
+			return RenderHTML(w, c, s, nil, "invalid-link")
 		}
 
-		user, err := h.Services.User.Get(link.User)
+		user, err := c.Services.User.Get(link.User)
 		if err != nil {
 			return http.StatusInternalServerError, err
 		}
 
 		user.Confirmed = true
-		err = h.Services.User.Update(user, "Confirmed")
+		err = c.Services.User.Update(user, "Confirmed")
 		if err != nil {
 			return http.StatusInternalServerError, err
 		}
 
 		link.Used = true
-		err = h.Services.Link.Update(link, "Used")
+		err = c.Services.Link.Update(link, "Used")
 		if err != nil {
 			return http.StatusInternalServerError, err
 		}
@@ -67,29 +47,29 @@ func (h *RegisterHandler) GET(w http.ResponseWriter, r *http.Request) (int, erro
 		return http.StatusOK, nil
 	}
 
-	if fest.InviteOnly {
+	if c.InviteOnly {
 		// Gets the referrer user
-		referrer, err := h.Services.User.GetByReferral(r.URL.Query().Get("ref"))
+		referrer, err := c.Services.User.GetByReferral(r.URL.Query().Get("ref"))
 
 		// If the user doesn't exist show a page telling that registration
 		// is invitation only
 		if err != nil {
 			log.Println(err)
-			return RenderHTML(w, s, nil, "register/invite")
+			return RenderHTML(w, c, s, nil, "register/invite")
 		}
 
 		// If the user exists, but doesn't have invites, show that information
 		if referrer.Invites < 1 {
-			return RenderHTML(w, s, referrer, "register/gone")
+			return RenderHTML(w, c, s, referrer, "register/gone")
 		}
 	}
 
 	// Otherwise, show the registration page
-	return RenderHTML(w, s, nil, "register/form")
+	return RenderHTML(w, c, s, nil, "register/form")
 }
 
-// POST ...
-func (h *RegisterHandler) POST(w http.ResponseWriter, r *http.Request) (int, error) {
+// RegisterPost ...
+func RegisterPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
 	s := r.Context().Value("session").(*fest.Session)
 
 	if s.IsLoggedIn() {
@@ -107,17 +87,17 @@ func (h *RegisterHandler) POST(w http.ResponseWriter, r *http.Request) (int, err
 		FirstName: r.FormValue("first_name"),
 		LastName:  r.FormValue("last_name"),
 		Email:     r.FormValue("email"),
-		Invites:   fest.BaseInvites,
+		Invites:   c.DefaultInvites,
 		Credit:    0,
 		Confirmed: false,
 		Referrer:  fest.NullInt64{NullInt64: sql.NullInt64{Int64: 0, Valid: false}},
 	}
 
-	if fest.InviteOnly {
+	if c.InviteOnly {
 		// Gets the referrer user using the ?referral= option in the URL. If it doesn't
 		// find the user, return a 403 Forbidden status
 		var referrer *fest.User
-		referrer, err = h.Services.User.GetByReferral(r.URL.Query().Get("ref"))
+		referrer, err = c.Services.User.GetByReferral(r.URL.Query().Get("ref"))
 		if err != nil {
 			return http.StatusForbidden, err
 		}
@@ -147,7 +127,7 @@ func (h *RegisterHandler) POST(w http.ResponseWriter, r *http.Request) (int, err
 			// we will keep the registration going because it's no user-fault and the
 			// refferer had invites available.
 			referrer.Invites--
-			err = h.Services.User.Update(referrer, "Invites")
+			err = c.Services.User.Update(referrer, "Invites")
 		}()
 	}
 
@@ -159,7 +139,7 @@ func (h *RegisterHandler) POST(w http.ResponseWriter, r *http.Request) (int, err
 
 	// Checks if there is already an user with this email. If there is,
 	// return a 407 Conflict error.
-	if is, _ := isExistentUser(h.Services.User, user.Email); is {
+	if is, _ := isExistentUser(c.Services.User, user.Email); is {
 		err = errors.New("Email already registred.")
 		return http.StatusConflict, err
 	}
@@ -174,7 +154,7 @@ func (h *RegisterHandler) POST(w http.ResponseWriter, r *http.Request) (int, err
 	}
 
 	// Inserts the user into the database
-	err = h.Services.User.Create(user)
+	err = c.Services.User.Create(user)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -183,11 +163,11 @@ func (h *RegisterHandler) POST(w http.ResponseWriter, r *http.Request) (int, err
 	// get an error while sending the email. Why? Because the status response
 	// is directed to the user CREATION. The user may ask for the resending
 	// of the email if he needs to.
-	_, err = confirmationEmail(h.Services.Link, user)
+	_, err = confirmationEmail(c, user)
 	return http.StatusCreated, err
 }
 
-func confirmationEmail(s fest.LinkService, user *fest.User) (int, error) {
+func confirmationEmail(c *fest.Config, user *fest.User) (int, error) {
 	// Sets the current time and expiration time of the confirmation email
 	now := time.Now()
 	expires := time.Now().Add(time.Hour * 24 * 20)
@@ -201,7 +181,7 @@ func confirmationEmail(s fest.LinkService, user *fest.User) (int, error) {
 		Expires: &expires,
 	}
 
-	err := s.Create(link)
+	err := c.Services.Link.Create(link)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -209,7 +189,7 @@ func confirmationEmail(s fest.LinkService, user *fest.User) (int, error) {
 	data := make(map[string]interface{})
 	data["Name"] = user.FirstName + " " + user.LastName
 	data["Hash"] = link.Hash
-	data["Host"] = fest.BaseAddress
+	data["Host"] = c.BaseAddress
 
 	email := &email.Email{
 		From: &mail.Address{

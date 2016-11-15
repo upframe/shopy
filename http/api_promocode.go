@@ -7,8 +7,35 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/upframe/fest"
 )
 
+// APIPromocodeGet ...
+func APIPromocodeGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
+	id, err := strconv.Atoi(mux.Vars(r)["id"])
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	p, err := c.Services.Promocode.Get(id)
+	if err == sql.ErrNoRows {
+		return http.StatusNotFound, err
+	}
+
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	data, err := json.MarshalIndent(p, "", "\t")
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	w.Write(data)
+	return http.StatusOK, nil
+}
+
+/*
 // PromocodeAPI ...
 type PromocodeAPI handler
 
@@ -40,7 +67,7 @@ func (h *PromocodeAPI) GET(w http.ResponseWriter, r *http.Request) (int, error) 
 		return http.StatusInternalServerError, err
 	}
 
-	p, err := h.Services.Promocode.Get(id)
+	p, err := c.Services.Promocode.Get(id)
 	if err == sql.ErrNoRows {
 		return http.StatusNotFound, err
 	}
@@ -74,4 +101,4 @@ func (h *PromocodeAPI) PUT(w http.ResponseWriter, r *http.Request) (int, error) 
 func (h *PromocodeAPI) DELETE(w http.ResponseWriter, r *http.Request) (int, error) {
 
 	return 0, nil
-}
+} */

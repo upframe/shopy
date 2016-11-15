@@ -15,22 +15,9 @@ import (
 
 // TODO:
 
-// CheckoutCancelHandler ...
-type CheckoutCancelHandler handler
-
-func (h *CheckoutCancelHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	var (
-		code int
-		err  error
-	)
-	defer checkErrors(w, r, code, err)
-
+// CheckoutCancelGet ...
+func CheckoutCancelGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
 	s := r.Context().Value("session").(*fest.Session)
-
-	if r.Method != http.MethodGet {
-		code = http.StatusNotImplemented
-		return
-	}
 
 	cart := s.Values["Cart"].(fest.CartCookie)
 	cart.Locked = false
@@ -38,56 +25,38 @@ func (h *CheckoutCancelHandler) ServeHTTP(w http.ResponseWriter, r *http.Request
 	s.Values["Order"] = &fest.OrderCookie{}
 	s.Values["Cart"] = cart
 
-	err = s.Save(r, w)
+	err := s.Save(r, w)
 	if err != nil {
-		code = http.StatusInternalServerError
-		return
+		return http.StatusInternalServerError, err
 	}
 
-	code, err = Redirect(w, r, "/cart")
+	return Redirect(w, r, "/cart")
 }
 
-// CheckoutConfirmHandler ...
-type CheckoutConfirmHandler handler
-
-func (h *CheckoutConfirmHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	var (
-		code int
-		err  error
-	)
-	defer checkErrors(w, r, code, err)
-
+// CheckoutConfirmGet ...
+func CheckoutConfirmGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
 	s := r.Context().Value("session").(*fest.Session)
-
-	if r.Method != http.MethodGet {
-		code = http.StatusNotImplemented
-		return
-	}
 
 	paymentID := r.URL.Query().Get("paymentId")
 	payerID := r.URL.Query().Get("PayerID")
 
 	if paymentID == "" || payerID == "" {
-		code, err = http.StatusBadRequest, nil
-		return
+		return http.StatusBadRequest, nil
 	}
 
-	_, err = fest.PayPal.GetAccessToken()
+	_, err := c.PayPal.GetAccessToken()
 	if err != nil {
-		code = http.StatusInternalServerError
-		return
+		return http.StatusInternalServerError, err
 	}
 
-	executeResult, err := fest.PayPal.ExecuteApprovedPayment(paymentID, payerID)
+	executeResult, err := c.PayPal.ExecuteApprovedPayment(paymentID, payerID)
 	if err != nil {
-		code = http.StatusInternalServerError
-		return
+		return http.StatusInternalServerError, err
 	}
 
-	cart, err := s.GetCart(h.Services.Product)
+	cart, err := s.GetCart(c.Services.Product)
 	if err != nil {
-		code = http.StatusInternalServerError
-		return
+		return http.StatusInternalServerError, err
 	}
 
 	order := s.Values["Order"].(fest.OrderCookie)
@@ -107,10 +76,9 @@ func (h *CheckoutConfirmHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 		o.PromocodeID.Int64 = int64(order.Promocode.ID)
 	}
 
-	err = h.Services.Order.Create(o)
+	err = c.Services.Order.Create(o)
 	if err != nil {
-		code = http.StatusInternalServerError
-		return
+		return http.StatusInternalServerError, err
 	}
 
 	o.Products = []*fest.OrderProduct{}
@@ -124,10 +92,9 @@ func (h *CheckoutConfirmHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 		})
 	}
 
-	err = h.Services.Order.AddProducts(o)
+	err = c.Services.Order.AddProducts(o)
 	if err != nil {
-		code = http.StatusInternalServerError
-		return
+		return http.StatusInternalServerError, err
 	}
 
 	s.Values["Cart"] = &fest.CartCookie{Products: map[int]int{}, Locked: false}
@@ -136,39 +103,18 @@ func (h *CheckoutConfirmHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 	// Saves the cookie and checks for errors
 	err = s.Save(r, w)
 	if err != nil {
-		code = http.StatusInternalServerError
-		return
+		return http.StatusInternalServerError, err
 	}
 
 	// TODO: send email with the invoice
-	code, err = Redirect(w, r, "/orders")
+	return Redirect(w, r, "/orders")
 }
 
-// CheckoutHandler ...
-type CheckoutHandler handler
-
-func (h *CheckoutHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	var (
-		code int
-		err  error
-	)
-	defer checkErrors(w, r, code, err)
-
-	switch r.Method {
-	case http.MethodGet:
-		code, err = h.GET(w, r)
-	case http.MethodPost:
-		code, err = h.POST(w, r)
-	default:
-		code, err = http.StatusNotImplemented, nil
-	}
-}
-
-// GET ...
-func (h *CheckoutHandler) GET(w http.ResponseWriter, r *http.Request) (int, error) {
+// CheckoutGet ...
+func CheckoutGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
 	s := r.Context().Value("session").(*fest.Session)
 
-	cart, err := s.GetCart(h.Services.Product)
+	cart, err := s.GetCart(c.Services.Product)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -183,11 +129,11 @@ func (h *CheckoutHandler) GET(w http.ResponseWriter, r *http.Request) (int, erro
 
 	}
 
-	return RenderHTML(w, s, cart, "checkout")
+	return RenderHTML(w, c, s, cart, "checkout")
 }
 
-// POST ...
-func (h *CheckoutHandler) POST(w http.ResponseWriter, r *http.Request) (int, error) {
+// CheckoutPost ...
+func CheckoutPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
 	s := r.Context().Value("session").(*fest.Session)
 
 	// Parses the form and checks for errors
@@ -196,7 +142,7 @@ func (h *CheckoutHandler) POST(w http.ResponseWriter, r *http.Request) (int, err
 		return http.StatusInternalServerError, err
 	}
 
-	cart, err := s.GetCart(h.Services.Product)
+	cart, err := s.GetCart(c.Services.Product)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -228,7 +174,7 @@ func (h *CheckoutHandler) POST(w http.ResponseWriter, r *http.Request) (int, err
 	if promocode != "" {
 		// Gets the promocode and checks for errors
 		var promo *fest.Promocode
-		promo, err = h.Services.Promocode.GetByCode(promocode)
+		promo, err = c.Services.Promocode.GetByCode(promocode)
 		if err == sql.ErrNoRows {
 			return http.StatusNotFound, nil
 		}
@@ -259,7 +205,7 @@ func (h *CheckoutHandler) POST(w http.ResponseWriter, r *http.Request) (int, err
 		return http.StatusInternalServerError, err
 	}
 
-	_, err = fest.PayPal.GetAccessToken()
+	_, err = c.PayPal.GetAccessToken()
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -269,10 +215,10 @@ func (h *CheckoutHandler) POST(w http.ResponseWriter, r *http.Request) (int, err
 		Currency: "EUR",
 	}
 
-	p, err := fest.PayPal.CreateDirectPaypalPayment(
+	p, err := c.PayPal.CreateDirectPaypalPayment(
 		amount,
-		fest.BaseAddress+"/checkout/confirm",
-		fest.BaseAddress+"/checkout/cancel",
+		c.BaseAddress+"/checkout/confirm",
+		c.BaseAddress+"/checkout/cancel",
 		"Shop at Upframe Fest",
 	)
 
@@ -283,37 +229,21 @@ func (h *CheckoutHandler) POST(w http.ResponseWriter, r *http.Request) (int, err
 	return Redirect(w, r, p.Links[1].Href)
 }
 
-// ValidatePromocodeHandler ...
-type ValidatePromocodeHandler handler
-
-func (h *ValidatePromocodeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	var (
-		code int
-		err  error
-	)
-	defer checkErrors(w, r, code, err)
-
-	if r.Method != http.MethodGet {
-		code = http.StatusNotImplemented
-		return
-	}
-
+// ValidatePromocodeGet ...
+func ValidatePromocodeGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
 	byt := new(bytes.Buffer)
 	byt.ReadFrom(r.Body)
 
-	promocode, err := h.Services.Promocode.GetByCode(string(byt.Bytes()))
+	promocode, err := c.Services.Promocode.GetByCode(string(byt.Bytes()))
 	if err == sql.ErrNoRows {
-		code = http.StatusNotFound
-		return
+		return http.StatusNotFound, err
 	}
 	if err != nil {
-		code = http.StatusInternalServerError
-		return
+		return http.StatusInternalServerError, err
 	}
 
 	if time.Now().Unix() > promocode.Expires.Unix() {
-		code = http.StatusNotFound
-		return
+		return http.StatusNotFound, err
 	}
 
 	res := map[string]interface{}{}
@@ -322,15 +252,13 @@ func (h *ValidatePromocodeHandler) ServeHTTP(w http.ResponseWriter, r *http.Requ
 
 	marsh, err := json.MarshalIndent(res, "", "")
 	if err != nil {
-		code = http.StatusInternalServerError
-		return
+		return http.StatusInternalServerError, err
 	}
 
 	w.Header().Set("Content-Type", "applicaion/json; charset=utf-8")
 	if _, err := w.Write(marsh); err != nil {
-		code = http.StatusInternalServerError
-		return
+		return http.StatusInternalServerError, err
 	}
 
-	code = http.StatusOK
+	return http.StatusOK, nil
 }

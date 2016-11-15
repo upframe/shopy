@@ -7,39 +7,19 @@ import (
 	"github.com/upframe/fest"
 )
 
-// LoginHandler ...
-type LoginHandler handler
-
-func (h *LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	var (
-		code int
-		err  error
-	)
-	defer checkErrors(w, r, code, err)
-
-	switch r.Method {
-	case http.MethodGet:
-		code, err = h.GET(w, r)
-	case http.MethodPost:
-		code, err = h.POST(w, r)
-	default:
-		code, err = http.StatusNotImplemented, nil
-	}
-}
-
-// GET ...
-func (h *LoginHandler) GET(w http.ResponseWriter, r *http.Request) (int, error) {
+// LoginGet ...
+func LoginGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
 	s := r.Context().Value("session").(*fest.Session)
 
 	if s.IsLoggedIn() {
 		return Redirect(w, r, "/")
 	}
 
-	return RenderHTML(w, s, nil, "login")
+	return RenderHTML(w, c, s, nil, "login")
 }
 
-// POST ...
-func (h *LoginHandler) POST(w http.ResponseWriter, r *http.Request) (int, error) {
+// LoginPost ...
+func LoginPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
 	s := r.Context().Value("session").(*fest.Session)
 
 	if s.IsLoggedIn() {
@@ -48,7 +28,7 @@ func (h *LoginHandler) POST(w http.ResponseWriter, r *http.Request) (int, error)
 
 	if r.Header.Get("Resend") == "true" {
 		// Obtains the user and checks for errors
-		user, err := h.Services.User.GetByEmail(r.Header.Get("email"))
+		user, err := c.Services.User.GetByEmail(r.Header.Get("email"))
 		if err == sql.ErrNoRows {
 			return http.StatusNotFound, err
 		}
@@ -57,7 +37,7 @@ func (h *LoginHandler) POST(w http.ResponseWriter, r *http.Request) (int, error)
 			return http.StatusInternalServerError, err
 		}
 
-		return confirmationEmail(h.Services.Link, user)
+		return confirmationEmail(c, user)
 	}
 
 	// Parses the form and checks for errors
@@ -76,7 +56,7 @@ func (h *LoginHandler) POST(w http.ResponseWriter, r *http.Request) (int, error)
 	}
 
 	// Obtains the user and checks for errors
-	user, err := h.Services.User.GetByEmail(email)
+	user, err := c.Services.User.GetByEmail(email)
 	if err == sql.ErrNoRows {
 		return http.StatusNotFound, err
 	}

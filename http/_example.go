@@ -6,6 +6,13 @@ import (
 	"github.com/upframe/fest"
 )
 
+// ExampleGET ...
+func ExampleGET(cfg fest.Config, srvc fest.Services) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+	}
+}
+
 // ExampleHandler ...
 type ExampleHandler struct {
 	SessionService fest.SessionService
@@ -31,7 +38,7 @@ func (h *ExampleHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // GET ...
 func (h *ExampleHandler) GET(w http.ResponseWriter, r *http.Request) (int, error) {
-	s, err := GetSession(w, r, h.Services.User)
+	s, err := GetSession(w, r, c.Services.User)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -41,7 +48,7 @@ func (h *ExampleHandler) GET(w http.ResponseWriter, r *http.Request) (int, error
 
 // POST ...
 func (h *ExampleHandler) POST(w http.ResponseWriter, r *http.Request) (int, error) {
-	s, err := GetSession(w, r, h.Services.User)
+	s, err := GetSession(w, r, c.Services.User)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}

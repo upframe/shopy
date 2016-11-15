@@ -8,11 +8,6 @@ import (
 	"github.com/upframe/fest"
 )
 
-// handler ...
-type handler struct {
-	Services *fest.Services
-}
-
 func checkErrors(w http.ResponseWriter, r *http.Request, code int, err error) {
 	if code != 0 {
 		w.WriteHeader(code)
@@ -33,15 +28,18 @@ func Redirect(w http.ResponseWriter, r *http.Request, path string) (int, error) 
 	return http.StatusOK, nil
 }
 
-// InjectSession ...
-func InjectSession(h http.Handler, us fest.UserService) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+// FestHandler ...
+type FestHandler func(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error)
+
+// Inject ...
+func Inject(h FestHandler, c *fest.Config) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 		// Create the session
 		s := &fest.Session{}
 
 		// Gets the current session or creates a new one if there is some error
 		// decrypting it or if it doesn't exist
-		s.Session, _ = fest.Store.Get(r, "upframe-auth")
+		s.Session, _ = c.Store.Get(r, "upframe-auth")
 
 		// If it is a new session, initialize it, setting 'IsLoggedIn' as false
 		if s.IsNew {
@@ -51,7 +49,7 @@ func InjectSession(h http.Handler, us fest.UserService) http.Handler {
 		// Get the user info from the database and add it to the session data
 		if s.IsLoggedIn() {
 			var err error
-			s.User, err = us.Get(s.Values["UserID"].(int))
+			s.User, err = c.Services.User.Get(s.Values["UserID"].(int))
 			if err != nil {
 				checkErrors(w, r, http.StatusInternalServerError, err)
 				return
@@ -66,28 +64,30 @@ func InjectSession(h http.Handler, us fest.UserService) http.Handler {
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), "session", s)
-		r = r.WithContext(ctx)
+		r = r.WithContext(context.WithValue(r.Context(), "session", s))
 
-		h.ServeHTTP(w, r)
-	})
+		h(w, r, c)
+
+		// code, err :=h(w, r, c)
+
+		// TODO: handle error
+	}
 }
 
 // MustLogin ...
-func MustLogin(h http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func MustLogin(h FestHandler) FestHandler {
+	return func(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
 		s := r.Context().Value("session").(*fest.Session)
 
 		if s.IsLoggedIn() {
-			h.ServeHTTP(w, r)
-			return
+			return h(w, r, c)
 		}
 
 		if r.Method == http.MethodGet {
-			http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
-			return
+			return Redirect(w, r, "/login")
 		}
 
 		w.WriteHeader(http.StatusUnauthorized)
-	})
+		return 0, nil
+	}
 }

@@ -10,36 +10,16 @@ import (
 	"github.com/upframe/fest"
 )
 
-// SettingsHandler ...
-type SettingsHandler handler
-
-func (h *SettingsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	var (
-		code int
-		err  error
-	)
-	defer checkErrors(w, r, code, err)
-
-	switch r.Method {
-	case http.MethodGet:
-		code, err = h.GET(w, r)
-	case http.MethodPost:
-		code, err = h.POST(w, r)
-	default:
-		code, err = http.StatusNotImplemented, nil
-	}
-}
-
 type settings struct {
 	User    *fest.User
 	BaseURL string
 }
 
-// GET ...
-func (h *SettingsHandler) GET(w http.ResponseWriter, r *http.Request) (int, error) {
+// SettingsGet ...
+func SettingsGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
 	s := r.Context().Value("session").(*fest.Session)
 
-	user, err := h.Services.User.Get(s.Values["UserID"].(int))
+	user, err := c.Services.User.Get(s.Values["UserID"].(int))
 	if err == sql.ErrNoRows {
 		return http.StatusNotFound, err
 	}
@@ -48,14 +28,14 @@ func (h *SettingsHandler) GET(w http.ResponseWriter, r *http.Request) (int, erro
 		return http.StatusInternalServerError, err
 	}
 
-	return RenderHTML(w, s, settings{
+	return RenderHTML(w, c, s, settings{
 		User:    user,
-		BaseURL: fest.BaseAddress,
+		BaseURL: c.BaseAddress,
 	}, "settings")
 }
 
-// POST ...
-func (h *SettingsHandler) POST(w http.ResponseWriter, r *http.Request) (int, error) {
+// SettingsPost ...
+func SettingsPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
 	// Get the JSON information
 	rawBuffer := &bytes.Buffer{}
 	rawBuffer.ReadFrom(r.Body)
@@ -72,7 +52,7 @@ func (h *SettingsHandler) POST(w http.ResponseWriter, r *http.Request) (int, err
 	}
 
 	// Updates and checks for errors
-	err = h.Services.User.Update(user, "FirstName", "LastName", "Email", "Address")
+	err = c.Services.User.Update(user, "FirstName", "LastName", "Email", "Address")
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}

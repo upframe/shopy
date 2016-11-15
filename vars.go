@@ -19,14 +19,6 @@ const (
 var (
 	ErrAlreadyLoggedIn = errors.New("The user is already logged in.")
 	ErrNotLoggedIn     = errors.New("The user is not logged in.")
-
-	BaseInvites = 0
-	InviteOnly  = false
-
-	BaseAddress string
-	Templates   string
-	Store       *sessions.CookieStore
-	PayPal      *paypalsdk.Client
 )
 
 // Config ...
@@ -38,6 +30,7 @@ type Config struct {
 	Store          *sessions.CookieStore
 	PayPal         *paypalsdk.Client
 	Logger         *log.Logger
+	Services       *Services
 }
 
 // Services ...
@@ -50,13 +43,12 @@ type Services struct {
 }
 
 // InitPayPal configures the paypal client variable
-func InitPayPal(client, secret string, development bool) error {
+func InitPayPal(client, secret string, development bool) (*paypalsdk.Client, error) {
 	link := paypalsdk.APIBaseLive
 	if development {
 		link = paypalsdk.APIBaseSandBox
 	}
 
-	var err error
-	PayPal, err = paypalsdk.NewClient(client, secret, link)
-	return err
+	paypal, err := paypalsdk.NewClient(client, secret, link)
+	return paypal, err
 }

@@ -10,33 +10,13 @@ import (
 	"github.com/upframe/fest/email"
 )
 
-// ResetHandler ...
-type ResetHandler handler
-
-func (h *ResetHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	var (
-		code int
-		err  error
-	)
-	defer checkErrors(w, r, code, err)
-
-	switch r.Method {
-	case http.MethodGet:
-		code, err = h.GET(w, r)
-	case http.MethodPost:
-		code, err = h.POST(w, r)
-	default:
-		code, err = http.StatusNotImplemented, nil
-	}
-}
-
-// GET ...
-func (h *ResetHandler) GET(w http.ResponseWriter, r *http.Request) (int, error) {
+// ResetGet ...
+func ResetGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
 	s := r.Context().Value("session").(*fest.Session)
 
 	if hash := r.URL.Query().Get("hash"); hash != "" {
 		// Fetches the link from the database
-		link, err := h.Services.Link.Get(hash)
+		link, err := c.Services.Link.Get(hash)
 
 		// If the error is no rows, or the link is used, or it's expired or the path
 		// is incorrect, show a 404 Not Found page.
@@ -49,14 +29,14 @@ func (h *ResetHandler) GET(w http.ResponseWriter, r *http.Request) (int, error) 
 			return http.StatusInternalServerError, err
 		}
 
-		return RenderHTML(w, s, link.User, "reset/form")
+		return RenderHTML(w, c, s, link.User, "reset/form")
 	}
 
-	return RenderHTML(w, s, nil, "reset/email")
+	return RenderHTML(w, c, s, nil, "reset/email")
 }
 
-// POST ...
-func (h *ResetHandler) POST(w http.ResponseWriter, r *http.Request) (int, error) {
+// ResetPost ...
+func ResetPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
 	err := r.ParseForm()
 	if err != nil {
 		return http.StatusInternalServerError, err
@@ -65,7 +45,7 @@ func (h *ResetHandler) POST(w http.ResponseWriter, r *http.Request) (int, error)
 	if hash := r.URL.Query().Get("hash"); hash != "" {
 		// Fetches the link from the database
 		var link *fest.Link
-		link, err = h.Services.Link.Get(hash)
+		link, err = c.Services.Link.Get(hash)
 
 		// If the error is no rows, or the link is used, or it's expired or the path
 		// is incorrect, show a 404 Not Found page.
@@ -85,7 +65,7 @@ func (h *ResetHandler) POST(w http.ResponseWriter, r *http.Request) (int, error)
 
 		// SET USER PASSWORD AND UPDATE PWD HASH AND PWD SALT
 		var user *fest.User
-		user, err = h.Services.User.Get(link.User)
+		user, err = c.Services.User.Get(link.User)
 		if err != nil {
 			return http.StatusInternalServerError, err
 		}
@@ -95,14 +75,14 @@ func (h *ResetHandler) POST(w http.ResponseWriter, r *http.Request) (int, error)
 			return http.StatusInternalServerError, err
 		}
 
-		err = h.Services.User.Update(user, "PasswordHash", "PasswordSalt")
+		err = c.Services.User.Update(user, "PasswordHash", "PasswordSalt")
 		if err != nil {
 			return http.StatusInternalServerError, err
 		}
 
 		// SET LINK TO USED
 		link.Used = true
-		err = h.Services.Link.Update(link, "Used")
+		err = c.Services.Link.Update(link, "Used")
 		if err != nil {
 			return http.StatusInternalServerError, err
 		}
@@ -119,7 +99,7 @@ func (h *ResetHandler) POST(w http.ResponseWriter, r *http.Request) (int, error)
 
 	// get user by email
 	var user *fest.User
-	user, err = h.Services.User.GetByEmail(formEmail)
+	user, err = c.Services.User.GetByEmail(formEmail)
 	if err == sql.ErrNoRows {
 		return http.StatusNotFound, err
 	}
@@ -141,7 +121,7 @@ func (h *ResetHandler) POST(w http.ResponseWriter, r *http.Request) (int, error)
 		Expires: &expires,
 	}
 
-	err = h.Services.Link.Create(link)
+	err = c.Services.Link.Create(link)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -149,7 +129,7 @@ func (h *ResetHandler) POST(w http.ResponseWriter, r *http.Request) (int, error)
 	data := make(map[string]interface{})
 	data["Name"] = user.FirstName + " " + user.LastName
 	data["Hash"] = link.Hash
-	data["Host"] = fest.BaseAddress
+	data["Host"] = c.BaseAddress
 
 	email := &email.Email{
 		From: &mail.Address{

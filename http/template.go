@@ -33,7 +33,7 @@ type page struct {
 
 // RenderHTML renders an HTML response and send it to the client based on the
 // choosen templates
-func RenderHTML(w http.ResponseWriter, s *fest.Session, data interface{}, templates ...string) (int, error) {
+func RenderHTML(w http.ResponseWriter, c *fest.Config, s *fest.Session, data interface{}, templates ...string) (int, error) {
 	if strings.HasPrefix(templates[0], "admin/") {
 		templates = append(templates, "admin/base")
 	} else {
@@ -54,7 +54,7 @@ func RenderHTML(w http.ResponseWriter, s *fest.Session, data interface{}, templa
 	// For each template, add it to the the tpl variable
 	for i := range templates {
 		// Get the template from the assets
-		page, err := ioutil.ReadFile(filepath.Clean(fest.Templates + templates[i] + ".tmpl"))
+		page, err := ioutil.ReadFile(filepath.Clean(c.Templates + templates[i] + ".tmpl"))
 
 		// Check if there is some error. If so, the template doesn't exist
 		if err != nil {
@@ -79,7 +79,7 @@ func RenderHTML(w http.ResponseWriter, s *fest.Session, data interface{}, templa
 	p := &page{
 		IsLoggedIn:  s.IsLoggedIn(),
 		Data:        data,
-		BaseAddress: fest.BaseAddress,
+		BaseAddress: c.BaseAddress,
 	}
 
 	// Refresh user information

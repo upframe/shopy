@@ -2,15 +2,16 @@ package http
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 )
 
 type apiMessage struct {
 	Code    int
 	Message string
+	Error   error `json:"-"`
 }
 
+/*
 // NotFoundAPI ...
 type NotFoundAPI handler
 
@@ -25,30 +26,24 @@ func (h *NotFoundAPI) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusNotFound)
 	w.Write(data)
-}
+} */
 
-func apiErrors(w http.ResponseWriter, r *http.Request, code *int, err error) {
-	msg := &apiMessage{
-		Code: *code,
+func apiErrors(w http.ResponseWriter, r *http.Request, err *apiMessage) {
+	if err.Error != nil {
+		err.Message = err.Error.Error()
 	}
 
-	fmt.Println(err)
-
-	if err != nil {
-		msg.Message = err.Error()
+	if err.Error == nil && err.Code != 0 {
+		err.Message = http.StatusText(err.Code)
 	}
 
-	if err == nil && *code != 0 {
-		msg.Message = http.StatusText(*code)
-	}
-
-	if *code != 0 {
-		data, err := json.MarshalIndent(msg, "", "\t")
-		if err != nil {
+	if err.Code != 0 {
+		data, e := json.MarshalIndent(err, "", "\t")
+		if e != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 		}
 
-		w.WriteHeader(*code)
+		w.WriteHeader(err.Code)
 		w.Write(data)
 	}
 }

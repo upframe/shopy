@@ -9,61 +9,20 @@ import (
 	"github.com/upframe/fest"
 )
 
-// CartHandler ...
-type CartHandler handler
-
-func (h *CartHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	var (
-		code int
-		err  error
-	)
-	defer checkErrors(w, r, code, err)
-
-	switch r.Method {
-	case http.MethodGet:
-		code, err = h.GET(w, r)
-	default:
-		code, err = http.StatusNotImplemented, nil
-	}
-}
-
-// GET ...
-func (h *CartHandler) GET(w http.ResponseWriter, r *http.Request) (int, error) {
+// CartGet ...
+func CartGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
 	s := r.Context().Value("session").(*fest.Session)
 
-	cart, err := s.GetCart(h.Services.Product)
+	cart, err := s.GetCart(c.Services.Product)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
 
-	return RenderHTML(w, s, cart, "cart")
+	return RenderHTML(w, c, s, cart, "cart")
 }
 
-// CartItemHandler ...
-type CartItemHandler handler
-
-func (h *CartItemHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	var (
-		code int
-		err  error
-	)
-
-	switch r.Method {
-	case http.MethodGet:
-		code, err = http.StatusNotFound, nil
-	case http.MethodPost:
-		code, err = h.POST(w, r)
-	case http.MethodDelete:
-		code, err = h.DELETE(w, r)
-	default:
-		code, err = http.StatusNotImplemented, nil
-	}
-
-	checkErrors(w, r, code, err)
-}
-
-// POST ...
-func (h *CartItemHandler) POST(w http.ResponseWriter, r *http.Request) (int, error) {
+// CartItemPost ...
+func CartItemPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
 	s := r.Context().Value("session").(*fest.Session)
 
 	id, err := strconv.Atoi(strings.Replace(r.URL.Path, "/cart/", "", -1))
@@ -72,7 +31,7 @@ func (h *CartItemHandler) POST(w http.ResponseWriter, r *http.Request) (int, err
 	}
 
 	// Gets the product, checks if it exists and checks for errors.
-	product, err := h.Services.Product.Get(id)
+	product, err := c.Services.Product.Get(id)
 	if err == sql.ErrNoRows {
 		return http.StatusNotFound, err
 	}
@@ -107,8 +66,8 @@ func (h *CartItemHandler) POST(w http.ResponseWriter, r *http.Request) (int, err
 	return http.StatusOK, nil
 }
 
-// DELETE ...
-func (h *CartItemHandler) DELETE(w http.ResponseWriter, r *http.Request) (int, error) {
+// CartItemDelete ...
+func CartItemDelete(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
 	s := r.Context().Value("session").(*fest.Session)
 
 	id, err := strconv.Atoi(strings.Replace(r.URL.Path, "/cart/", "", 1))
