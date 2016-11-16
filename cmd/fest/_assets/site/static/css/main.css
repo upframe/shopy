@@ -12,7 +12,7 @@ body {
 }
 
 body.covered {
-    background: url(/imgs/cover.jpg) center center / cover;
+    background: url(/static/imgs/cover.jpg) center center / cover;
 }
 
 a {
@@ -390,10 +390,6 @@ table {
     border: 1px solid rgba(0, 0, 0, 0.075);
 }
 
-table tr {
-    cursor: pointer;
-}
-
 table thead tr:first-child {
     font-weight: 900;
     background: #EEEEEE;
@@ -500,10 +496,11 @@ table th:first-child {
     content: "€ ";
 }
 
+
 /* My orders */
+
 main.floating-box.my-orders {
     max-width: 70%;
 }
 
-#order-products {
-}
+#order-products {}

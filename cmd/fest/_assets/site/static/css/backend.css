@@ -14,7 +14,7 @@ body {
 }
 
 body.covered {
-    background: url(/imgs/cover.jpg) center center / cover;
+    background: url(/static/imgs/cover.jpg) center center / cover;
 }
 
 a {

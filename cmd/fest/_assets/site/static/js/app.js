@@ -80,8 +80,8 @@ function validateCoupon(e) {
     }
 
     let request = new XMLHttpRequest();
-    request.open("POST", "/coupon/validate", true);
-    request.send(this.value);
+    request.open("GET", "/api/promocode/" + this.value + "?code=true", true);
+    request.send();
     request.onreadystatechange = function() {
         if (request.readyState == 4) {
             switch (request.status) {
@@ -217,7 +217,7 @@ function submitSettings(event) {
 
 
     var request = new XMLHttpRequest();
-    request.open("PUT", window.location, true);
+    request.open("POST", window.location, true);
     request.setRequestHeader("Content-type", "application/json; charset=utf-8");
     request.send(JSON.stringify(copyFormToObject(this)));
     request.onreadystatechange = function() {

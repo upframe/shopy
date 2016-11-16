@@ -7,22 +7,16 @@
                 <th>Promocode</th>
                 <th>Status</th>
                 <th>Products</th>
-                <th>Price/unit</th>
                 <th>Total</th>
             </tr>
             {{ range $order := .Data }}
             <tr>
                 <td>{{ $order.ID }}</td>
-                <td>{{ $order.PromocodeCode }}</td>
+                <td>{{ if $order.Promocode }}{{ $order.Promocode.Code }} (-{{ if $order.Promocode.Percentage}}{{ $order.Promocode.Discount}}%{{ else }}{{ DisplayCents $order.Promocode.Discount }}€{{ end }}){{ else }}--{{ end }}</td>
                 <td style="text-transform: capitalize;">{{ $order.Status }}</td>
                 <td id="order-products">
                     {{ range $product := $order.Products }}
                         {{ $product.Quantity }}x {{ $product.Name }}<br>
-                    {{ end }}
-                </td>
-                <td>
-                    {{ range $product := $order.Products }}
-                        {{ DisplayCents $product.Price }}€<br>
                     {{ end }}
                 </td>
                 <td>{{ DisplayCents $order.Value }}€</td>
