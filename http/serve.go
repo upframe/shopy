@@ -79,7 +79,7 @@ func Serve(c *fest.Config) {
 	admin.HandleFunc("/{category:(?:products|promocodes|orders|users)}/{page:[0-9]+}", Inject(MustAdmin(AdminListing), c))
 
 	// TODO :check CSRF
-	log.Fatal(http.ListenAndServe(c.Domain+":"+c.Port, r))
+	log.Fatal(http.ListenAndServe(":"+c.Port, r))
 }
 
 // logout resets the session values and saves the cookie
