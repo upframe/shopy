@@ -171,7 +171,7 @@ function deactivateHandler(event) {
     event.preventDefault();
 
     Array.from(document.querySelectorAll('tr.highlight')).forEach((row) => {
-        let link = "/admin/" + window.location.pathname.split("/")[2] + "/" + row.dataset.id
+        let link = "/api/" + window.location.pathname.split("/")[2] + "/" + row.dataset.id
         let request = new XMLHttpRequest();
 
         request.open("DELETE", link);
@@ -192,7 +192,7 @@ function activateHandler(event) {
     event.preventDefault();
 
     Array.from(document.querySelectorAll('tr.highlight')).forEach((row) => {
-        let link = "/admin/" + window.location.pathname.split("/")[2] + "/" + row.dataset.id
+        let link = "/api/" + window.location.pathname.split("/")[2] + "/" + row.dataset.id
 
         copyRowToForm(row);
         let data = copyFormToObject(editor);
@@ -200,7 +200,7 @@ function activateHandler(event) {
 
         let request = new XMLHttpRequest();
         request.open("PUT", link);
-        request.send(JSON.stringify(data));
+        request.send('{"Deactivated":true}');
         request.onreadystatechange = function() {
             if (request.readyState == 4) {
                 if (request.status == 200) {

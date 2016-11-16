@@ -64,7 +64,7 @@ func APIPromocodePost(w http.ResponseWriter, r *http.Request, c *fest.Config) (i
 		return http.StatusInternalServerError, err
 	}
 
-	http.Redirect(w, r, "/api/promocode/"+strconv.Itoa(p.ID), http.StatusSeeOther)
+	http.Redirect(w, r, "/api/promocodes/"+strconv.Itoa(p.ID), http.StatusSeeOther)
 	return 0, nil
 }
 

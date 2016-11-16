@@ -77,6 +77,11 @@ func (s *ProductService) GetsWhereIn(first, limit int, order, where, in string) 
 	return products, err
 }
 
+// Total ...
+func (s *ProductService) Total() (int, error) {
+	return getTableCount(s.DB, "products")
+}
+
 // Create ...
 func (s *ProductService) Create(p *fest.Product) error {
 	if p.ID != 0 {

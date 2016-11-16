@@ -17,6 +17,7 @@ type ProductService interface {
 	GetsWhere(first, limit int, order, where, sth string) ([]*Product, error)
 	GetsWhereIn(first, limit int, order, where, in string) ([]*Product, error)
 
+	Total() (int, error)
 	Create(p *Product) error
 	Update(p *Product, fields ...string) error
 	Delete(id int) error

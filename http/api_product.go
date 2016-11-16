@@ -49,7 +49,7 @@ func APIProductPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int
 		return http.StatusInternalServerError, err
 	}
 
-	http.Redirect(w, r, "/api/product/"+strconv.Itoa(p.ID), http.StatusSeeOther)
+	http.Redirect(w, r, "/api/products/"+strconv.Itoa(p.ID), http.StatusSeeOther)
 	return 0, nil
 }
 

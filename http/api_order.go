@@ -54,7 +54,7 @@ func APIOrderPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, 
 		return http.StatusInternalServerError, err
 	}
 
-	http.Redirect(w, r, "/api/order/"+strconv.Itoa(o.ID), http.StatusSeeOther)
+	http.Redirect(w, r, "/api/orders/"+strconv.Itoa(o.ID), http.StatusSeeOther)
 	return 0, nil
 }
 

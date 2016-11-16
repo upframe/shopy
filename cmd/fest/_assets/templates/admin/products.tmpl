@@ -22,6 +22,7 @@
             <th></th>
         </tr>
     </thead>
+
     {{range $product := .Data.Items }}
     <tr data-id="{{ $product.ID }}">
         <td data-name="ID">{{ $product.ID }}</td>
@@ -44,7 +45,7 @@
     <a {{ if .Data.HasNext }}href="{{ .Data.LinkNext }}" ><button>Next</button></a>{{ else }}><button disabled>Next</button>{{ end }}</a>
 </div>
 
-<form method="POST" id="editor" class="floating-box"  data-link="/admin/products">
+<form method="POST" id="editor" class="floating-box"  data-link="/api/products">
     <h2><span id="new-text">New Product</span><span id="edit-text">Product #<span id="barID"></span></span><span id="expand">&#9660;</span></h2>
 
     <div>

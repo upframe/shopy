@@ -94,7 +94,7 @@ func (s *OrderService) GetsWhere(first, limit int, order, where, sth string) ([]
 		if limit == 0 {
 			rows, err = s.DB.Query(orderBaseSelectQuery+" ORDER BY ?", order)
 		} else {
-			rows, err = s.DB.Query(orderBaseSelectQuery+" ORDER BY ? LIMIT ? OFFSET ?", limit, first)
+			rows, err = s.DB.Query(orderBaseSelectQuery+" ORDER BY ? LIMIT ? OFFSET ?", order, limit, first)
 		}
 	} else {
 		where = fieldsToColumns(ordersMap, where)[0]
@@ -102,7 +102,7 @@ func (s *OrderService) GetsWhere(first, limit int, order, where, sth string) ([]
 		if limit == 0 {
 			rows, err = s.DB.Query(orderBaseSelectQuery+" WHERE "+where+"=? ORDER BY ?", sth, order)
 		} else {
-			rows, err = s.DB.Query(orderBaseSelectQuery+" WHERE "+where+"=? ORDER BY ? LIMIT ? OFFSET ?", sth, limit, first)
+			rows, err = s.DB.Query(orderBaseSelectQuery+" WHERE "+where+"=? ORDER BY ? LIMIT ? OFFSET ?", sth, order, limit, first)
 		}
 	}
 
@@ -168,6 +168,11 @@ func (s *OrderService) GetsWhere(first, limit int, order, where, sth string) ([]
 	}
 
 	return orders, nil
+}
+
+// Total ...
+func (s *OrderService) Total() (int, error) {
+	return getTableCount(s.DB, "orders")
 }
 
 // Create ...

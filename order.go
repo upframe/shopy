@@ -34,6 +34,7 @@ type OrderService interface {
 	Gets(first, limit int, order string) ([]*Order, error)
 	GetsWhere(first, limit int, order, where, sth string) ([]*Order, error)
 
+	Total() (int, error)
 	Create(o *Order) error
 	Update(o *Order, fields ...string) error
 	Delete(id int) error

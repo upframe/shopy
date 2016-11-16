@@ -54,7 +54,7 @@ func APIUserPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, e
 		return http.StatusInternalServerError, err
 	}
 
-	http.Redirect(w, r, "/api/user/"+strconv.Itoa(u.ID), http.StatusSeeOther)
+	http.Redirect(w, r, "/api/users/"+strconv.Itoa(u.ID), http.StatusSeeOther)
 	return 0, nil
 }
 

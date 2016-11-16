@@ -70,6 +70,14 @@ func Serve(c *fest.Config) {
 	api.HandleFunc("/promocodes/{id:[0-9]+}", Inject(MustAdmin(APIPromocodeDelete), c)).Methods("DELETE")
 	api.HandleFunc("/users/{id:[0-9]+}", Inject(MustAdmin(APIUserDelete), c)).Methods("DELETE")
 
+	r.HandleFunc("/admin", Inject(MustAdmin(AdminGet), c)).Methods("GET")
+
+	admin := r.PathPrefix("/admin").Methods("GET").Subrouter()
+
+	admin.HandleFunc("/{category:(?:products|promocodes|orders|users)}", Inject(MustAdmin(AdminRedirect), c))
+	admin.HandleFunc("/{category:(?:products|promocodes|orders|users)}/new", Inject(MustAdmin(AdminNew), c))
+	admin.HandleFunc("/{category:(?:products|promocodes|orders|users)}/{page:[0-9]+}", Inject(MustAdmin(AdminListing), c))
+
 	// TODO :check CSRF
 	log.Fatal(http.ListenAndServe(c.Domain+":"+c.Port, r))
 }

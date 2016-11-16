@@ -18,6 +18,7 @@ type PromocodeService interface {
 	GetByCode(code string) (*Promocode, error)
 	Gets(first, limit int, order string) ([]*Promocode, error)
 
+	Total() (int, error)
 	Create(p *Promocode) error
 	Update(p *Promocode, fields ...string) error
 	Delete(id int) error

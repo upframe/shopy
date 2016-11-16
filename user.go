@@ -71,6 +71,7 @@ type UserService interface {
 	GetByReferral(referral string) (*User, error)
 	Gets(first, limit int, order string) ([]*User, error)
 
+	Total() (int, error)
 	Create(u *User) error
 	Update(u *User, fields ...string) error
 	Delete(id int) error

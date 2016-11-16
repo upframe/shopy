@@ -3,6 +3,7 @@ package mysql
 import (
 
 	// Import driver
+	"net/http"
 	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -45,12 +46,10 @@ func updateQuery(table, where string, fields []string) string {
 			continue
 		}
 
-		if i == len(fields)-1 {
-			query += fields[i] + "=:" + fields[i]
-		} else {
-			query += fields[i] + "=:" + fields[i] + ", "
-		}
+		query += fields[i] + "=:" + fields[i] + ", "
 	}
+
+	query = strings.TrimSuffix(query, ", ")
 
 	// Finish the query adding the 'where' filter
 	query += " WHERE " + where + "=:" + where
@@ -109,10 +108,9 @@ func getAllColumns(m map[string]string) []string {
 	return columns
 }
 
-/*
-// GetTableRecords gets the number of records in a table
-func GetTableRecords(table string) (int, error) {
-	rows, err := s.DB.Query("SELECT COUNT(*) FROM " + table)
+// getTableCount gets the number of records in a table
+func getTableCount(db *sqlx.DB, table string) (int, error) {
+	rows, err := db.Query("SELECT COUNT(*) FROM " + table)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -128,4 +126,3 @@ func GetTableRecords(table string) (int, error) {
 
 	return count, nil
 }
-*/

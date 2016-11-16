@@ -51,6 +51,11 @@ func (s *PromocodeService) Gets(first, limit int, order string) ([]*fest.Promoco
 	return promocodes, err
 }
 
+// Total ...
+func (s *PromocodeService) Total() (int, error) {
+	return getTableCount(s.DB, "promocodes")
+}
+
 // Create ...
 func (s *PromocodeService) Create(p *fest.Promocode) error {
 	if p.ID != 0 {

@@ -67,6 +67,11 @@ func (s *UserService) Gets(first, limit int, order string) ([]*fest.User, error)
 	return users, err
 }
 
+// Total ...
+func (s *UserService) Total() (int, error) {
+	return getTableCount(s.DB, "users")
+}
+
 // Create ...
 func (s *UserService) Create(u *fest.User) error {
 	if u.ID != 0 {

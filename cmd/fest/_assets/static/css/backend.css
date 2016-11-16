@@ -338,6 +338,7 @@ tr .checkbox {
 
 .navigation button:disabled {
     opacity: .4;
+    cursor: not-allowed;
 }
 
 
