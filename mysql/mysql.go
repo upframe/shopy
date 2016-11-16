@@ -3,6 +3,8 @@ package mysql
 import (
 
 	// Import driver
+	"strings"
+
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	"github.com/upframe/fest"
@@ -39,7 +41,7 @@ func updateQuery(table, where string, fields []string) string {
 
 	// Add the fields that we are going to update to the queyr
 	for i := range fields {
-		if fields[i] == "ID" || fields[i] == "id" {
+		if strings.ToLower(fields[i]) == "id" {
 			continue
 		}
 

@@ -5,11 +5,8 @@ import (
 	"net/http"
 )
 
-// TODO: How can we reduce the API code? Delete, Put and Post functions
-// are basically the same.
-
 func apiPrint(w http.ResponseWriter, o interface{}) (int, error) {
-	data, err := json.MarshalIndent(o, "", "\t")
+	data, err := json.MarshalIndent(o, "", "   ")
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}

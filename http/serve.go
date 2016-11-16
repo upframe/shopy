@@ -21,6 +21,9 @@ func Serve(c *fest.Config) {
 	r.HandleFunc("/register", Inject(RegisterGet, c)).Methods("GET")
 	r.HandleFunc("/register", Inject(RegisterPost, c)).Methods("POST")
 
+	r.HandleFunc("/reset", Inject(ResetGet, c)).Methods("GET")
+	r.HandleFunc("/reset", Inject(ResetPost, c)).Methods("POST")
+
 	r.HandleFunc("/settings", Inject(MustLogin(SettingsGet), c)).Methods("GET")
 	r.HandleFunc("/settings", Inject(MustLogin(SettingsPost), c)).Methods("POST")
 
@@ -46,25 +49,26 @@ func Serve(c *fest.Config) {
 	// Users can only access their own orders and their own user information. Admins
 	// can access everything.
 	api := r.PathPrefix("/api").Subrouter()
-	api.HandleFunc("/order/{id:[0-9]+}", Inject(MustLogin(APIOrderGet), c)).Methods("GET")
-	api.HandleFunc("/product/{id:[0-9]+}", Inject(MustAdmin(APIProductGet), c)).Methods("GET")
-	api.HandleFunc("/promocode/{id}", Inject(MustLogin(APIPromocodeGet), c)).Methods("GET")
-	api.HandleFunc("/user/{id:[0-9]+}", Inject(MustLogin(APIUserGet), c)).Methods("GET")
 
-	api.HandleFunc("/order", Inject(MustAdmin(APIOrderPost), c)).Methods("POST")
-	api.HandleFunc("/product", Inject(MustAdmin(APIProductPost), c)).Methods("POST")
-	api.HandleFunc("/promocode", Inject(MustAdmin(APIPromocodePost), c)).Methods("POST")
-	api.HandleFunc("/user", Inject(MustAdmin(APIUserPost), c)).Methods("POST")
+	api.HandleFunc("/orders/{id:[0-9]+}", Inject(MustLogin(APIOrderGet), c)).Methods("GET")
+	api.HandleFunc("/products/{id:[0-9]+}", Inject(MustAdmin(APIProductGet), c)).Methods("GET")
+	api.HandleFunc("/promocodes/{id}", Inject(MustLogin(APIPromocodeGet), c)).Methods("GET")
+	api.HandleFunc("/users/{id:[0-9]+}", Inject(MustLogin(APIUserGet), c)).Methods("GET")
 
-	api.HandleFunc("/order/{id:[0-9]+}", Inject(MustAdmin(APIOrderPut), c)).Methods("PUT")
-	api.HandleFunc("/product/{id:[0-9]+}", Inject(MustAdmin(APIProductPut), c)).Methods("PUT")
-	api.HandleFunc("/promocode/{id:[0-9]+}", Inject(MustAdmin(APIPromocodePut), c)).Methods("PUT")
-	api.HandleFunc("/user/{id:[0-9]+}", Inject(MustAdmin(APIUserPut), c)).Methods("PUT")
+	api.HandleFunc("/orders", Inject(MustAdmin(APIOrderPost), c)).Methods("POST")
+	api.HandleFunc("/products", Inject(MustAdmin(APIProductPost), c)).Methods("POST")
+	api.HandleFunc("/promocodes", Inject(MustAdmin(APIPromocodePost), c)).Methods("POST")
+	api.HandleFunc("/users", Inject(MustAdmin(APIUserPost), c)).Methods("POST")
 
-	api.HandleFunc("/order/{id:[0-9]+}", Inject(MustAdmin(APIOrderDelete), c)).Methods("DELETE")
-	api.HandleFunc("/product/{id:[0-9]+}", Inject(MustAdmin(APIProductDelete), c)).Methods("DELETE")
-	api.HandleFunc("/promocode/{id:[0-9]+}", Inject(MustAdmin(APIPromocodeDelete), c)).Methods("DELETE")
-	api.HandleFunc("/user/{id:[0-9]+}", Inject(MustAdmin(APIUserDelete), c)).Methods("DELETE")
+	api.HandleFunc("/orders/{id:[0-9]+}", Inject(MustAdmin(APIOrderPut), c)).Methods("PUT")
+	api.HandleFunc("/products/{id:[0-9]+}", Inject(MustAdmin(APIProductPut), c)).Methods("PUT")
+	api.HandleFunc("/promocodes/{id:[0-9]+}", Inject(MustAdmin(APIPromocodePut), c)).Methods("PUT")
+	api.HandleFunc("/users/{id:[0-9]+}", Inject(MustAdmin(APIUserPut), c)).Methods("PUT")
+
+	api.HandleFunc("/orders/{id:[0-9]+}", Inject(MustAdmin(APIOrderDelete), c)).Methods("DELETE")
+	api.HandleFunc("/products/{id:[0-9]+}", Inject(MustAdmin(APIProductDelete), c)).Methods("DELETE")
+	api.HandleFunc("/promocodes/{id:[0-9]+}", Inject(MustAdmin(APIPromocodeDelete), c)).Methods("DELETE")
+	api.HandleFunc("/users/{id:[0-9]+}", Inject(MustAdmin(APIUserDelete), c)).Methods("DELETE")
 
 	// TODO :check CSRF
 	log.Fatal(http.ListenAndServe(c.Domain+":"+c.Port, r))
