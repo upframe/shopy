@@ -1,5 +1,13 @@
 package fest
 
+const (
+	OrderWaitingPayment = "pending"
+	OrderApproved       = "approved"
+	OrderCreated        = "created"
+	OrderFailed         = "failed"
+	OrderCanceled       = "canceled"
+)
+
 // Order ...
 type Order struct {
 	ID        int
@@ -11,14 +19,6 @@ type Order struct {
 	Promocode *Promocode
 	Products  []*OrderProduct
 }
-
-const (
-	OrderWaitingPayment = "pending"
-	OrderApproved       = "approved"
-	OrderCreated        = "created"
-	OrderFailed         = "failed"
-	OrderCanceled       = "canceled"
-)
 
 // OrderProduct ...
 type OrderProduct struct {

@@ -2,17 +2,6 @@ package fest
 
 import "strconv"
 
-// CartItem handles products and its quantity
-type CartItem struct {
-	*Product
-	Quantity int
-}
-
-// GetPrice displays the product price * quantity
-func (i CartItem) GetPrice() int {
-	return i.Price * i.Quantity
-}
-
 // Cart does exactly what is says
 type Cart struct {
 	Products []*CartItem
@@ -39,4 +28,15 @@ func (c Cart) GetDescription() string {
 	}
 
 	return description
+}
+
+// CartItem handles products and its quantity
+type CartItem struct {
+	*Product
+	Quantity int
+}
+
+// GetPrice displays the product price * quantity
+func (i CartItem) GetPrice() int {
+	return i.Price * i.Quantity
 }

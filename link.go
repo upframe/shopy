@@ -12,6 +12,11 @@ type Link struct {
 	Expires *time.Time `db:"expires"`
 }
 
+// IsValid returns if the link is still valid and not used
+func (l Link) IsValid() bool {
+	return l.Expires.Unix() < time.Now().Unix() && !l.Used
+}
+
 // LinkService ...
 type LinkService interface {
 	Get(hash string) (*Link, error)
@@ -20,9 +25,4 @@ type LinkService interface {
 	Create(l *Link) error
 	Update(l *Link, fields ...string) error
 	Delete(hash string) error
-}
-
-// IsValid returns if the link is still valid and not used
-func (l Link) IsValid() bool {
-	return l.Expires.Unix() < time.Now().Unix() && !l.Used
 }

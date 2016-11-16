@@ -1,7 +1,6 @@
 package fest
 
 import (
-	"net/http"
 	"strconv"
 	"strings"
 
@@ -64,9 +63,4 @@ func (s Session) GetCart(service ProductService) (*Cart, error) {
 	}
 
 	return cart, nil
-}
-
-// SessionService ...
-type SessionService interface {
-	Session(w http.ResponseWriter, r *http.Request) (*Session, error)
 }
