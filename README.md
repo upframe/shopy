@@ -2,14 +2,9 @@
 
 Certify yourself that the variable `GOPATH` is set and that `$GOPATH/bin` is in your `PATH`.
 
-1. `go get github.com/mholt/caddy/caddy`
-2. `go get github.com/upframe/fest`
-3. Edit `GOPATH\src\github.com\mholt\caddy\caddyhttp\httpserver\plugin.go` and add `"fest",` on line 434.
-4. Edit `GOPATH\src\github.com\mholt\caddy\caddy\caddymain\run.go` and add `_ "github.com/upframe/fest"` to line 20.
-5. `cd $GOPATH/src/github.com/upframe/fest/dist`
-6. `go install github.com/mholt/caddy/caddy && caddy`
-
-If you get any errors during the installation related to missing packages, run `go get` for those.
+1. `go get github.com/upframe/fest`
+2. `cd $GOPATH/src/github.com/upframe/fest/cmd/fest`
+3. `go install && fest`
 
 To build a final version, execute:
 

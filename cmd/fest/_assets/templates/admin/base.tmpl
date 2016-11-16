@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>{{ template "title" }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/normalize.css">
+    <link rel="stylesheet" href="/static/css/backend.css">
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="/"><img src="https://upframe.xyz/img/logo.svg"></a></li>
+            <li><i class="material-icons">exit_to_app</i></li>
+        </ul>
+    </nav>
+
+    <aside>
+        <ul>
+            <li><a href="/admin" alt="Home" title="Home"><i class="material-icons">home</i></a></li>
+            <li><a href="/admin/users" alt="Users" title="Users"><i class="material-icons">supervisor_account</i></a></li>
+            <li><a href="/admin/products" alt="Products" title="Products"><i class="material-icons">shopping_basket</i></a></li>
+            <li><a href="/admin/promocodes" alt="Promocodes" title="Promocodes"><i class="material-icons">redeem</i></a></li>
+            <li><a href="/admin/orders" alt="Orders" title="Orders"><i class="material-icons">shopping_cart</i></a></li>
+        </ul>
+    </aside>
+
+    <header>
+        <div>{{ template "header-left" . }}</div>
+        <div>{{ template "header-right" . }}</div>
+    </header>
+
+    <main role="main">
+        {{ template "content" . }}
+    </main>
+
+    <script src="/static/js/common.js"></script>
+    <script src="/static/js/backend.js"></script>
+    <script src="/static/js/vendor/smooth-scroll.js">smoothScroll.init();</script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+{{ define "title" }}Products{{ end }}
+
+{{ define "header-left" }}<h1>Products</h1>{{ end }}
+
+{{ define "header-right" }}
+<button id="edit" alt="Edit" title="Edit"><i class="material-icons">mode_edit</i> Edit</button>
+<button id="activate"><i class="material-icons">lens</i> Activate</button>
+<button id="deactivate" alt="Deactivate" title="Deactivate"><i class="material-icons">blur_on</i> Deactivate</button>
+<button id="add"><i class="material-icons">add</i> New</button>
+{{ end }}
+
+{{ define "content" }}
+<table id="products">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Price</th>
+            <th>Picture</th>
+            <th>Deactivated</th>
+            <th></th>
+        </tr>
+    </thead>
+
+    {{range $product := .Data.Items }}
+    <tr data-id="{{ $product.ID }}">
+        <td data-name="ID">{{ $product.ID }}</td>
+        <td data-name="Name">{{ $product.Name }}</td>
+        <td data-name="Description">{{ $product.Description }}</td>
+        <td data-name="Price">{{ $product.Price }}</td>
+        <td data-name="Picture">{{ $product.Picture }}</td>
+        <td data-name="Deactivated">
+            <div class="checkbox">
+                <input type="checkbox" disabled value="second_checkbox" {{ if $product.Deactivated }}checked{{ end }}>
+                <label></label>
+            </div>
+        </td>
+        <td><button class="edit"><i class="material-icons">mode_edit</i></button></td>
+    </tr>
+    {{ end }}
+</table>
+<div class="navigation">
+    <a {{ if .Data.HasPrevious }}href="{{ .Data.LinkPrevious }}" ><button>Previous</button></a>{{ else }}><button disabled>Previous</button>{{ end }}</a>
+    <a {{ if .Data.HasNext }}href="{{ .Data.LinkNext }}" ><button>Next</button></a>{{ else }}><button disabled>Next</button>{{ end }}</a>
+</div>
+
+<form method="POST" id="editor" class="floating-box"  data-link="/api/products">
+    <h2><span id="new-text">New Product</span><span id="edit-text">Product #<span id="barID"></span></span><span id="expand">&#9660;</span></h2>
+
+    <div>
+        <input name="ID" id="ID" required readonly type="number" value="">
+
+        <div id="form-error"></div>
+
+        <label for="Name">Name</label>
+        <input name="Name" id="Name" required type="text" value="">
+
+        <label for="Description">Description</label>
+        <input name="Description" id="Description" required type="text" value="">
+
+        <label for="Price">Price</label>
+        <input name="Price" id="Price" required type="number" value="">
+
+        <label for="Picture">Picture</label>
+        <input name="Picture" id="Picture" required type="text" value="">
+
+        <div class="flex">
+            <div class="checkbox">
+                <input type="checkbox" name="Deactivated" id="Deactivated">
+                <label for="Deactivated"></label>
+            </div>
+            <label for="Deactivated">Deactivated</label>
+        </div>
+
+        <button type="submit">Save</button>
+    </div>
+</form>
+{{ end }}

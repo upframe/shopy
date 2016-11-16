@@ -1,0 +1,88 @@
+{{ define "title" }}Promocodes{{ end }}
+
+{{ define "header-left" }}<h1>Promocodes</h1>{{ end }}
+
+{{ define "header-right" }}
+<button id="edit" alt="Edit" title="Edit"><i class="material-icons">mode_edit</i> Edit</button>
+<button id="activate"><i class="material-icons">lens</i> Activate</button>
+<button id="deactivate" alt="Deactivate" title="Deactivate"><i class="material-icons">blur_on</i> Deactivate</button>
+<button id="add"><i class="material-icons">add</i> New</button>
+{{ end }}
+
+{{ define "content" }}
+<table id="promocodes">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Code</th>
+            <th>Percentage</th>
+            <th>Discount</th>
+            <th>Expiration Date (UTC)</th>
+            <th>Deactivated</th>
+            <th></th>
+        </tr>
+    </thead>
+    {{range $promocode := .Data.Items }}
+    <tr data-id="{{ $promocode.ID }}">
+        <td data-name="ID">{{ $promocode.ID }}</td>
+        <td data-name="Code">{{ $promocode.Code }}</td>
+        <td data-name="Percentage">
+            <div class="checkbox">
+                <input type="checkbox" disabled value="second_checkbox" {{ if $promocode.Percentage }}checked{{ end }}>
+                <label></label>
+            </div>
+        </td>
+        <td data-name="Discount">{{ $promocode.Discount }}</td>
+        <td data-name="Expires">{{ $promocode.Expires.Format "02 Jan 06 15:04 MST" }}</td>
+        <td data-name="Deactivated">
+            <div class="checkbox">
+                <input type="checkbox" disabled value="second_checkbox" {{ if $promocode.Deactivated }}checked{{ end }}>
+                <label></label>
+            </div>
+        </td>
+        <td><button class="edit"><i class="material-icons">mode_edit</i></button></td>
+    </tr>
+    {{ end }}
+</table>
+<div class="navigation">
+    <a {{ if .Data.HasPrevious }}href="{{ .Data.LinkPrevious }}" ><button>Previous</button></a>{{ else }}><button disabled>Previous</button>{{ end }}</a>
+    <a {{ if .Data.HasNext }}href="{{ .Data.LinkNext }}" ><button>Next</button></a>{{ else }}><button disabled>Next</button>{{ end }}</a>
+</div>
+
+<form method="POST" id="editor" class="floating-box" data-link="/admin/promocodes">
+    <h2><span id="new-text">New Promocode</span><span id="edit-text">Promocode #<span id="barID"></span></span><span id="expand">&#9660;</span></h2>
+
+    <div>
+        <input name="ID" id="ID" required readonly type="number" value="0">
+
+        <div id="form-error"></div>
+
+        <label for="Code">Code</label>
+        <input name="Code" id="Code" required type="text" value="">
+
+        <label for="Discount">Discount</label>
+        <input name="Discount" id="Discount" required type="number" value="">
+
+        <label for="Expires">Expiration Date (UTC)</label>
+        <input name="Expires" id="Expires" required type="datetime-local" value="">
+
+        <div class="flex">
+            <div class="checkbox">
+                <input type="checkbox" name="Percentage" id="Percentage">
+                <label for="Percentage"></label>
+            </div>
+            <label for="Percentage">Percentage</label>
+        </div>
+
+        <div class="flex">
+            <div class="checkbox">
+                <input type="checkbox" name="Deactivated" id="Deactivated">
+                <label for="Deactivated"></label>
+            </div>
+            <label for="Deactivated">Deactivated</label>
+        </div>
+
+        <button type="submit">Save</button>
+    </div>
+</form>
+{{ end }}
