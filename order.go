@@ -11,11 +11,11 @@ const (
 // Order ...
 type Order struct {
 	ID        int
-	UserID    int
 	PayPal    string
 	Value     int
 	Status    string
 	Credits   int
+	User      *User
 	Promocode *Promocode
 	Products  []*OrderProduct
 }
