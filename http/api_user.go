@@ -35,6 +35,13 @@ func APIUserGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, er
 	return apiPrint(w, p)
 }
 
+// APICurrentUser ...
+func APICurrentUser(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
+	s := r.Context().Value("session").(*fest.Session)
+
+	return Redirect(w, r, "/api/users/"+strconv.Itoa(s.User.ID))
+}
+
 // APIUserPost  ...
 func APIUserPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
 	u := &fest.User{}
