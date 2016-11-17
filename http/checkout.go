@@ -111,7 +111,7 @@ func CheckoutPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, 
 	}
 
 	order := &fest.Order{
-		UserID:   s.User.ID,
+		User:     &fest.User{ID: s.User.ID},
 		Status:   fest.OrderWaitingPayment,
 		Products: []*fest.OrderProduct{},
 		Value:    cart.GetTotal(),

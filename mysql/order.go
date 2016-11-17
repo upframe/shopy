@@ -16,7 +16,7 @@ type OrderService struct {
 
 var ordersMap = map[string]string{
 	"ID":                    "o.id",
-	"UserID":                "o.user_id",
+	"User.ID":               "o.user_id",
 	"PayPal":                "o.paypal",
 	"Value":                 "o.value",
 	"Status":                "o.status",
@@ -113,7 +113,7 @@ func (s *OrderService) GetsWhere(first, limit int, order, where, sth string) ([]
 	defer rows.Close()
 
 	for rows.Next() {
-		order := &fest.Order{Products: []*fest.OrderProduct{}}
+		order := &fest.Order{Products: []*fest.OrderProduct{}, User: &fest.User{}}
 
 		var (
 			id          sql.NullInt64
@@ -125,7 +125,7 @@ func (s *OrderService) GetsWhere(first, limit int, order, where, sth string) ([]
 		)
 
 		err = rows.Scan(
-			&order.ID, &order.UserID, &order.PayPal, &order.Value, &order.Status, &order.Credits,
+			&order.ID, &order.User.ID, &order.PayPal, &order.Value, &order.Status, &order.Credits,
 			&id, &code, &expires, &discount, &percentage, &deactivated)
 		if err != nil {
 			return orders, err
@@ -185,7 +185,7 @@ func (s *OrderService) Create(o *fest.Order) error {
 	if o.Promocode == nil {
 		res, err = s.DB.Exec(
 			"INSERT INTO orders (`user_id`, `value`, `status`, `paypal`) VALUES (?, ?, ?, ?)",
-			o.UserID,
+			o.User.ID,
 			o.Value,
 			o.Status,
 			o.PayPal,
@@ -193,7 +193,7 @@ func (s *OrderService) Create(o *fest.Order) error {
 	} else {
 		res, err = s.DB.Exec(
 			"INSERT INTO orders (`user_id`, `promocode_id`, `value`, `status`, `paypal`) VALUES (?, ?, ?, ?, ?)",
-			o.UserID,
+			o.User.ID,
 			o.Promocode.ID,
 			o.Value,
 			o.Status,
@@ -258,7 +258,7 @@ func (s *OrderService) Update(o *fest.Order, fields ...string) error {
 
 	obj := &updateOrder{
 		ID:          o.ID,
-		UserID:      o.UserID,
+		UserID:      o.User.ID,
 		PromocodeID: sql.NullInt64{Valid: false},
 		PayPal:      o.PayPal,
 		Status:      o.Status,

@@ -25,7 +25,6 @@ func Serve(c *fest.Config) {
 	r.HandleFunc("/reset", Inject(ResetPost, c)).Methods("POST")
 
 	r.HandleFunc("/settings", Inject(MustLogin(SettingsGet), c)).Methods("GET")
-	r.HandleFunc("/settings", Inject(MustLogin(SettingsPost), c)).Methods("POST")
 
 	r.HandleFunc("/settings/deactivate", Inject(MustLogin(DeactivateGet), c)).Methods("GET")
 	r.HandleFunc("/settings/deactivate", Inject(MustLogin(DeactivatePost), c)).Methods("POST")
@@ -63,12 +62,13 @@ func Serve(c *fest.Config) {
 	api.HandleFunc("/orders/{id:[0-9]+}", Inject(MustAdmin(APIOrderPut), c)).Methods("PUT")
 	api.HandleFunc("/products/{id:[0-9]+}", Inject(MustAdmin(APIProductPut), c)).Methods("PUT")
 	api.HandleFunc("/promocodes/{id:[0-9]+}", Inject(MustAdmin(APIPromocodePut), c)).Methods("PUT")
-	api.HandleFunc("/users/{id:[0-9]+}", Inject(MustAdmin(APIUserPut), c)).Methods("PUT")
+	api.HandleFunc("/users/{id:[0-9]+}", Inject(MustLogin(APIUserPut), c)).Methods("PUT")
 
 	api.HandleFunc("/orders/{id:[0-9]+}", Inject(MustAdmin(APIOrderDelete), c)).Methods("DELETE")
 	api.HandleFunc("/products/{id:[0-9]+}", Inject(MustAdmin(APIProductDelete), c)).Methods("DELETE")
 	api.HandleFunc("/promocodes/{id:[0-9]+}", Inject(MustAdmin(APIPromocodeDelete), c)).Methods("DELETE")
 	api.HandleFunc("/users/{id:[0-9]+}", Inject(MustAdmin(APIUserDelete), c)).Methods("DELETE")
+	api.HandleFunc("/users/current", Inject(APICurrentUser, c))
 
 	r.HandleFunc("/admin", Inject(MustAdmin(AdminGet), c)).Methods("GET")
 

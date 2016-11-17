@@ -217,7 +217,7 @@ function submitSettings(event) {
 
 
     var request = new XMLHttpRequest();
-    request.open("POST", window.location, true);
+    request.open("PUT", "/api/users/current", true);
     request.setRequestHeader("Content-type", "application/json; charset=utf-8");
     request.send(JSON.stringify(copyFormToObject(this)));
     request.onreadystatechange = function() {
@@ -227,7 +227,7 @@ function submitSettings(event) {
                     formError("Successfully updated.", "success");
                     break;
                 default:
-                    formError("Something wrong happened :(", "success");
+                    formError("Something wrong happened :(", "error");
             }
         }
     }

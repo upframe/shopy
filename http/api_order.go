@@ -28,7 +28,7 @@ func APIOrderGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, e
 	}
 
 	s := r.Context().Value("session").(*fest.Session)
-	if !s.IsAdmin() && s.Values["UserID"].(int) != o.UserID {
+	if !s.IsAdmin() && s.Values["UserID"].(int) != o.User.ID {
 		return http.StatusForbidden, nil
 	}
 

@@ -35,6 +35,13 @@ func APIUserGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, er
 	return apiPrint(w, p)
 }
 
+// APICurrentUser ...
+func APICurrentUser(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
+	s := r.Context().Value("session").(*fest.Session)
+
+	return Redirect(w, r, "/api/users/"+strconv.Itoa(s.User.ID))
+}
+
 // APIUserPost  ...
 func APIUserPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
 	u := &fest.User{}
@@ -84,6 +91,12 @@ func APIUserPut(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, er
 	fields, err := topLevelKeys(rawBuffer.Bytes())
 	if err != nil {
 		return http.StatusInternalServerError, err
+	}
+
+	for i := range fields {
+		if fields[i] == "PasswordHash" || fields[i] == "PasswordSalt" {
+			fields = append(fields[:i], fields[i+1:]...)
+		}
 	}
 
 	err = c.Services.User.Update(u, fields...)
