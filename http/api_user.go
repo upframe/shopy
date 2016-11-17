@@ -93,6 +93,12 @@ func APIUserPut(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, er
 		return http.StatusInternalServerError, err
 	}
 
+	for i := range fields {
+		if fields[i] == "PasswordHash" || fields[i] == "PasswordSalt" {
+			fields = append(fields[:i], fields[i+1:]...)
+		}
+	}
+
 	err = c.Services.User.Update(u, fields...)
 	if err != nil {
 		return http.StatusInternalServerError, err

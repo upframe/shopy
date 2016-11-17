@@ -21,8 +21,8 @@ type User struct {
 	Admin        bool       `db:"admin"`
 	Referral     string     `db:"referral"`
 	Referrer     NullInt64  `db:"referrer"`
-	PasswordSalt string     `db:"password_salt"`
-	PasswordHash string     `db:"password_hash"`
+	PasswordSalt string     `db:"password_salt" json:"-"`
+	PasswordHash string     `db:"password_hash" json:"-"`
 	Deactivated  bool       `db:"deactivated"`
 }
 
