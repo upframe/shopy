@@ -96,6 +96,15 @@ input#ID {
     transition: .2s ease height;
 }
 
+#form-error pre {
+     margin: 0;
+    display: inline;
+    word-wrap: break-word;
+    font-size: .8em;
+    background: rgba(0,0,0,0.1);
+    padding: .15em;
+}
+
 #form-error.error,
 #form-error.success,
 #form-error.warning {

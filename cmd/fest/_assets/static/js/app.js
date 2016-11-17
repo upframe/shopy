@@ -233,8 +233,8 @@ function submitSettings(event) {
     }
 }
 
-function printMessage(status, hash) {
-    let type = (status >= 200 && status < 300) ? "success" : "error";
+function printMessage(status, responseText, hash) {
+    let type = (status < 400) ? "success" : "error";
 
     if (status == 424) {
         type = "warning";
@@ -243,7 +243,7 @@ function printMessage(status, hash) {
     if (status in hash) {
         formError(hash[status], type);
     } else {
-        formError(hash['default'], type);
+        formError(hash['default'] + " <pre>id: "+JSON.parse(responseText)["ID"]+"</pre>", type);
     }
 }
 
@@ -277,7 +277,7 @@ function registerHandler(event) {
     request.send(form.serialize());
     request.onreadystatechange = function() {
         if (request.readyState == 4) {
-            printMessage(request.status, registerMessages)
+            printMessage(request.status, request.responseText, registerMessages)
         }
     }
 }
@@ -311,7 +311,7 @@ function loginHandler(event) {
                 return;
             }
 
-            printMessage(request.status, loginMessages)
+            printMessage(request.status, request.responseText, loginMessages)
         }
     }
 }
@@ -332,7 +332,7 @@ function resetEmailForm(event) {
     request.send(form.serialize());
     request.onreadystatechange = function() {
         if (request.readyState == 4) {
-            printMessage(request.status, resetEmailStatus)
+            printMessage(request.status, request.responseText, resetEmailStatus)
         }
     }
 }
@@ -361,7 +361,7 @@ function resetForm(event) {
                 return;
             }
 
-            printMessage(request.status, loginMessages)
+            printMessage(request.status, request.responseText, loginMessages)
         }
     }
 }
@@ -387,7 +387,7 @@ function resendConfirmation() {
     request.send(form.serialize());
     request.onreadystatechange = function() {
         if (request.readyState == 4) {
-            printMessage(request.status, resendMessages)
+            printMessage(request.status, request.responseText, resendMessages)
         }
     }
 }
