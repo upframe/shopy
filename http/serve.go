@@ -59,16 +59,16 @@ func Serve(c *fest.Config) {
 	api.HandleFunc("/promocodes", Inject(MustAdmin(APIPromocodePost), c)).Methods("POST")
 	api.HandleFunc("/users", Inject(MustAdmin(APIUserPost), c)).Methods("POST")
 
-	api.HandleFunc("/orders/{id:[0-9]+}", Inject(MustAdmin(APIOrderPut), c)).Methods("PUT")
-	api.HandleFunc("/products/{id:[0-9]+}", Inject(MustAdmin(APIProductPut), c)).Methods("PUT")
-	api.HandleFunc("/promocodes/{id:[0-9]+}", Inject(MustAdmin(APIPromocodePut), c)).Methods("PUT")
-	api.HandleFunc("/users/{id:[0-9]+}", Inject(MustLogin(APIUserPut), c)).Methods("PUT")
+	api.HandleFunc("/orders/{id:[0-9]+}", Inject(MustAdmin(APIOrderPatch), c)).Methods("PATCH")
+	api.HandleFunc("/products/{id:[0-9]+}", Inject(MustAdmin(APIProductPatch), c)).Methods("PATCH")
+	api.HandleFunc("/promocodes/{id:[0-9]+}", Inject(MustAdmin(APIPromocodePatch), c)).Methods("PATCH")
+	api.HandleFunc("/users/{id:[0-9]+}", Inject(MustLogin(APIUserPatch), c)).Methods("PATCH")
 
 	api.HandleFunc("/orders/{id:[0-9]+}", Inject(MustAdmin(APIOrderDelete), c)).Methods("DELETE")
 	api.HandleFunc("/products/{id:[0-9]+}", Inject(MustAdmin(APIProductDelete), c)).Methods("DELETE")
 	api.HandleFunc("/promocodes/{id:[0-9]+}", Inject(MustAdmin(APIPromocodeDelete), c)).Methods("DELETE")
 	api.HandleFunc("/users/{id:[0-9]+}", Inject(MustAdmin(APIUserDelete), c)).Methods("DELETE")
-	api.HandleFunc("/users/current", Inject(APICurrentUser, c))
+	api.HandleFunc("/users/current", Inject(MustLogin(APICurrentUser), c))
 
 	r.HandleFunc("/admin", Inject(MustAdmin(AdminGet), c)).Methods("GET")
 

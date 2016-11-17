@@ -199,7 +199,7 @@ function activateHandler(event) {
         data["Deactivated"] = false;
 
         let request = new XMLHttpRequest();
-        request.open("PUT", link);
+        request.open("PATCH", link);
         request.send('{"Deactivated":true}');
         request.onreadystatechange = function() {
             if (request.readyState == 4) {
@@ -217,7 +217,7 @@ function submitHandler(event) {
     event.preventDefault();
 
     let data = copyFormToObject(this);
-    let method = (data.ID == 0) ? 'POST' : 'PUT';
+    let method = (data.ID == 0) ? 'POST' : 'PATCH';
     let link = this.dataset.link;
 
     if (data.ID != 0) {
@@ -232,7 +232,7 @@ function submitHandler(event) {
             if (request.status == 200) {
                 editor.className = "Down";
 
-                if (method == "PUT") {
+                if (method == "PATCH") {
                     copyFormToRow(document.querySelector('tr[data-id="' + data.ID + '"]'));
                 } else {
                     window.location.pathname = "/admin/" + window.location.pathname.split("/")[2] + "/" + request.responseText;

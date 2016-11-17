@@ -53,8 +53,8 @@ func APIProductPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int
 	return 0, nil
 }
 
-// APIProductPut ...
-func APIProductPut(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
+// APIProductPatch ...
+func APIProductPatch(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
 	id, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
 		return http.StatusNotFound, nil

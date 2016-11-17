@@ -68,8 +68,8 @@ func APIPromocodePost(w http.ResponseWriter, r *http.Request, c *fest.Config) (i
 	return 0, nil
 }
 
-// APIPromocodePut ...
-func APIPromocodePut(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
+// APIPromocodePatch ...
+func APIPromocodePatch(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
 	id, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
 		return http.StatusNotFound, nil

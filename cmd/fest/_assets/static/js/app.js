@@ -217,7 +217,7 @@ function submitSettings(event) {
 
 
     var request = new XMLHttpRequest();
-    request.open("PUT", "/api/users/current", true);
+    request.open("PATCH", "/api/users/current", true);
     request.setRequestHeader("Content-type", "application/json; charset=utf-8");
     request.send(JSON.stringify(copyFormToObject(this)));
     request.onreadystatechange = function() {
