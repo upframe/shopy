@@ -12,9 +12,11 @@ import (
 func Serve(c *fest.Config) {
 	r := mux.NewRouter()
 
+	r.NotFoundHandler = &notfound{Config: c}
+
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(c.Assets+"static/"))))
 
-	r.HandleFunc("/", Inject(IndexGet, c)).Methods("GET")
+	r.HandleFunc("/", Inject(StaticHandler("index"), c)).Methods("GET")
 	r.HandleFunc("/login", Inject(LoginGet, c)).Methods("GET")
 	r.HandleFunc("/login", Inject(LoginPost, c)).Methods("POST")
 
@@ -80,6 +82,16 @@ func Serve(c *fest.Config) {
 
 	// TODO :check CSRF
 	log.Fatal(http.ListenAndServe(":"+c.Port, r))
+}
+
+type notfound struct {
+	Config *fest.Config
+}
+
+func (handler *notfound) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	Inject(func(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
+		return http.StatusNotFound, nil
+	}, handler.Config)(w, r)
 }
 
 // logout resets the session values and saves the cookie

@@ -245,3 +245,12 @@ func displayCents(cents int) string {
 
 	return price
 }
+
+// StaticHandler ...
+func StaticHandler(templates ...string) FestHandler {
+	return func(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
+		s := r.Context().Value("session").(*fest.Session)
+
+		return Render(w, c, s, nil, templates...)
+	}
+}
