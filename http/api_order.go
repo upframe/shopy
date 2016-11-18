@@ -58,8 +58,8 @@ func APIOrderPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, 
 	return 0, nil
 }
 
-// APIOrderPut ...
-func APIOrderPut(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
+// APIOrderPatch ...
+func APIOrderPatch(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
 	id, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
 		return http.StatusNotFound, nil

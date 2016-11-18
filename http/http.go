@@ -13,11 +13,13 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/upframe/fest"
 )
 
 type message struct {
+	ID      string
 	Code    int
 	Message string
 	Error   error `json:"-"`
@@ -42,10 +44,15 @@ func Inject(h FestHandler, c *fest.Config) http.HandlerFunc {
 			msg := &message{Code: code}
 
 			if err != nil {
-				c.Logger.Print(err)
 				msg.Message = err.Error()
 			} else {
 				msg.Message = http.StatusText(code)
+			}
+
+			if code >= 400 {
+				t := time.Now()
+				msg.ID = t.Format("20060102150405")
+				c.Logger.Print(err.Error())
 			}
 
 			if code != 0 {

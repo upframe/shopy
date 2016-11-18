@@ -65,8 +65,8 @@ func APIUserPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, e
 	return 0, nil
 }
 
-// APIUserPut ...
-func APIUserPut(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
+// APIUserPatch ...
+func APIUserPatch(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
 	id, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
 		return http.StatusNotFound, nil
