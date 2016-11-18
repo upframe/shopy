@@ -22,7 +22,7 @@ func main() {
 		path = os.Args[1]
 	}
 
-	conf, err := configFile(path)
+	conf, err := fest.ConfigFile(path)
 	if err != nil {
 		panic(err)
 	}
