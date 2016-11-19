@@ -1,6 +1,8 @@
 package mysql
 
 import (
+	"fmt"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/upframe/fest"
 )
@@ -62,6 +64,8 @@ func (s *PromocodeService) Create(p *fest.Promocode) error {
 	if p.ID != 0 {
 		return nil
 	}
+
+	fmt.Println(insertQuery("promocodes", getAllColumns(promocodeMap)))
 
 	res, err := s.DB.NamedExec(insertQuery("promocodes", getAllColumns(promocodeMap)), p)
 	if err != nil {

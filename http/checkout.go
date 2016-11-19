@@ -87,7 +87,6 @@ func CheckoutGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, e
 	err = s.Save(r, w)
 	if err != nil {
 		return http.StatusInternalServerError, err
-
 	}
 
 	return Render(w, c, s, cart, "checkout")
@@ -160,7 +159,10 @@ func CheckoutPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, 
 
 		if order.Promocode.Usage > 0 {
 			order.Promocode.Usage--
-			c.Services.Promocode.Update(order.Promocode, "usage")
+			err = c.Services.Promocode.Update(order.Promocode, "Usage")
+			if err != nil {
+				return http.StatusInternalServerError, err
+			}
 		}
 
 		var discount int

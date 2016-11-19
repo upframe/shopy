@@ -65,14 +65,12 @@ func insertQuery(table string, fields []string) string {
 	vars := "("
 
 	for i := range fields {
-		if i == len(fields)-1 {
-			vars += fields[i]
-			values += ":" + fields[i]
-		} else {
-			vars += fields[i] + ", "
-			values += ":" + fields[i] + ", "
-		}
+		vars += "`" + fields[i] + "`" + ", "
+		values += ":" + fields[i] + ", "
 	}
+
+	vars = strings.TrimSuffix(vars, ", ")
+	values = strings.TrimSuffix(values, ", ")
 
 	values += ")"
 	vars += ")"
