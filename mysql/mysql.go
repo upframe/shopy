@@ -46,7 +46,7 @@ func updateQuery(table, where string, fields []string) string {
 			continue
 		}
 
-		query += fields[i] + "=:" + fields[i] + ", "
+		query += "`" + fields[i] + "`" + "=:" + fields[i] + ", "
 	}
 
 	query = strings.TrimSuffix(query, ", ")
