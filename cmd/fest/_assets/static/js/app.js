@@ -102,10 +102,10 @@ function validateCoupon(e) {
 
 function useCoupon(response) {
     var ob = JSON.parse(response),
-    total = document.getElementById("total"),
-    subtotal = document.getElementById("subtotal"),
-    promocode = document.getElementById("promocode-value"),
-    credits = document.getElementById("credits");
+        total = document.getElementById("total"),
+        subtotal = document.getElementById("subtotal"),
+        promocode = document.getElementById("promocode-value"),
+        credits = document.getElementById("credits");
 
     let base = subtotal.innerHTML * 100;
     let discount = 0;
@@ -121,7 +121,7 @@ function useCoupon(response) {
 
 function validateCredits(e) {
     let input = this;
-    if(input.value > input.max) {
+    if (input.value > input.max) {
         input.value = input.max;
     }
 
@@ -243,7 +243,7 @@ function printMessage(status, responseText, hash) {
     if (status in hash) {
         formError(hash[status], type);
     } else {
-        formError(hash['default'] + " <pre>id: "+JSON.parse(responseText)["ID"]+"</pre>", type);
+        formError(hash['default'] + " <pre>id: " + JSON.parse(responseText)["ID"] + "</pre>", type);
     }
 }
 

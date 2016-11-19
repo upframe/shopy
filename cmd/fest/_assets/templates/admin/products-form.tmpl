@@ -1,31 +1,29 @@
 {{ define "products-form" }}
-  <h2><span id="new-text">New Product</span><span id="edit-text">Product #<span id="barID"></span></span><span id="expand">&#9660;</span></h2>
+<div>
+<input name="ID" id="ID" required readonly type="number" value="">
 
-  <div>
-    <input name="ID" id="ID" required readonly type="number" value="">
+<div id="form-error"></div>
 
-    <div id="form-error"></div>
+<label for="Name">Name</label>
+<input name="Name" id="Name" required type="text" value="">
 
-    <label for="Name">Name</label>
-    <input name="Name" id="Name" required type="text" value="">
+<label for="Description">Description</label>
+<input name="Description" id="Description" required type="text" value="">
 
-    <label for="Description">Description</label>
-    <input name="Description" id="Description" required type="text" value="">
+<label for="Price">Price</label>
+<input name="Price" id="Price" required type="number" value="">
 
-    <label for="Price">Price</label>
-    <input name="Price" id="Price" required type="number" value="">
+<label for="Picture">Picture</label>
+<input name="Picture" id="Picture" required type="text" value="">
 
-    <label for="Picture">Picture</label>
-    <input name="Picture" id="Picture" required type="text" value="">
-
-    <div class="flex">
-        <div class="checkbox">
-            <input type="checkbox" name="Deactivated" id="Deactivated">
-            <label for="Deactivated"></label>
-        </div>
-        <label for="Deactivated">Deactivated</label>
+<div class="flex">
+    <div class="checkbox">
+        <input type="checkbox" name="Deactivated" id="Deactivated">
+        <label for="Deactivated"></label>
     </div>
+    <label for="Deactivated">Deactivated</label>
+</div>
 
-    <button type="submit">Save</button>
-  </div>
+<button type="submit">Save</button>
+</div>
 {{ end}}

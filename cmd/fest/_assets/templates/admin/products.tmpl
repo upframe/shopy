@@ -46,6 +46,9 @@
 </div>
 
 <form method="POST" id="editor" class="floating-box" data-link="/api/products">
+    <h2>
+        <span id="new-text">New Product</span><span id="edit-text">Product #<span id="barID"></span></span><span id="expand">&#9660;</span>
+    </h2>
   {{ template "products-form" }}
 </form>
 {{ end }}

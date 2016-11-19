@@ -52,6 +52,9 @@ func Inject(h FestHandler, c *fest.Config) http.HandlerFunc {
 			if code >= 400 {
 				t := time.Now()
 				msg.ID = t.Format("20060102150405")
+			}
+
+			if code >= 400 && err != nil {
 				c.Logger.Print(err.Error())
 			}
 

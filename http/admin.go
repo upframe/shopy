@@ -2,6 +2,7 @@ package http
 
 import (
 	"database/sql"
+	"math"
 	"net/http"
 	"strconv"
 
@@ -107,4 +108,32 @@ func AdminListing(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, 
 
 	// Show the page with the table.
 	return Render(w, c, s, data, "admin/"+category, "admin/"+category+"-form")
+}
+
+// AdminListingLast ...
+func AdminListingLast(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
+	category := mux.Vars(r)["category"]
+	var err error
+
+	var total int
+	switch category {
+	case "orders":
+		total, err = c.Services.Order.Total()
+	case "products":
+		total, err = c.Services.Product.Total()
+	case "promocodes":
+		total, err = c.Services.Promocode.Total()
+	case "users":
+		total, err = c.Services.User.Total()
+	default:
+		// This mustn't happen!
+		return http.StatusInternalServerError, nil
+	}
+
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	page := int(math.Ceil(float64(total) / float64(itemsPerPage)))
+	return Redirect(w, r, "/admin/"+category+"/"+strconv.Itoa(page))
 }

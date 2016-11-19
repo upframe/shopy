@@ -12,7 +12,7 @@ import (
 func Serve(c *fest.Config) {
 	r := mux.NewRouter()
 
-	r.NotFoundHandler = &notfound{Config: c}
+	r.NotFoundHandler = &notFoundHandler{Config: c}
 
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(c.Assets+"static/"))))
 
@@ -78,20 +78,21 @@ func Serve(c *fest.Config) {
 
 	admin.HandleFunc("/{category:(?:products|promocodes|orders|users)}", Inject(MustAdmin(AdminRedirect), c))
 	admin.HandleFunc("/{category:(?:products|promocodes|orders|users)}/new", Inject(MustAdmin(AdminNew), c))
+	admin.HandleFunc("/{category:(?:products|promocodes|orders|users)}/last", Inject(MustAdmin(AdminListingLast), c))
 	admin.HandleFunc("/{category:(?:products|promocodes|orders|users)}/{page:[0-9]+}", Inject(MustAdmin(AdminListing), c))
 
 	// TODO :check CSRF
 	log.Fatal(http.ListenAndServe(":"+c.Port, r))
 }
 
-type notfound struct {
+type notFoundHandler struct {
 	Config *fest.Config
 }
 
-func (handler *notfound) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h *notFoundHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	Inject(func(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
 		return http.StatusNotFound, nil
-	}, handler.Config)(w, r)
+	}, h.Config)(w, r)
 }
 
 // logout resets the session values and saves the cookie

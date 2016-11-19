@@ -38,10 +38,12 @@ document.addEventListener("DOMContentLoaded", () => {
             thing.addEventListener("click", activateHandler);
         }
 
-        document.getElementById('expand').addEventListener('click', function(event) {
-            event.preventDefault();
-            editor.classList.toggle("show");
-        });
+        if (thing = document.getElementById('expand')) {
+            thing.addEventListener('click', function(event) {
+                event.preventDefault();
+                editor.classList.toggle("show");
+            });
+        }
 
         let rows = document.querySelectorAll('tbody tr');
         Array.from(rows).forEach((row) => {
@@ -230,12 +232,12 @@ function submitHandler(event) {
     request.onreadystatechange = function() {
         if (request.readyState == 4) {
             if (request.status == 200) {
-                editor.className = "Down";
+                editor.classList.toggle("show");
 
                 if (method == "PATCH") {
                     copyFormToRow(document.querySelector('tr[data-id="' + data.ID + '"]'));
                 } else {
-                    window.location.pathname = "/admin/" + window.location.pathname.split("/")[2] + "/" + request.responseText;
+                    window.location.pathname = "/admin/" + window.location.pathname.split("/")[2] + "/last";
                 }
             } else {
                 formError("Something went wrong.", "error")
