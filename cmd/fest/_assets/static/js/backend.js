@@ -312,7 +312,7 @@ function copyRowToForm(row) {
 
     for (var x = 0; x < row.childElementCount - 1; x++) {
         let data = row.children[x].dataset.name,
-            input = form.querySelector("input[name=" + data + "]"),
+            input = form.querySelector("input[name=\"" + data + "\"]"),
             barID = form.querySelector("#barID");
 
         if (data == undefined || input == undefined) {

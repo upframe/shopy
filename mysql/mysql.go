@@ -90,7 +90,9 @@ func fieldsToColumns(m map[string]string, fields ...string) []string {
 		columns = getAllColumns(m)
 	} else {
 		for i := range fields {
-			columns = append(columns, m[fields[i]])
+			if val, ok := m[fields[i]]; ok {
+				columns = append(columns, val)
+			}
 		}
 	}
 

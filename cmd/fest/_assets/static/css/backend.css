@@ -85,7 +85,7 @@ input#ID {
 
 #form-error {
     background-color: #FF3855;
-    margin-bottom: 1em;
+    margin: 1em 0;
     padding: 0;
     color: #fff;
     border-radius: 2px;
@@ -345,7 +345,7 @@ tr .checkbox {
 /* SINGLE FORM */
 
 #editor {
-    margin-top: -1em;
+    margin-top: -2em;
     max-width: 350px;
     width: 90%;
 }

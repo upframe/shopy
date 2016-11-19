@@ -229,13 +229,13 @@ func (s *OrderService) Create(o *fest.Order) error {
 }
 
 var ordersUpdateMap = map[string]string{
-	"ID":          "id",
-	"UserID":      "user_id",
-	"PayPal":      "paypal",
-	"Value":       "value",
-	"Status":      "status",
-	"Credits":     "credits",
-	"PromocodeID": "promocode_id",
+	"ID":        "id",
+	"User":      "user_id",
+	"PayPal":    "paypal",
+	"Value":     "value",
+	"Status":    "status",
+	"Credits":   "credits",
+	"Promocode": "promocode_id",
 }
 
 type updateOrder struct {
@@ -250,20 +250,18 @@ type updateOrder struct {
 
 // Update ...
 func (s *OrderService) Update(o *fest.Order, fields ...string) error {
-	for i := range fields {
-		if fields[i] == "Promocode" {
-			fields[i] = "PromocodeID"
-		}
-	}
-
 	obj := &updateOrder{
 		ID:          o.ID,
-		UserID:      o.User.ID,
+		UserID:      0,
 		PromocodeID: sql.NullInt64{Valid: false},
 		PayPal:      o.PayPal,
 		Status:      o.Status,
 		Value:       o.Value,
 		Credits:     o.Credits,
+	}
+
+	if o.User != nil {
+		obj.UserID = o.User.ID
 	}
 
 	if o.Promocode != nil {

@@ -40,21 +40,46 @@ function copyFormToObject(form) {
             return;
         }
 
-        switch (input.type) {
-            case "number":
-                object[name] = parseInt(input.value);
-                break;
-            case "datetime-local":
-                object[name] = (new Date(input.value)).toISOString();
-                break;
-            case "checkbox":
-                object[name] = input.checked;
-                break;
-            default:
-                object[name] = input.value;
+        if (name.indexOf(".") !== -1) {
+            let parts = name.split(".");
+
+            if (parts.length > 2) {
+                console.log("Invalid.");
+                return;
+            }
+
+            let val = inputToValue(input);
+
+            if (val == null) {
+                object[parts[0]] = null;
+            } else {
+                object[parts[0]] = new Object();
+                object[parts[0]][parts[1]] = inputToValue(input);
+            }    
+        } else {
+            object[name] = inputToValue(input);
         }
     })
 
     if (isNaN(object.ID)) object.ID = 0;
     return object;
+}
+
+function inputToValue(input) {
+    switch (input.type) {
+        case "number":
+            if (input.value == "") {
+                return null;
+            }
+
+            return parseInt(input.value);
+        case "datetime-local":
+            return (new Date(input.value)).toISOString();
+            break;
+        case "checkbox":
+            return input.checked;
+            break;
+        default:
+            return input.value;
+    }
 }

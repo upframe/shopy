@@ -1,0 +1,24 @@
+{{ define "orders-form" }}
+<div>
+    <input name="ID" id="ID" required readonly type="number" value="0">
+
+    <div id="form-error"></div>
+
+    <label for="User.ID">User ID</label>
+    <input name="User.ID" id="User.ID" required type="number" value="">
+
+    <label for="PayPal">PayPal ID</label>
+    <input name="PayPal" id="PayPal" required type="text" value="">
+
+    <label for="Promocode.ID">Promocode ID</label>
+    <input name="Promocode.ID" id="Promocode.ID" type="number" value="">
+
+    <label for="Value">Value</label>
+    <input name="Value" id="Value" required type="number" value="">
+
+    <label for="Status">Status</label>
+    <input name="Status" id="Status" required type="text" value="">
+
+    <button type="submit">Save</button>
+</div>
+{{ end }}
