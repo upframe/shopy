@@ -17,6 +17,7 @@ var promocodeMap = map[string]string{
 	"Discount":    "discount",
 	"Percentage":  "percentage",
 	"Deactivated": "deactivated",
+	"Usage":       "usage",
 }
 
 // Get ...

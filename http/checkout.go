@@ -17,7 +17,6 @@ func CheckoutCancelGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (
 	cart := s.Values["Cart"].(fest.CartCookie)
 	cart.Locked = false
 
-	s.Values["Order"] = &fest.OrderCookie{}
 	s.Values["Cart"] = cart
 
 	err := s.Save(r, w)
@@ -61,7 +60,6 @@ func CheckoutConfirmGet(w http.ResponseWriter, r *http.Request, c *fest.Config) 
 	}
 
 	s.Values["Cart"] = &fest.CartCookie{Products: map[int]int{}, Locked: false}
-	s.Values["Order"] = &fest.OrderCookie{}
 
 	// Saves the cookie and checks for errors
 	err = s.Save(r, w)
@@ -141,7 +139,7 @@ func CheckoutPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, 
 
 	order.Value -= credits
 
-	// Gets the promocode
+	// Gets the promocode from the form
 	promocode := r.FormValue("promocode")
 
 	if promocode != "" {
@@ -155,7 +153,7 @@ func CheckoutPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, 
 			return http.StatusInternalServerError, err
 		}
 
-		if time.Now().Unix() > order.Promocode.Expires.Unix() {
+		if time.Now().Unix() > order.Promocode.Expires.Unix() || order.Promocode.Usage == 0 {
 			return http.StatusGone, nil
 		}
 

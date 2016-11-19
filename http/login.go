@@ -89,7 +89,6 @@ func LoginPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, err
 	s.Values["IsLoggedIn"] = true
 	s.Values["UserID"] = user.ID
 	s.Values["Cart"] = &fest.CartCookie{Products: map[int]int{}, Locked: false}
-	s.Values["Order"] = &fest.OrderCookie{}
 
 	// Saves the cookie and checks for errors
 	err = s.Save(r, w)

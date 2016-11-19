@@ -10,6 +10,7 @@ type Promocode struct {
 	Discount    int        `db:"discount"`
 	Percentage  bool       `db:"percentage"`
 	Deactivated bool       `db:"deactivated"`
+	Usage       int        `db:"usage"`
 }
 
 // PromocodeService ...
