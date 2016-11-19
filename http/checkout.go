@@ -154,7 +154,13 @@ func CheckoutPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, 
 		}
 
 		if time.Now().Unix() > order.Promocode.Expires.Unix() || order.Promocode.Usage == 0 {
+
 			return http.StatusGone, nil
+		}
+
+		if order.Promocode.Usage > 0 {
+			order.Promocode.Usage--
+			c.Services.Promocode.Update(order.Promocode, "usage")
 		}
 
 		var discount int
