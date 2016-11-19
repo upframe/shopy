@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/upframe/fest"
@@ -21,6 +22,11 @@ func APIPromocodeGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (in
 
 	if r.URL.Query().Get("code") == "true" {
 		p, err = c.Services.Promocode.GetByCode(code)
+
+		if time.Now().Unix() > p.Expires.Unix() || p.Usage == 0 {
+			return http.StatusNotFound, nil
+		}
+
 	} else {
 		s := r.Context().Value("session").(*fest.Session)
 		if !s.IsAdmin() {
