@@ -1,0 +1,12 @@
+{{ define "title" }}Promocodes - New{{ end }}
+
+{{ define "header-left" }}<h1>Promocodes</h1>{{ end }}
+
+{{ define "header-right" }}
+{{ end }}
+
+{{ define "content" }}
+  <form method="POST" id="editor" data-link="/admin/promocodes">
+    {{ template "promocodes-form" . }}
+  </form>
+{{ end }}

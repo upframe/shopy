@@ -1,55 +1,53 @@
 {{ define "users-form" }}
-<form method="POST" id="editor" class="floating-box"  data-link="/admin/users">
-    <h2><span id="new-text">New User</span><span id="edit-text">User #<span id="barID"></span></span><span id="expand">&#9660;</span></h2>
+  <h2><span id="new-text">New User</span><span id="edit-text">User #<span id="barID"></span></span><span id="expand">&#9660;</span></h2>
 
-    <div>
-        <input name="ID" id="ID" required readonly type="number" value="0">
+  <div>
+    <input name="ID" id="ID" required readonly type="number" value="0">
 
-        <div id="form-error"></div>
+    <div id="form-error"></div>
 
-        <label for="FirstName">First name</label>
-        <input name="FirstName" id="FirstName" required type="text" value="">
+      <label for="FirstName">First name</label>
+      <input name="FirstName" id="FirstName" required type="text" value="">
 
-        <label for="LastName">Last name</label>
-        <input name="LastName" id="LastName" required type="text" value="">
+      <label for="LastName">Last name</label>
+      <input name="LastName" id="LastName" required type="text" value="">
 
-        <label for="Email">Email</label>
-        <input name="Email" id="Email" required type="email" value="">
+      <label for="Email">Email</label>
+      <input name="Email" id="Email" required type="email" value="">
 
-        <label for="Address">Address</label>
-        <input name="Address" id="Address" type="text" value="">
+      <label for="Address">Address</label>
+      <input name="Address" id="Address" type="text" value="">
 
-        <label for="Invites">Invites</label>
-        <input name="Invites" id="invites" required type="number" value="0">
+      <label for="Invites">Invites</label>
+      <input name="Invites" id="invites" required type="number" value="0">
 
-        <label for="Credit">Credit</label>
-        <input name="Credit" id="Credit" required type="number" value="0">
+      <label for="Credit">Credit</label>
+      <input name="Credit" id="Credit" required type="number" value="0">
 
-        <div class="flex">
-            <div class="checkbox">
-                <input type="checkbox" name="Confirmed" id="Confirmed">
-                <label for="Confirmed"></label>
-            </div>
-            <label for="Confirmed">Confirmed</label>
+      <div class="flex">
+        <div class="checkbox">
+          <input type="checkbox" name="Confirmed" id="Confirmed">
+          <label for="Confirmed"></label>
         </div>
+        <label for="Confirmed">Confirmed</label>
+      </div>
 
-        <div class="flex">
-            <div class="checkbox">
-                <input type="checkbox" name="Admin" id="Admin">
-                <label for="Admin"></label>
-            </div>
-            <label for="Admin">Admin</label>
+      <div class="flex">
+        <div class="checkbox">
+          <input type="checkbox" name="Admin" id="Admin">
+          <label for="Admin"></label>
         </div>
+        <label for="Admin">Admin</label>
+      </div>
 
-        <div class="flex">
-            <div class="checkbox">
-                <input type="checkbox" name="Deactivated" id="Deactivated">
-                <label for="Deactivated"></label>
-            </div>
-            <label for="Deactivated">Deactivated</label>
+      <div class="flex">
+        <div class="checkbox">
+          <input type="checkbox" name="Deactivated" id="Deactivated">
+          <label for="Deactivated"></label>
         </div>
+        <label for="Deactivated">Deactivated</label>
+      </div>
 
-        <button type="submit">Save</button>
-    </div>
-</form>
+      <button type="submit">Save</button>
+  </div>
 {{ end }}

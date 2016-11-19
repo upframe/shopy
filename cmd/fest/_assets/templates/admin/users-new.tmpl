@@ -1,0 +1,12 @@
+{{ define "title" }}Users - New{{ end }}
+
+{{ define "header-left" }}<h1>Users</h1>{{ end }}
+
+{{ define "header-right" }}
+{{ end }}
+
+{{ define "content" }}
+  <form method="POST" id="editor" data-link="/admin/users">
+    {{ template "users-form" }}
+  </form>
+{{ end }}

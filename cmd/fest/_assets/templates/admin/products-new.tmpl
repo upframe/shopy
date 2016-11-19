@@ -1,0 +1,12 @@
+{{ define "title" }}Products - New{{ end }}
+
+{{ define "header-left" }}<h1>Products</h1>{{ end }}
+
+{{ define "header-right" }}
+{{ end }}
+
+{{ define "content" }}
+  <form method="POST" id="editor" data-link="/api/products">
+    {{ template "products-form" }}
+  </form>
+{{ end }}

@@ -64,5 +64,7 @@
     <a {{ if .Data.HasNext }}href="{{ .Data.LinkNext }}" ><button>Next</button></a>{{ else }}><button disabled>Next</button>{{ end }}</a>
 </div>
 
-{{ template "users-new" }}
+<form method="POST" id="editor" class="floating-box"  data-link="/admin/users">
+  {{ template "users-form" }}
+</form>
 {{ end }}

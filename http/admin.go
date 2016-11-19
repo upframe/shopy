@@ -35,7 +35,8 @@ func AdminRedirect(w http.ResponseWriter, r *http.Request, c *fest.Config) (int,
 // AdminNew ...
 func AdminNew(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
 	s := r.Context().Value("session").(*fest.Session)
-	return Render(w, c, s, nil, "admin/"+mux.Vars(r)["category"]+"-new")
+	category := mux.Vars(r)["category"]
+	return Render(w, c, s, nil, "admin/"+category+"-new", "admin/"+category+"-form")
 }
 
 // AdminListing ...
@@ -105,5 +106,5 @@ func AdminListing(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, 
 	data.LinkNext = "/admin/" + category + "/" + strconv.Itoa(page+1)
 
 	// Show the page with the table.
-	return Render(w, c, s, data, "admin/"+category)
+	return Render(w, c, s, data, "admin/"+category, "admin/"+category+"-form")
 }

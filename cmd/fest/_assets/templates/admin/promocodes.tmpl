@@ -49,5 +49,7 @@
     <a {{ if .Data.HasNext }}href="{{ .Data.LinkNext }}" ><button>Next</button></a>{{ else }}><button disabled>Next</button>{{ end }}</a>
 </div>
 
-{{ template "promocodes-form" . }}
+<form method="POST" id="editor" class="floating-box" data-link="/admin/promocodes">
+  {{ template "promocodes-form" . }}
+</form>
 {{ end }}

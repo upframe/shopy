@@ -1,38 +1,33 @@
 {{ define "promocodes-form" }}
-<form method="POST" id="editor" class="floating-box" data-link="/admin/promocodes">
-    <h2><span id="new-text">New Promocode</span><span id="edit-text">Promocode #<span id="barID"></span></span><span id="expand">&#9660;</span></h2>
+  <h2><span id="new-text">New Promocode</span><span id="edit-text">Promocode #<span id="barID"></span></span><span id="expand">&#9660;</span></h2>
 
-    <div>
-        <input name="ID" id="ID" required readonly type="number" value="0">
+  <div>
+    <input name="ID" id="ID" required readonly type="number" value="0">
+    <div id="form-error"></div>
+      <label for="Code">Code</label>
+      <input name="Code" id="Code" required type="text" value="">
+      <label for="Discount">Discount</label>
+      <input name="Discount" id="Discount" required type="number" value="">
 
-        <div id="form-error"></div>
+      <label for="Expires">Expiration Date (UTC)</label>
+      <input name="Expires" id="Expires" required type="datetime-local" value="">
 
-        <label for="Code">Code</label>
-        <input name="Code" id="Code" required type="text" value="">
-
-        <label for="Discount">Discount</label>
-        <input name="Discount" id="Discount" required type="number" value="">
-
-        <label for="Expires">Expiration Date (UTC)</label>
-        <input name="Expires" id="Expires" required type="datetime-local" value="">
-
-        <div class="flex">
-            <div class="checkbox">
-                <input type="checkbox" name="Percentage" id="Percentage">
-                <label for="Percentage"></label>
-            </div>
-            <label for="Percentage">Percentage</label>
+      <div class="flex">
+        <div class="checkbox">
+          <input type="checkbox" name="Percentage" id="Percentage">
+          <label for="Percentage"></label>
         </div>
+        <label for="Percentage">Percentage</label>
+      </div>
 
-        <div class="flex">
-            <div class="checkbox">
-                <input type="checkbox" name="Deactivated" id="Deactivated">
-                <label for="Deactivated"></label>
-            </div>
-            <label for="Deactivated">Deactivated</label>
+      <div class="flex">
+        <div class="checkbox">
+          <input type="checkbox" name="Deactivated" id="Deactivated">
+          <label for="Deactivated"></label>
         </div>
-
-        <button type="submit">Save</button>
+        <label for="Deactivated">Deactivated</label>
+      </div>
+      <button type="submit">Save</button>
     </div>
 </form>
 {{ end }}
