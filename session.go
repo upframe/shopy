@@ -7,6 +7,11 @@ import (
 	"github.com/gorilla/sessions"
 )
 
+type SessionCookie struct {
+	isLoggedIn
+	userID int
+}
+
 // Session ...
 type Session struct {
 	*sessions.Session

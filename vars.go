@@ -6,13 +6,14 @@ import (
 	"log"
 	"os"
 
-	"github.com/gorilla/sessions"
+	"github.com/gorilla/securecookie"
 	"github.com/logpacker/PayPal-Go-SDK"
 )
 
 type config struct {
 	Development    bool
-	Key            string
+	Key1           string
+	Key2           string
 	Domain         string
 	Port           int
 	Scheme         string
@@ -75,7 +76,7 @@ type Config struct {
 	Domain         string
 	Scheme         string
 	Assets         string
-	Store          *sessions.CookieStore
+	CookieStore    securecookie.SecureCookie
 	PayPal         *paypalsdk.Client
 	Logger         *log.Logger
 	Services       *Services

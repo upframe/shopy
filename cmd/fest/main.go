@@ -6,6 +6,7 @@ import (
 	"runtime"
 	"strconv"
 
+	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
 	"github.com/upframe/fest"
 	"github.com/upframe/fest/email"
@@ -74,13 +75,7 @@ func main() {
 	}
 
 	// Define the Store options
-	c.Store.Options = &sessions.Options{
-		Path:     "/",
-		MaxAge:   3600 * 3,
-		Secure:   conf.Scheme == "https",
-		HttpOnly: true,
-		Domain:   conf.Domain,
-	}
+	c.CookieStore = securecookie.New(conf.Key1, conf.Key2)
 
 	h.Serve(c)
 }
