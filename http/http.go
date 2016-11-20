@@ -65,6 +65,7 @@ func Inject(h FestHandler, c *fest.Config) http.HandlerFunc {
 			if strings.HasPrefix(r.URL.Path, "/api") || r.Method != http.MethodGet {
 				data, e := json.MarshalIndent(msg, "", "\t")
 				if e != nil {
+					// TODO I think this musst be removed
 					w.WriteHeader(http.StatusInternalServerError)
 				}
 
@@ -83,7 +84,8 @@ func Inject(h FestHandler, c *fest.Config) http.HandlerFunc {
 
 		// Get the user info from the database and add it to the session data
 		if s.Logged {
-			u, err := c.Services.User.Get(s.UserID)
+			var u *fest.User
+			u, err = c.Services.User.Get(s.UserID)
 			if err != nil {
 				return
 			}
@@ -149,7 +151,7 @@ type page struct {
 }
 
 // Render renders an HTML response and send it to the client based on the
-// choosen templates
+// chosen templates
 func Render(w http.ResponseWriter, c *fest.Config, s *fest.SessionCookie, data interface{}, templates ...string) (int, error) {
 	if strings.HasPrefix(templates[0], "admin/") {
 		templates = append(templates, "admin/base")

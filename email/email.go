@@ -19,7 +19,7 @@ type Email struct {
 	Body    string
 }
 
-// UseTemplate adds  the tempalte to the email and renders it to the Body field
+// UseTemplate adds  the template to the email and renders it to the Body field
 func (e *Email) UseTemplate(name string, data interface{}) error {
 	// Opens the template file and checks if there is any error
 	page, err := ioutil.ReadFile(filepath.Clean(Templates + name + ".tmpl"))
