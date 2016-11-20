@@ -13,10 +13,6 @@ import (
 func OrdersGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
 	s := r.Context().Value("session").(*fest.SessionCookie)
 
-	if !s.Logged {
-		return Redirect(w, r, "/login")
-	}
-
 	data, err := c.Services.Order.GetsWhere(0, 0, "ID", "User.ID", strconv.Itoa(s.UserID))
 	if err != nil {
 		return http.StatusInternalServerError, err
