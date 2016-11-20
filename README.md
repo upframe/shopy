@@ -1,5 +1,6 @@
 # Fest
 
+[![Build](https://img.shields.io/travis/upframe/fest.svg?style=flat-square)](https://travis-ci.org/upframe/fest)
 [![Go Report Card](https://goreportcard.com/badge/github.com/upframe/fest?style=flat-square)](https://goreportcard.com/report/upframe/fest)
 
 ## Get the environment ready FOR DEVELOPMENT
