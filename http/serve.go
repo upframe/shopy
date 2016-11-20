@@ -36,6 +36,7 @@ func Serve(c *fest.Config) {
 	// If you can Register without having an invite, you will be able to start adding
 	// items to the cart without being logged in. Then, you log in or create an account
 	// and finish the checkout.
+	// TODO: this should be checked directly on the functions...
 	if c.InviteOnly {
 		r.HandleFunc("/cart", Inject(MustLogin(CartGet), c)).Methods("GET")
 		r.HandleFunc("/cart/{id:[0-9]+}", Inject(MustLogin(CartItemPost), c)).Methods("POST")
