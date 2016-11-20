@@ -3,7 +3,6 @@ package http
 import (
 	"database/sql"
 	"errors"
-	"log"
 	"net/http"
 	"net/mail"
 	"time"
@@ -53,9 +52,12 @@ func RegisterGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, e
 
 		// If the user doesn't exist show a page telling that registration
 		// is invitation only
-		if err != nil {
-			log.Println(err)
+		if err == sql.ErrNoRows {
 			return Render(w, c, s, nil, "register/invite")
+		}
+
+		if err != nil {
+			return http.StatusInternalServerError, err
 		}
 
 		// If the user exists, but doesn't have invites, show that information

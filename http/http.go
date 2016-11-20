@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"html/template"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"path/filepath"
 	"strconv"
@@ -178,7 +177,7 @@ func Render(w http.ResponseWriter, c *fest.Config, s *fest.SessionCookie, data i
 
 		// Check if there is some error. If so, the template doesn't exist
 		if err != nil {
-			log.Print(err)
+			c.Logger.Print(err)
 			return http.StatusInternalServerError, err
 		}
 
@@ -191,7 +190,7 @@ func Render(w http.ResponseWriter, c *fest.Config, s *fest.SessionCookie, data i
 		}
 
 		if err != nil {
-			log.Print(err)
+			c.Logger.Print(err)
 			return http.StatusInternalServerError, err
 		}
 	}

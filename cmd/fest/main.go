@@ -80,6 +80,7 @@ func main() {
 			panic(err)
 		}
 
+		defer file.Close()
 		c.Logger = log.New(file, "", log.Ldate|log.Ltime|log.Lshortfile)
 	}
 
