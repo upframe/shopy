@@ -10,6 +10,7 @@ type config struct {
 	Key1           string
 	Key2           string
 	Domain         string
+	Errors         string
 	Port           int
 	Scheme         string
 	Assets         string
