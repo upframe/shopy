@@ -71,6 +71,10 @@ func main() {
 		},
 	}
 
+	if conf.Errors == "" {
+		conf.Errors = "stdout"
+	}
+
 	if conf.Errors == "stdout" {
 		c.Logger = log.New(os.Stdout, "", log.Ldate|log.Ltime|log.Lshortfile)
 	} else {
