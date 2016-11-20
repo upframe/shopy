@@ -32,6 +32,8 @@ func OrderCancel(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, e
 		return http.StatusInternalServerError, err
 	}
 
+	session, err := ReadSessionCookie(w, r, c)
+
 	id, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
 		return http.StatusInternalServerError, err
@@ -45,7 +47,15 @@ func OrderCancel(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, e
 		return http.StatusInternalServerError, err
 	}
 
-	order.Status = fest.OrderCanceled
+	if order.Status != fest.OrderWaitingPayment {
+		return http.StatusNotFound, nil
+	}
+
+	if order.User.ID == session.UserID {
+		order.Status = fest.OrderCanceled
+	} else {
+		return http.StatusForbidden, nil
+	}
 
 	err = c.Services.Order.Update(order, "Status")
 	if err != nil {
@@ -70,5 +80,6 @@ func OrderCancel(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, e
 		return http.StatusInternalServerError, err
 	}
 
-	return Redirect(w, r, "/cart")
+	s := r.Context().Value("session").(*fest.SessionCookie)
+	return Render(w, c, s, s, "order-canceled")
 }

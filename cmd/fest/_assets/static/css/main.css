@@ -136,6 +136,11 @@ input#ID {
     text-align: center;
 }
 
+.notice-box {
+  max-width: 40em;
+  text-align: center;
+}
+
 #settings-page {
     max-width: 500px;
     word-wrap: break-word;

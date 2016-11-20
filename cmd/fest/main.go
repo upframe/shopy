@@ -59,7 +59,7 @@ func main() {
 		Assets:         conf.Assets,
 		InviteOnly:     conf.InviteOnly,
 		DefaultInvites: conf.DefaultInvites,
-		BaseAddress:    conf.Scheme + "//" + conf.Domain,
+		BaseAddress:    conf.Scheme + "://" + conf.Domain,
 		Templates:      conf.Assets + "templates/",
 		Logger:         log.New(os.Stdout, "", log.Ldate|log.Ltime|log.Lshortfile),
 		PayPal:         paypal,

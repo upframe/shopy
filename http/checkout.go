@@ -172,6 +172,11 @@ func CheckoutPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, 
 		Currency: "EUR",
 	}
 
+	err = c.Services.Order.Create(order)
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
 	p, err := c.PayPal.CreateDirectPaypalPayment(
 		amount,
 		c.BaseAddress+"/checkout/confirm",
@@ -184,8 +189,7 @@ func CheckoutPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, 
 	}
 
 	order.PayPal = p.ID
-
-	err = c.Services.Order.Create(order)
+	err = c.Services.Order.Update(order, "PayPal")
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
