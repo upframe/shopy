@@ -139,6 +139,7 @@ type page struct {
 	IsLoggedIn  bool
 	BaseAddress string
 	Data        interface{}
+	InviteOnly  bool
 	Session     struct {
 		FirstName string
 		LastName  string
@@ -199,6 +200,7 @@ func Render(w http.ResponseWriter, c *fest.Config, s *fest.SessionCookie, data i
 		IsLoggedIn:  s.Logged,
 		Data:        data,
 		BaseAddress: c.BaseAddress,
+		InviteOnly:  c.InviteOnly,
 	}
 
 	// Refresh user information

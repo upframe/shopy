@@ -33,10 +33,18 @@ func Serve(c *fest.Config) {
 
 	r.HandleFunc("/store", Inject(StoreGet, c)).Methods("GET")
 
-	r.HandleFunc("/cart", Inject(MustLogin(CartGet), c)).Methods("GET")
-
-	r.HandleFunc("/cart/{id:[0-9]+}", Inject(MustLogin(CartItemPost), c)).Methods("POST")
-	r.HandleFunc("/cart/{id:[0-9]+}", Inject(MustLogin(CartItemDelete), c)).Methods("DELETE")
+	// If you can Register without having an invite, you will be able to start adding
+	// items to the cart without being logged in. Then, you log in or create an account
+	// and finish the checkout.
+	if c.InviteOnly {
+		r.HandleFunc("/cart", Inject(MustLogin(CartGet), c)).Methods("GET")
+		r.HandleFunc("/cart/{id:[0-9]+}", Inject(MustLogin(CartItemPost), c)).Methods("POST")
+		r.HandleFunc("/cart/{id:[0-9]+}", Inject(MustLogin(CartItemDelete), c)).Methods("DELETE")
+	} else {
+		r.HandleFunc("/cart", Inject(CartGet, c)).Methods("GET")
+		r.HandleFunc("/cart/{id:[0-9]+}", Inject(CartItemPost, c)).Methods("POST")
+		r.HandleFunc("/cart/{id:[0-9]+}", Inject(CartItemDelete, c)).Methods("DELETE")
+	}
 
 	r.HandleFunc("/orders", Inject(MustLogin(OrdersGet), c)).Methods("GET")
 	r.HandleFunc("/orders/{id:[0-9]+}/cancel", Inject(MustLogin(OrderCancel), c)).Methods("GET")
