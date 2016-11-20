@@ -7,7 +7,6 @@ import (
 	"strconv"
 
 	"github.com/gorilla/securecookie"
-	"github.com/gorilla/sessions"
 	"github.com/upframe/fest"
 	"github.com/upframe/fest/email"
 	h "github.com/upframe/fest/http"
@@ -64,7 +63,6 @@ func main() {
 		Templates:      conf.Assets + "templates/",
 		Logger:         log.New(os.Stdout, "", log.Ldate|log.Ltime|log.Lshortfile),
 		PayPal:         paypal,
-		Store:          sessions.NewCookieStore([]byte(conf.Key)),
 		Services: &fest.Services{
 			User:      &mysql.UserService{DB: db},
 			Link:      &mysql.LinkService{DB: db},
@@ -75,7 +73,7 @@ func main() {
 	}
 
 	// Define the Store options
-	c.CookieStore = securecookie.New(conf.Key1, conf.Key2)
+	c.CookieStore = securecookie.New(securecookie.GenerateRandomKey(32), securecookie.GenerateRandomKey(32))
 
 	h.Serve(c)
 }

@@ -28,8 +28,8 @@ func APIPromocodeGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (in
 		}
 
 	} else {
-		s := r.Context().Value("session").(*fest.Session)
-		if !s.IsAdmin() {
+		s := r.Context().Value("session").(*fest.SessionCookie)
+		if !s.User().Admin {
 			return http.StatusForbidden, nil
 		}
 		var id int

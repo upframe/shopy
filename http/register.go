@@ -14,8 +14,8 @@ import (
 
 // RegisterGet ...
 func RegisterGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	s := r.Context().Value("session").(*fest.Session)
-	if s.IsLoggedIn() {
+	s := r.Context().Value("session").(*fest.SessionCookie)
+	if s.Logged {
 		return Redirect(w, r, "/")
 	}
 
@@ -70,9 +70,9 @@ func RegisterGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, e
 
 // RegisterPost ...
 func RegisterPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	s := r.Context().Value("session").(*fest.Session)
+	s := r.Context().Value("session").(*fest.SessionCookie)
 
-	if s.IsLoggedIn() {
+	if s.Logged {
 		return http.StatusBadRequest, nil
 	}
 

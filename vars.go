@@ -39,6 +39,7 @@ type config struct {
 	}
 }
 
+// ConfigFile ...
 func ConfigFile(path string) (*config, error) {
 	file := &config{}
 
@@ -76,7 +77,7 @@ type Config struct {
 	Domain         string
 	Scheme         string
 	Assets         string
-	CookieStore    securecookie.SecureCookie
+	CookieStore    *securecookie.SecureCookie
 	PayPal         *paypalsdk.Client
 	Logger         *log.Logger
 	Services       *Services

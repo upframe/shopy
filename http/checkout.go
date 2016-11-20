@@ -10,27 +10,8 @@ import (
 	"github.com/upframe/fest"
 )
 
-// CheckoutCancelGet ...
-func CheckoutCancelGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	s := r.Context().Value("session").(*fest.Session)
-
-	cart := s.Values["Cart"].(fest.CartCookie)
-	cart.Locked = false
-
-	s.Values["Cart"] = cart
-
-	err := s.Save(r, w)
-	if err != nil {
-		return http.StatusInternalServerError, err
-	}
-
-	return Redirect(w, r, "/cart")
-}
-
 // CheckoutConfirmGet ...
 func CheckoutConfirmGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	s := r.Context().Value("session").(*fest.Session)
-
 	paymentID := r.URL.Query().Get("paymentId")
 	payerID := r.URL.Query().Get("PayerID")
 
@@ -59,10 +40,8 @@ func CheckoutConfirmGet(w http.ResponseWriter, r *http.Request, c *fest.Config) 
 		return http.StatusInternalServerError, err
 	}
 
-	s.Values["Cart"] = &fest.CartCookie{Products: map[int]int{}, Locked: false}
-
 	// Saves the cookie and checks for errors
-	err = s.Save(r, w)
+	err = SetCartCookie(w, c, &fest.CartCookie{Products: map[int]int{}, Locked: false})
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -73,18 +52,21 @@ func CheckoutConfirmGet(w http.ResponseWriter, r *http.Request, c *fest.Config) 
 
 // CheckoutGet ...
 func CheckoutGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	s := r.Context().Value("session").(*fest.Session)
+	s := r.Context().Value("session").(*fest.SessionCookie)
 
-	cart, err := s.GetCart(c.Services.Product)
+	cookie, err := ReadCartCookie(w, r, c)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
 
-	cartCookie := s.Values["Cart"].(fest.CartCookie)
-	cartCookie.Locked = true
-	s.Values["Cart"] = cartCookie
+	cart, err := cookie.GetCart(c.Services.Product)
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
 
-	err = s.Save(r, w)
+	cookie.Locked = true
+
+	err = SetCartCookie(w, c, cookie)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -94,7 +76,7 @@ func CheckoutGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, e
 
 // CheckoutPost ...
 func CheckoutPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	s := r.Context().Value("session").(*fest.Session)
+	s := r.Context().Value("session").(*fest.SessionCookie)
 
 	// Parses the form and checks for errors
 	err := r.ParseForm()
@@ -102,13 +84,18 @@ func CheckoutPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, 
 		return http.StatusInternalServerError, err
 	}
 
-	cart, err := s.GetCart(c.Services.Product)
+	cookie, err := ReadCartCookie(w, r, c)
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	cart, err := cookie.GetCart(c.Services.Product)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
 
 	order := &fest.Order{
-		User:     &fest.User{ID: s.User.ID},
+		User:     &fest.User{ID: s.UserID},
 		Status:   fest.OrderWaitingPayment,
 		Products: []*fest.OrderProduct{},
 		Value:    cart.GetTotal(),
@@ -132,7 +119,7 @@ func CheckoutPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, 
 		return http.StatusInternalServerError, err
 	}
 
-	if s.User.Credit < credits || credits > order.Value {
+	if s.User().Credit < credits || credits > order.Value {
 		return http.StatusBadRequest, nil
 	}
 
@@ -188,7 +175,7 @@ func CheckoutPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, 
 	p, err := c.PayPal.CreateDirectPaypalPayment(
 		amount,
 		c.BaseAddress+"/checkout/confirm",
-		c.BaseAddress+"/checkout/cancel",
+		c.BaseAddress+"/orders/"+strconv.Itoa(order.ID)+"/cancel",
 		"Shop at Upframe Fest",
 	)
 

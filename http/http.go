@@ -76,31 +76,19 @@ func Inject(h FestHandler, c *fest.Config) http.HandlerFunc {
 			w.Write([]byte(msg.Message))
 		}()
 
-		// Create the session
-		s := &fest.Session{}
-
-		// Gets the current session or creates a new one if there is some error
-		// decrypting it or if it doesn't exist
-		s.Session, _ = c.Store.Get(r, "upframe-auth")
-
-		// If it is a new session, initialize it, setting 'IsLoggedIn' as false
-		if s.IsNew {
-			s.Values["IsLoggedIn"] = false
+		s, err := ReadSessionCookie(w, r, c)
+		if err != nil {
+			return
 		}
 
 		// Get the user info from the database and add it to the session data
-		if s.IsLoggedIn() {
-			s.User, err = c.Services.User.Get(s.Values["UserID"].(int))
+		if s.Logged {
+			u, err := c.Services.User.Get(s.UserID)
 			if err != nil {
 				return
 			}
-		}
 
-		// Saves the session in the cookie and checks for errors. This is useful
-		// to reset the expiration time.
-		err = s.Save(r, w)
-		if err != nil {
-			return
+			s.SetUser(u)
 		}
 
 		r = r.WithContext(context.WithValue(r.Context(), "session", s))
@@ -111,9 +99,9 @@ func Inject(h FestHandler, c *fest.Config) http.HandlerFunc {
 // MustLogin ...
 func MustLogin(h FestHandler) FestHandler {
 	return func(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-		s := r.Context().Value("session").(*fest.Session)
+		s := r.Context().Value("session").(*fest.SessionCookie)
 
-		if s.IsLoggedIn() {
+		if s.Logged {
 			return h(w, r, c)
 		}
 
@@ -128,9 +116,9 @@ func MustLogin(h FestHandler) FestHandler {
 // MustAdmin ...
 func MustAdmin(h FestHandler) FestHandler {
 	return MustLogin(func(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-		s := r.Context().Value("session").(*fest.Session)
+		s := r.Context().Value("session").(*fest.SessionCookie)
 
-		if s.IsAdmin() {
+		if s.User().Admin {
 			return h(w, r, c)
 		}
 
@@ -162,7 +150,7 @@ type page struct {
 
 // Render renders an HTML response and send it to the client based on the
 // choosen templates
-func Render(w http.ResponseWriter, c *fest.Config, s *fest.Session, data interface{}, templates ...string) (int, error) {
+func Render(w http.ResponseWriter, c *fest.Config, s *fest.SessionCookie, data interface{}, templates ...string) (int, error) {
 	if strings.HasPrefix(templates[0], "admin/") {
 		templates = append(templates, "admin/base")
 	} else {
@@ -206,20 +194,20 @@ func Render(w http.ResponseWriter, c *fest.Config, s *fest.Session, data interfa
 	}
 
 	p := &page{
-		IsLoggedIn:  s.IsLoggedIn(),
+		IsLoggedIn:  s.Logged,
 		Data:        data,
 		BaseAddress: c.BaseAddress,
 	}
 
 	// Refresh user information
 	if p.IsLoggedIn {
-		p.Session.FirstName = s.User.FirstName
-		p.Session.LastName = s.User.LastName
-		p.Session.Email = s.User.Email
-		p.Session.Referral = s.User.Referral
-		p.Session.IsAdmin = s.User.Admin
-		p.Session.Credit = s.User.Credit
-		p.Session.Invites = s.User.Invites
+		p.Session.FirstName = s.User().FirstName
+		p.Session.LastName = s.User().LastName
+		p.Session.Email = s.User().Email
+		p.Session.Referral = s.User().Referral
+		p.Session.IsAdmin = s.User().Admin
+		p.Session.Credit = s.User().Credit
+		p.Session.Invites = s.User().Invites
 	}
 
 	buf := &bytes.Buffer{}
@@ -252,7 +240,7 @@ func displayCents(cents int) string {
 // StaticHandler ...
 func StaticHandler(templates ...string) FestHandler {
 	return func(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-		s := r.Context().Value("session").(*fest.Session)
+		s := r.Context().Value("session").(*fest.SessionCookie)
 
 		return Render(w, c, s, nil, templates...)
 	}

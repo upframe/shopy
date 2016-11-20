@@ -14,9 +14,9 @@ type settings struct {
 
 // SettingsGet ...
 func SettingsGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	s := r.Context().Value("session").(*fest.Session)
+	s := r.Context().Value("session").(*fest.SessionCookie)
 
-	user, err := c.Services.User.Get(s.Values["UserID"].(int))
+	user, err := c.Services.User.Get(s.UserID)
 	if err == sql.ErrNoRows {
 		return http.StatusNotFound, err
 	}

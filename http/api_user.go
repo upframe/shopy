@@ -18,8 +18,8 @@ func APIUserGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, er
 		return http.StatusNotFound, nil
 	}
 
-	s := r.Context().Value("session").(*fest.Session)
-	if !s.IsAdmin() && s.Values["UserID"].(int) != id {
+	s := r.Context().Value("session").(*fest.SessionCookie)
+	if !s.User().Admin && s.UserID != id {
 		return http.StatusForbidden, nil
 	}
 
@@ -37,9 +37,9 @@ func APIUserGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, er
 
 // APICurrentUser ...
 func APICurrentUser(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	s := r.Context().Value("session").(*fest.Session)
+	s := r.Context().Value("session").(*fest.SessionCookie)
 
-	return Redirect(w, r, "/api/users/"+strconv.Itoa(s.User.ID))
+	return Redirect(w, r, "/api/users/"+strconv.Itoa(s.UserID))
 }
 
 // APIUserPost  ...

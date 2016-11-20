@@ -39,10 +39,10 @@ func Serve(c *fest.Config) {
 	r.HandleFunc("/cart/{id:[0-9]+}", Inject(MustLogin(CartItemDelete), c)).Methods("DELETE")
 
 	r.HandleFunc("/orders", Inject(MustLogin(OrdersGet), c)).Methods("GET")
+	r.HandleFunc("/orders/{id:[0-9]+}/cancel", Inject(MustLogin(OrderCancel), c)).Methods("GET")
 
 	r.HandleFunc("/checkout", Inject(MustLogin(CheckoutGet), c)).Methods("GET")
 	r.HandleFunc("/checkout", Inject(MustLogin(CheckoutPost), c)).Methods("POST")
-	r.HandleFunc("/checkout/cancel", Inject(MustLogin(CheckoutCancelGet), c)).Methods("GET")
 	r.HandleFunc("/checkout/confirm", Inject(MustLogin(CheckoutConfirmGet), c)).Methods("GET")
 
 	r.HandleFunc("/logout", Inject(logout, c))
@@ -97,14 +97,9 @@ func (h *notFoundHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // logout resets the session values and saves the cookie
 func logout(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	s := r.Context().Value("session").(*fest.Session)
 
 	// Reset the session values
-	s.Values = map[interface{}]interface{}{}
-	s.Values["IsLoggedIn"] = false
-
-	// Saves the session and checks for error
-	err := s.Save(r, w)
+	err := SetSessionCookie(w, c, &fest.SessionCookie{})
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}

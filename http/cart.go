@@ -11,9 +11,14 @@ import (
 
 // CartGet ...
 func CartGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	s := r.Context().Value("session").(*fest.Session)
+	s := r.Context().Value("session").(*fest.SessionCookie)
 
-	cart, err := s.GetCart(c.Services.Product)
+	cookie, err := ReadCartCookie(w, r, c)
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	cart, err := cookie.GetCart(c.Services.Product)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -23,8 +28,6 @@ func CartGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error
 
 // CartItemPost ...
 func CartItemPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	s := r.Context().Value("session").(*fest.Session)
-
 	id, err := strconv.Atoi(strings.Replace(r.URL.Path, "/cart/", "", -1))
 	if err != nil {
 		return http.StatusInternalServerError, err
@@ -43,7 +46,10 @@ func CartItemPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, 
 		return http.StatusNotFound, err
 	}
 
-	cart := s.Values["Cart"].(fest.CartCookie)
+	cart, err := ReadCartCookie(w, r, c)
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
 	if cart.Locked {
 		return http.StatusForbidden, nil
 	}
@@ -57,8 +63,7 @@ func CartItemPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, 
 		cart.Products[id] = 1
 	}
 
-	s.Values["Cart"] = cart
-	err = s.Save(r, w)
+	err = SetCartCookie(w, c, cart)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -68,15 +73,16 @@ func CartItemPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, 
 
 // CartItemDelete ...
 func CartItemDelete(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	s := r.Context().Value("session").(*fest.Session)
-
 	id, err := strconv.Atoi(strings.Replace(r.URL.Path, "/cart/", "", 1))
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
 
 	// Remove one item of this type from the cart
-	cart := s.Values["Cart"].(fest.CartCookie)
+	cart, err := ReadCartCookie(w, r, c)
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
 	if cart.Locked {
 		return http.StatusForbidden, nil
 	}
@@ -88,9 +94,7 @@ func CartItemDelete(w http.ResponseWriter, r *http.Request, c *fest.Config) (int
 		}
 	}
 
-	s.Values["Cart"] = cart
-
-	err = s.Save(r, w)
+	err = SetCartCookie(w, c, cart)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}

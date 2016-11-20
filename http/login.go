@@ -9,9 +9,9 @@ import (
 
 // LoginGet ...
 func LoginGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	s := r.Context().Value("session").(*fest.Session)
+	s := r.Context().Value("session").(*fest.SessionCookie)
 
-	if s.IsLoggedIn() {
+	if s.Logged {
 		return Redirect(w, r, "/")
 	}
 
@@ -20,9 +20,9 @@ func LoginGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, erro
 
 // LoginPost ...
 func LoginPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	s := r.Context().Value("session").(*fest.Session)
+	s := r.Context().Value("session").(*fest.SessionCookie)
 
-	if s.IsLoggedIn() {
+	if s.Logged {
 		return http.StatusBadRequest, fest.ErrAlreadyLoggedIn
 	}
 
@@ -86,12 +86,11 @@ func LoginPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, err
 	}
 
 	// Sets the session cookie values
-	s.Values["IsLoggedIn"] = true
-	s.Values["UserID"] = user.ID
-	s.Values["Cart"] = &fest.CartCookie{Products: map[int]int{}, Locked: false}
+	s.Logged = true
+	s.UserID = user.ID
 
 	// Saves the cookie and checks for errors
-	err = s.Save(r, w)
+	err = SetSessionCookie(w, c, s)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}

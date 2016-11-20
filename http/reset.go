@@ -12,7 +12,7 @@ import (
 
 // ResetGet ...
 func ResetGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	s := r.Context().Value("session").(*fest.Session)
+	s := r.Context().Value("session").(*fest.SessionCookie)
 
 	if hash := r.URL.Query().Get("hash"); hash != "" {
 		// Fetches the link from the database
