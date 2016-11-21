@@ -102,5 +102,7 @@ func (s *UserService) Delete(id int) error {
 	}
 
 	u.Deactivated = true
+	u.PasswordHash = ""
+	u.PasswordSalt = ""
 	return s.Update(u, "Deactivated", "PasswordHash", "PasswordSalt")
 }

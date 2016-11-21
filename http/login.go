@@ -65,6 +65,11 @@ func LoginPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, err
 		return http.StatusInternalServerError, err
 	}
 
+	// Checks if the user is deactivated
+	if user.Deactivated {
+		return http.StatusLocked, nil
+	}
+
 	// Checks the password and checks for errors
 	ok, err := user.CheckPassword(password)
 	if err != nil {
@@ -78,11 +83,6 @@ func LoginPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, err
 	// Checks if the user is confirmed
 	if !user.Confirmed {
 		return http.StatusFailedDependency, nil
-	}
-
-	// Checks if the user is deactivated
-	if user.Deactivated {
-		return http.StatusLocked, nil
 	}
 
 	// Sets the session cookie values
