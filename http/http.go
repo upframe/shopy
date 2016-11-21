@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -106,7 +107,7 @@ func MustLogin(h FestHandler) FestHandler {
 		}
 
 		if r.Method == http.MethodGet && !strings.HasPrefix(r.URL.Path, "/api") {
-			return Redirect(w, r, "/login")
+			return Redirect(w, r, "/login?redirect="+url.QueryEscape(r.URL.Path))
 		}
 
 		return http.StatusUnauthorized, fest.ErrNotLoggedIn

@@ -307,7 +307,11 @@ function loginHandler(event) {
     request.onreadystatechange = function() {
         if (request.readyState == 4) {
             if (request.status == 200) {
-                window.location = window.location.protocol + "//" + window.location.hostname;
+                if (getURLVariables("redirect") != false) {
+                  window.location = getURLVariables("redirect");
+                } else {
+                  window.location = "/";
+                }
                 return;
             }
 
@@ -411,4 +415,15 @@ function checkRegisterFields(form) {
     }
 
     return true;
+}
+
+function getURLVariables(variable) {
+  let query = window.location.search.substring(1),
+    vars = query.split("&");
+
+  for (var i = 0; i < vars.length; i++) {
+    let pair = vars[i].split("=");
+    if(pair[0] == variable){return pair[1];}
+  }
+  return false;
 }
