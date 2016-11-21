@@ -54,7 +54,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (window.location.pathname === "/checkout") {
         document.getElementById("promocode").addEventListener("keyup", validateCoupon);
-        document.querySelector('input[name="credits"]').addEventListener("change", validateCredits);
+        if (thing = document.querySelector('input[name="credits"]')) {
+            thing.addEventListener("change", validateCredits);
+        }
         document.querySelector('form#checkout').addEventListener("submit", submitCheckout);
     }
 });
