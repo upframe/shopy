@@ -401,7 +401,7 @@ var resendMessages = {
 }
 
 function resendConfirmation() {
-    email = document.querySelector('input[name="email"]');
+    let email = document.querySelector('input[name="email"]');
 
     if (email.value.search("@") == -1) {
         return formError("Your email is invalid.", "error");
@@ -411,7 +411,7 @@ function resendConfirmation() {
     request.open("POST", window.location, true);
     request.setRequestHeader("Resend", "true");
     request.setRequestHeader("Email", email.value);
-    request.send(form.serialize());
+    request.send();
     request.onreadystatechange = function() {
         if (request.readyState == 4) {
             printMessage(request.status, request.responseText, resendMessages)
