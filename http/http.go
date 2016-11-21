@@ -134,11 +134,6 @@ func Redirect(w http.ResponseWriter, r *http.Request, path string) (int, error) 
 	return 0, nil
 }
 
-func RedirectWithQuery(r *http.Request, path string, rpage string) {
-	r.URL.Query().Add("redirect", rpage)
-	r.URL.RawQuery = r.URL.Query().Encode()
-}
-
 // page is the type that contains the information that goes into the page
 type page struct {
 	IsLoggedIn  bool

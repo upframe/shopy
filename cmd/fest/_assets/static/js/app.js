@@ -54,7 +54,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (window.location.pathname === "/checkout") {
         document.getElementById("promocode").addEventListener("keyup", validateCoupon);
-        document.querySelector('input[name="credits"').addEventListener("change", validateCredits);
+        document.querySelector('input[name="credits"]').addEventListener("change", validateCredits);
+        document.querySelector('form#checkout').addEventListener("submit", submitCheckout);
     }
 });
 
@@ -127,8 +128,8 @@ function validateCredits(e) {
 
     let credits = document.getElementById("credits"),
         total = document.getElementById("total");
-    //credits.innerHTML = (input.value).toFixed(2);
-    //total.innerHTML = (total.innerHTML - input.value).toFixed(2);
+    credits.innerHTML = (input.value).toFixed(2);
+    total.innerHTML = (total.innerHTML - input.value).toFixed(2);
 }
 
 function initializeStore() {
@@ -186,6 +187,30 @@ function cartRequest(method, link, data, itemID) {
             }
         }
     }
+}
+
+var checkoutMessages = {
+  400: "Check your credits input value or refresh the page.",
+  404: "That promocode isn't available right now.",
+  'default': "Something went wrong but we're trying to fix it now."
+}
+
+function submitCheckout(event) {
+  event.preventDefault();
+
+  let request = new XMLHttpRequest(),
+    form = document.querySelector("form#checkout");
+  request.open("POST", window.location, true);
+  request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  request.send(form.serialize());
+  request.onreadystatechange = function() {
+    if (request.readyState == 4) {
+      if (request.status == 200) {
+          window.location = JSON.parse(request.responseText).Link;
+      }
+      printMessage(request.status, request.responseText, checkoutMessages);
+    }
+  }
 }
 
 function deactivateAccount(event) {
@@ -252,7 +277,7 @@ var registerMessages = {
     403: "The reffer link is invalid.",
     409: "Your email is already registered. Please <a href='/login'>login</a>.",
     410: "It seems that in the meanwhile the person that invited you ran out of invites.",
-    'default': "Something went wrong and we are unable to explain it right now."
+    'default': "Something went wrong and we are trying to fix it as soon as possible."
 }
 
 function registerHandler(event) {
@@ -286,7 +311,7 @@ var loginMessages = {
     404: "We can't find you in our database. <a href='/register'>Register</a> first.",
     423: "Your account is deactivated.",
     424: "Check your email to confirm your account first. <a href='#' onclick='resendConfirmation();'>Resend confirmation.</a>",
-    'default': "Something went wrong and we are unable to explain it right now."
+    'default': "Something went wrong and we are trying to fix it as soon as possible."
 }
 
 function loginHandler(event) {
@@ -320,7 +345,7 @@ function loginHandler(event) {
 
 var resetEmailStatus = {
     200: 'Please, check your inbox to continue.',
-    'default': "Something went wrong and we are unable to explain it right now."
+    'default': "Something went wrong and we are trying to fix it as soon as possible."
 }
 
 function resetEmailForm(event) {
@@ -372,7 +397,7 @@ var resendMessages = {
     200: "Check your email!",
     201: "Check your email!",
     404: "We can't find you in our database. <a href='/register'>Register</a> first.",
-    'default': "Something went wrong and we are unable to explain it right now."
+    'default': "Something went wrong and we are trying to fix it as soon as possible."
 }
 
 function resendConfirmation() {

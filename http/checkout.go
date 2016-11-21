@@ -59,6 +59,10 @@ func CheckoutGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, e
 		return http.StatusInternalServerError, err
 	}
 
+	if len(cookie.Products) == 0 {
+		return Redirect(w, r, "/cart")
+	}
+
 	cart, err := cookie.GetCart(c.Services.Product)
 	if err != nil {
 		return http.StatusInternalServerError, err
@@ -194,5 +198,5 @@ func CheckoutPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, 
 		return http.StatusInternalServerError, err
 	}
 
-	return Redirect(w, r, p.Links[1].Href)
+	return apiPrint(w, map[string]string{"Link": p.Links[1].Href})
 }
