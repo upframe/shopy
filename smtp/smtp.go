@@ -1,4 +1,4 @@
-package email
+package smtp
 
 import (
 	"bytes"
@@ -6,23 +6,32 @@ import (
 	"fmt"
 	"html/template"
 	"io/ioutil"
-	"net/mail"
 	"net/smtp"
 	"path/filepath"
+
+	"github.com/upframe/fest"
 )
 
-// Email contains the information about email
-type Email struct {
-	From    *mail.Address
-	To      *mail.Address
-	Subject string
-	Body    string
+// Config ...
+type Config struct {
+	Host       string
+	Port       string
+	ServerName string
+	Auth       smtp.Auth
+	TLSConfig  *tls.Config
+}
+
+// EmailService ...
+type EmailService struct {
+	TemplatesPath    string
+	FromDefaultEmail string
+	SMTP             *Config
 }
 
 // UseTemplate adds  the template to the email and renders it to the Body field
-func (e *Email) UseTemplate(name string, data interface{}) error {
+func (s *EmailService) UseTemplate(e *fest.Email, data interface{}, name string) error {
 	// Opens the template file and checks if there is any error
-	page, err := ioutil.ReadFile(filepath.Clean(Templates + name + ".tmpl"))
+	page, err := ioutil.ReadFile(filepath.Clean(s.TemplatesPath + name + ".tmpl"))
 	if err != nil {
 		return err
 	}
@@ -59,7 +68,11 @@ func (e *Email) UseTemplate(name string, data interface{}) error {
 }
 
 // Send sends the email
-func (e Email) Send() error {
+func (s *EmailService) Send(e *fest.Email) error {
+	if e.From.Address == "" {
+		e.From.Address = s.FromDefaultEmail
+	}
+
 	// Setup headers
 	headers := make(map[string]string)
 	headers["From"] = e.From.String()
@@ -77,18 +90,18 @@ func (e Email) Send() error {
 	// Here is the key, you need to call tls.Dial instead of smtp.Dial
 	// for smtp servers running on 465 that require an ssl connection
 	// from the very beginning (no starttls)
-	conn, err := tls.Dial("tcp", smtpServerName, smtpTLSConfig)
+	conn, err := tls.Dial("tcp", s.SMTP.ServerName, s.SMTP.TLSConfig)
 	if err != nil {
 		return err
 	}
 
-	c, err := smtp.NewClient(conn, smtpHost)
+	c, err := smtp.NewClient(conn, s.SMTP.Host)
 	if err != nil {
 		return err
 	}
 
 	// Auth
-	if err = c.Auth(smtpAuth); err != nil {
+	if err = c.Auth(s.SMTP.Auth); err != nil {
 		return err
 	}
 
@@ -119,4 +132,22 @@ func (e Email) Send() error {
 
 	c.Quit()
 	return nil
+}
+
+// InitSMTP configures the email variables
+func InitSMTP(user, pass, host, port string) *EmailService {
+	s := &EmailService{
+		SMTP: &Config{
+			Host:       host,
+			Port:       port,
+			ServerName: host + ":" + port,
+			Auth:       smtp.PlainAuth("", user, pass, host),
+			TLSConfig: &tls.Config{
+				InsecureSkipVerify: true,
+				ServerName:         host,
+			},
+		},
+	}
+
+	return s
 }

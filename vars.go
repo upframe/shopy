@@ -48,6 +48,7 @@ type Services struct {
 	Promocode PromocodeService
 	User      UserService
 	Link      LinkService
+	Email     EmailService
 }
 
 // InitPayPal configures the paypal client variable

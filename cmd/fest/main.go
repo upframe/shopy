@@ -8,9 +8,9 @@ import (
 
 	"github.com/gorilla/securecookie"
 	"github.com/upframe/fest"
-	"github.com/upframe/fest/email"
 	h "github.com/upframe/fest/http"
 	"github.com/upframe/fest/mysql"
+	"github.com/upframe/fest/smtp"
 )
 
 func main() {
@@ -40,17 +40,16 @@ func main() {
 		panic(err)
 	}
 
-	// Configures the email
-	// TODO: Email... global or a struct inside config?
-	email.Templates = conf.Assets + "templates/email/"
-	email.InitSMTP(conf.SMTP.User, conf.SMTP.Password, conf.SMTP.Host, conf.SMTP.Port)
-
 	// Configures PayPal
 	paypal, err := fest.InitPayPal(conf.PayPal.Client, conf.PayPal.Secret, conf.Development)
 
 	if err != nil {
 		panic(err)
 	}
+
+	email := smtp.InitSMTP(conf.SMTP.User, conf.SMTP.Password, conf.SMTP.Host, conf.SMTP.Port)
+	email.TemplatesPath = conf.Assets + "templates/email/"
+	email.FromDefaultEmail = "noreply@upframe.xyz"
 
 	c := &fest.Config{
 		Domain:         conf.Domain,
@@ -62,12 +61,14 @@ func main() {
 		BaseAddress:    conf.Scheme + "://" + conf.Domain,
 		Templates:      conf.Assets + "templates/",
 		PayPal:         paypal,
+		CookieStore:    securecookie.New([]byte(conf.Key1), []byte(conf.Key2)),
 		Services: &fest.Services{
 			User:      &mysql.UserService{DB: db},
 			Link:      &mysql.LinkService{DB: db},
 			Product:   &mysql.ProductService{DB: db},
 			Promocode: &mysql.PromocodeService{DB: db},
 			Order:     &mysql.OrderService{DB: db},
+			Email:     email,
 		},
 	}
 
@@ -87,10 +88,6 @@ func main() {
 		defer file.Close()
 		c.Logger = log.New(file, "", log.Ldate|log.Ltime|log.Lshortfile)
 	}
-
-	// Define the Store options
-	// TODO: change this
-	c.CookieStore = securecookie.New(securecookie.GenerateRandomKey(32), securecookie.GenerateRandomKey(32))
 
 	h.Serve(c)
 }

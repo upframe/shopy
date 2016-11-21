@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/upframe/fest"
-	"github.com/upframe/fest/email"
 )
 
 // RegisterGet ...
@@ -193,10 +192,9 @@ func confirmationEmail(c *fest.Config, user *fest.User) (int, error) {
 	data["Hash"] = link.Hash
 	data["Host"] = c.BaseAddress
 
-	email := &email.Email{
+	email := &fest.Email{
 		From: &mail.Address{
-			Name:    "Upframe",
-			Address: email.FromDefaultEmail,
+			Name: "Upframe",
 		},
 		To: &mail.Address{
 			Name:    "",
@@ -205,12 +203,12 @@ func confirmationEmail(c *fest.Config, user *fest.User) (int, error) {
 		Subject: "You're almost there",
 	}
 
-	err = email.UseTemplate("confirmation", data)
+	err = c.Services.Email.UseTemplate(email, data, "confirmation")
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
 
-	err = email.Send()
+	err = c.Services.Email.Send(email)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
