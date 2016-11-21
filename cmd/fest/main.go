@@ -22,7 +22,7 @@ func main() {
 		path = os.Args[1]
 	}
 
-	conf, err := fest.ConfigFile(path)
+	conf, err := configFile(path)
 	if err != nil {
 		panic(err)
 	}
@@ -61,7 +61,6 @@ func main() {
 		DefaultInvites: conf.DefaultInvites,
 		BaseAddress:    conf.Scheme + "://" + conf.Domain,
 		Templates:      conf.Assets + "templates/",
-		Logger:         log.New(os.Stdout, "", log.Ldate|log.Ltime|log.Lshortfile),
 		PayPal:         paypal,
 		Services: &fest.Services{
 			User:      &mysql.UserService{DB: db},
@@ -72,7 +71,25 @@ func main() {
 		},
 	}
 
+	if conf.Errors == "" {
+		conf.Errors = "stdout"
+	}
+
+	if conf.Errors == "stdout" {
+		c.Logger = log.New(os.Stdout, "", log.Ldate|log.Ltime|log.Lshortfile)
+	} else {
+		var file *os.File
+		file, err = os.OpenFile(conf.Errors, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
+		if err != nil {
+			panic(err)
+		}
+
+		defer file.Close()
+		c.Logger = log.New(file, "", log.Ldate|log.Ltime|log.Lshortfile)
+	}
+
 	// Define the Store options
+	// TODO: change this
 	c.CookieStore = securecookie.New(securecookie.GenerateRandomKey(32), securecookie.GenerateRandomKey(32))
 
 	h.Serve(c)

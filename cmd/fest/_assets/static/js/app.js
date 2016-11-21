@@ -172,11 +172,9 @@ function cartRequest(method, link, data, itemID) {
                         let item = document.querySelector('tr[data-id="' + itemID + '"]');
                         item.children[0].innerHTML--;
 
-                        let price = item.querySelector('td[data-name="Price"]');
-                        price.innerHTML -= item.dataset.price;
-
                         let total = document.querySelector("#total");
-                        total.innerHTML -= item.dataset.price;
+                        let num = total.innerHTML - item.dataset.price;
+                        total.innerHTML = num.toFixed(2);
 
                         if (item.children[0].innerHTML == 0) {
                             item.parentElement.removeChild(item);

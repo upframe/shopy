@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"html/template"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"path/filepath"
@@ -66,6 +65,7 @@ func Inject(h FestHandler, c *fest.Config) http.HandlerFunc {
 			if strings.HasPrefix(r.URL.Path, "/api") || r.Method != http.MethodGet {
 				data, e := json.MarshalIndent(msg, "", "\t")
 				if e != nil {
+					// TODO I think this musst be removed
 					w.WriteHeader(http.StatusInternalServerError)
 				}
 
@@ -84,7 +84,8 @@ func Inject(h FestHandler, c *fest.Config) http.HandlerFunc {
 
 		// Get the user info from the database and add it to the session data
 		if s.Logged {
-			u, err := c.Services.User.Get(s.UserID)
+			var u *fest.User
+			u, err = c.Services.User.Get(s.UserID)
 			if err != nil {
 				return
 			}
@@ -133,11 +134,17 @@ func Redirect(w http.ResponseWriter, r *http.Request, path string) (int, error) 
 	return 0, nil
 }
 
+func RedirectWithQuery(r *http.Request, path string, rpage string) {
+	r.URL.Query().Add("redirect", rpage)
+	r.URL.RawQuery = r.URL.Query().Encode()
+}
+
 // page is the type that contains the information that goes into the page
 type page struct {
 	IsLoggedIn  bool
 	BaseAddress string
 	Data        interface{}
+	InviteOnly  bool
 	Session     struct {
 		FirstName string
 		LastName  string
@@ -150,7 +157,7 @@ type page struct {
 }
 
 // Render renders an HTML response and send it to the client based on the
-// choosen templates
+// chosen templates
 func Render(w http.ResponseWriter, c *fest.Config, s *fest.SessionCookie, data interface{}, templates ...string) (int, error) {
 	if strings.HasPrefix(templates[0], "admin/") {
 		templates = append(templates, "admin/base")
@@ -176,7 +183,7 @@ func Render(w http.ResponseWriter, c *fest.Config, s *fest.SessionCookie, data i
 
 		// Check if there is some error. If so, the template doesn't exist
 		if err != nil {
-			log.Print(err)
+			c.Logger.Print(err)
 			return http.StatusInternalServerError, err
 		}
 
@@ -189,7 +196,7 @@ func Render(w http.ResponseWriter, c *fest.Config, s *fest.SessionCookie, data i
 		}
 
 		if err != nil {
-			log.Print(err)
+			c.Logger.Print(err)
 			return http.StatusInternalServerError, err
 		}
 	}
@@ -198,6 +205,7 @@ func Render(w http.ResponseWriter, c *fest.Config, s *fest.SessionCookie, data i
 		IsLoggedIn:  s.Logged,
 		Data:        data,
 		BaseAddress: c.BaseAddress,
+		InviteOnly:  c.InviteOnly,
 	}
 
 	// Refresh user information

@@ -55,7 +55,7 @@ function copyFormToObject(form) {
             } else {
                 object[parts[0]] = new Object();
                 object[parts[0]][parts[1]] = inputToValue(input);
-            }    
+            }
         } else {
             object[name] = inputToValue(input);
         }
