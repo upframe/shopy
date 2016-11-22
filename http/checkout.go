@@ -41,7 +41,7 @@ func CheckoutConfirmGet(w http.ResponseWriter, r *http.Request, c *fest.Config) 
 	}
 
 	// Saves the cookie and checks for errors
-	err = SetCartCookie(w, c, &fest.CartCookie{Products: map[int]int{}, Locked: false})
+	err = c.Services.Cart.Reset(w)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -54,23 +54,23 @@ func CheckoutConfirmGet(w http.ResponseWriter, r *http.Request, c *fest.Config) 
 func CheckoutGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
 	s := r.Context().Value("session").(*fest.Session)
 
-	cookie, err := ReadCartCookie(w, r, c)
+	cart, err := c.Services.Cart.Get(w, r)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
 
-	if len(cookie.Products) == 0 {
+	if len(cart.RawList) == 0 {
 		return Redirect(w, r, "/cart")
 	}
 
-	cart, err := cookie.GetCart(c.Services.Product)
+	err = cart.FillProducts(c.Services.Product)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
 
-	cookie.Locked = true
+	cart.Locked = true
 
-	err = SetCartCookie(w, c, cookie)
+	err = c.Services.Cart.Save(w, cart)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -88,12 +88,12 @@ func CheckoutPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, 
 		return http.StatusInternalServerError, err
 	}
 
-	cookie, err := ReadCartCookie(w, r, c)
+	cart, err := c.Services.Cart.Get(w, r)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
 
-	cart, err := cookie.GetCart(c.Services.Product)
+	err = cart.FillProducts(c.Services.Product)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}

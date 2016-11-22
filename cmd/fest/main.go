@@ -80,6 +80,10 @@ func main() {
 				Secure:      conf.Scheme == "https",
 				UserService: userService,
 			},
+			Cart: &cookie.CartService{
+				Store:  store,
+				Secure: conf.Scheme == "https",
+			},
 		},
 	}
 

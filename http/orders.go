@@ -25,7 +25,7 @@ func OrdersGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, err
 func OrderCancel(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
 	s := r.Context().Value("session").(*fest.Session)
 
-	cart, err := ReadCartCookie(w, r, c)
+	cart, err := c.Services.Cart.Get(w, r)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -71,7 +71,7 @@ func OrderCancel(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, e
 
 	cart.Locked = false
 
-	err = SetCartCookie(w, c, cart)
+	err = c.Services.Cart.Save(w, cart)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}

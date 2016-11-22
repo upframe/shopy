@@ -13,12 +13,12 @@ import (
 func CartGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
 	s := r.Context().Value("session").(*fest.Session)
 
-	cookie, err := ReadCartCookie(w, r, c)
+	cart, err := c.Services.Cart.Get(w, r)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
 
-	cart, err := cookie.GetCart(c.Services.Product)
+	err = cart.FillProducts(c.Services.Product)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -46,24 +46,24 @@ func CartItemPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, 
 		return http.StatusNotFound, err
 	}
 
-	cart, err := ReadCartCookie(w, r, c)
+	cart, err := c.Services.Cart.Get(w, r)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
 	if cart.Locked {
 		return http.StatusForbidden, nil
 	}
-	if _, ok := cart.Products[id]; ok {
+	if _, ok := cart.RawList[id]; ok {
 		// If the Product is already in the cart, increment the quantity
 		// Notice that in order for this to work, we have to use pointers
 		// (check line 20) and not "normal" values
-		cart.Products[id]++
+		cart.RawList[id]++
 	} else {
 		// Otherwise, we just create a new Cart item, with the product
-		cart.Products[id] = 1
+		cart.RawList[id] = 1
 	}
 
-	err = SetCartCookie(w, c, cart)
+	err = c.Services.Cart.Save(w, cart)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -79,22 +79,22 @@ func CartItemDelete(w http.ResponseWriter, r *http.Request, c *fest.Config) (int
 	}
 
 	// Remove one item of this type from the cart
-	cart, err := ReadCartCookie(w, r, c)
+	cart, err := c.Services.Cart.Get(w, r)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
 	if cart.Locked {
 		return http.StatusForbidden, nil
 	}
-	if _, ok := cart.Products[id]; ok {
-		if cart.Products[id]-1 == 0 {
-			delete(cart.Products, id)
+	if _, ok := cart.RawList[id]; ok {
+		if cart.RawList[id]-1 == 0 {
+			delete(cart.RawList, id)
 		} else {
-			cart.Products[id]--
+			cart.RawList[id]--
 		}
 	}
 
-	err = SetCartCookie(w, c, cart)
+	err = c.Services.Cart.Save(w, cart)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}

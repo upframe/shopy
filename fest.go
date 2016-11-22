@@ -8,10 +8,10 @@ import (
 	"github.com/logpacker/PayPal-Go-SDK"
 )
 
-// UpdateAll is used as a placeholder to update all of the fields
-const UpdateAll = "#update#"
-
 const (
+	// UpdateAll is used as a placeholder to update all of the fields
+	UpdateAll = "#update#"
+
 	passwordSaltBytes = 32
 	passwordHashBytes = 64
 )
@@ -50,6 +50,7 @@ type Services struct {
 	Link      LinkService
 	Email     EmailService
 	Session   SessionService
+	Cart      CartService
 }
 
 // InitPayPal configures the paypal client variable

@@ -209,6 +209,7 @@ function submitCheckout(event) {
     if (request.readyState == 4) {
       if (request.status == 200) {
           window.location = JSON.parse(request.responseText).Link;
+          return;
       }
       printMessage(request.status, request.responseText, checkoutMessages);
     }
