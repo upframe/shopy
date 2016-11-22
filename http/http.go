@@ -18,6 +18,8 @@ import (
 	"github.com/upframe/fest"
 )
 
+// TODO: clean this file
+
 type message struct {
 	ID      string
 	Code    int
@@ -108,7 +110,7 @@ func Inject(h FestHandler, c *fest.Config) http.HandlerFunc {
 const errorTemplate = `<!DOCTYPE html>
 <html>
 <head>
-    <title>TITLE</title>
+    <title>{{ .Code }}</title>
     <style>
     html {
         background-color: #2196f3;
