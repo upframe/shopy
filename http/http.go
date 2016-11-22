@@ -36,6 +36,11 @@ func Inject(h FestHandler, c *fest.Config) http.HandlerFunc {
 			err  error
 		)
 
+		s, err := c.Services.Session.Get(w, r)
+		if err != nil {
+			return
+		}
+
 		defer func() {
 			if code == 0 && err == nil {
 				return
@@ -73,19 +78,72 @@ func Inject(h FestHandler, c *fest.Config) http.HandlerFunc {
 				return
 			}
 
-			// TODO: show page
-			w.Write([]byte(msg.Message))
-		}()
+			if code == http.StatusNotFound {
+				_, err = Render(w, c, s, msg, "404")
+				if err != nil {
+					c.Logger.Print(err)
+					return
+				}
+				return
+			}
 
-		s, err := c.Services.Session.Get(w, r)
-		if err != nil {
-			return
-		}
+			var tpl *template.Template
+			tpl, err = template.New("errors").Parse(errorTemplate)
+			if err != nil {
+				c.Logger.Print(err)
+				return
+			}
+
+			err = tpl.Execute(w, msg)
+			if err != nil {
+				c.Logger.Print(err)
+			}
+		}()
 
 		r = r.WithContext(context.WithValue(r.Context(), "session", s))
 		code, err = h(w, r, c)
 	}
 }
+
+const errorTemplate = `<!DOCTYPE html>
+<html>
+<head>
+    <title>TITLE</title>
+    <style>
+    html {
+        background-color: #2196f3;
+        color: #fff;
+        font-family: sans-serif;
+    }
+    code {
+        background-color: rgba(0,0,0,0.1);
+        border-radius: 5px;
+        padding: 1em;
+        display: block;
+        box-sizing: border-box;
+    }
+    .center {
+        max-width: 40em;
+        margin: 2em auto 0;
+    }
+    a {
+        text-decoration: none;
+        color: #eee;
+        font-weight: bold;
+    }
+	p {
+		line-height: 1.3;
+	}
+    </style>
+</head>
+
+<body>
+    <div class="center">
+        <h1>Error {{ .Code }}</h1>
+        <p>{{ .Message }}</p>
+        <code>{{ .ID }}</code>
+    </div>
+</html>`
 
 // MustLogin ...
 func MustLogin(h FestHandler) FestHandler {
