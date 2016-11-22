@@ -2,6 +2,7 @@ package fest
 
 import (
 	"encoding/gob"
+	"net/http"
 	"strconv"
 	"strings"
 )
@@ -43,25 +44,20 @@ func (c *CartCookie) GetCart(service ProductService) (*Cart, error) {
 	return cart, nil
 }
 
-// SessionCookie ...
-type SessionCookie struct {
+// Session ...
+type Session struct {
 	Logged bool
-	UserID int
-	user   *User
+	User   *User
 }
 
-// User ...
-func (s *SessionCookie) User() *User {
-	return s.user
-}
-
-// SetUser ...
-func (s *SessionCookie) SetUser(u *User) {
-	s.user = u
+// SessionService ...
+type SessionService interface {
+	Save(w http.ResponseWriter, sess *Session) error
+	Get(w http.ResponseWriter, r *http.Request) (*Session, error)
+	Reset(w http.ResponseWriter) error
 }
 
 func init() {
 	// Regist types so they can be used on Cookies
 	gob.Register(CartCookie{})
-	gob.Register(SessionCookie{})
 }

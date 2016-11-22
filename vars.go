@@ -49,6 +49,7 @@ type Services struct {
 	User      UserService
 	Link      LinkService
 	Email     EmailService
+	Session   SessionService
 }
 
 // InitPayPal configures the paypal client variable

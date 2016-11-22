@@ -11,7 +11,7 @@ import (
 
 // CartGet ...
 func CartGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	s := r.Context().Value("session").(*fest.SessionCookie)
+	s := r.Context().Value("session").(*fest.Session)
 
 	cookie, err := ReadCartCookie(w, r, c)
 	if err != nil {

@@ -106,9 +106,7 @@ func (h *notFoundHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // logout resets the session values and saves the cookie
 func logout(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-
-	// Reset the session values
-	err := SetSessionCookie(w, c, &fest.SessionCookie{})
+	err := c.Services.Session.Reset(w)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}

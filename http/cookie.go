@@ -6,26 +6,6 @@ import (
 	"github.com/upframe/fest"
 )
 
-// SetSessionCookie ...
-func SetSessionCookie(w http.ResponseWriter, c *fest.Config, s *fest.SessionCookie) error {
-	encoded, err := c.CookieStore.Encode("session", s)
-	if err != nil {
-		return err
-	}
-
-	cookie := &http.Cookie{
-		Name:     "session",
-		Value:    encoded,
-		Path:     "/",
-		MaxAge:   10800,
-		Secure:   c.Scheme == "https",
-		HttpOnly: true,
-	}
-
-	http.SetCookie(w, cookie)
-	return nil
-}
-
 // SetCartCookie ...
 func SetCartCookie(w http.ResponseWriter, c *fest.Config, cart *fest.CartCookie) error {
 	encoded, err := c.CookieStore.Encode("cart", cart)
@@ -44,29 +24,6 @@ func SetCartCookie(w http.ResponseWriter, c *fest.Config, cart *fest.CartCookie)
 
 	http.SetCookie(w, cookie)
 	return nil
-}
-
-// ReadSessionCookie ...
-func ReadSessionCookie(w http.ResponseWriter, r *http.Request, c *fest.Config) (*fest.SessionCookie, error) {
-	reset := func() (*fest.SessionCookie, error) {
-		s := &fest.SessionCookie{Logged: false}
-		err := SetSessionCookie(w, c, s)
-		return s, err
-	}
-
-	cookie, err := r.Cookie("session")
-	if err != nil {
-		return reset()
-	}
-
-	var value *fest.SessionCookie
-	// if the decryption keys aren't right
-	err = c.CookieStore.Decode("session", cookie.Value, &value)
-	if err != nil {
-		return reset()
-	}
-
-	return value, nil
 }
 
 // ReadCartCookie ...

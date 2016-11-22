@@ -27,8 +27,8 @@ func APIOrderGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, e
 		return http.StatusInternalServerError, err
 	}
 
-	s := r.Context().Value("session").(*fest.SessionCookie)
-	if !s.User().Admin && s.UserID != o.User.ID {
+	s := r.Context().Value("session").(*fest.Session)
+	if !s.User.Admin && s.User.ID != o.User.ID {
 		return http.StatusForbidden, nil
 	}
 

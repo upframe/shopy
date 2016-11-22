@@ -52,7 +52,7 @@ func CheckoutConfirmGet(w http.ResponseWriter, r *http.Request, c *fest.Config) 
 
 // CheckoutGet ...
 func CheckoutGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	s := r.Context().Value("session").(*fest.SessionCookie)
+	s := r.Context().Value("session").(*fest.Session)
 
 	cookie, err := ReadCartCookie(w, r, c)
 	if err != nil {
@@ -80,7 +80,7 @@ func CheckoutGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, e
 
 // CheckoutPost ...
 func CheckoutPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	s := r.Context().Value("session").(*fest.SessionCookie)
+	s := r.Context().Value("session").(*fest.Session)
 
 	// Parses the form and checks for errors
 	err := r.ParseForm()
@@ -99,7 +99,7 @@ func CheckoutPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, 
 	}
 
 	order := &fest.Order{
-		User:     &fest.User{ID: s.UserID},
+		User:     &fest.User{ID: s.User.ID},
 		Status:   fest.OrderWaitingPayment,
 		Products: []*fest.OrderProduct{},
 		Value:    cart.GetTotal(),
@@ -123,7 +123,7 @@ func CheckoutPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, 
 		return http.StatusInternalServerError, err
 	}
 
-	if s.User().Credit < credits || credits > order.Value {
+	if s.User.Credit < credits || credits > order.Value {
 		return http.StatusBadRequest, nil
 	}
 

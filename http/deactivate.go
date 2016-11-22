@@ -49,7 +49,7 @@ func DeactivateGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int,
 
 // DeactivatePost ...
 func DeactivatePost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	s := r.Context().Value("session").(*fest.SessionCookie)
+	s := r.Context().Value("session").(*fest.Session)
 
 	if !s.Logged {
 		return http.StatusBadRequest, fest.ErrNotLoggedIn
@@ -61,8 +61,8 @@ func DeactivatePost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int
 
 	link := &fest.Link{
 		Path:    "/settings/deactivate",
-		Hash:    fest.UniqueHash(s.User().Email),
-		User:    s.UserID,
+		Hash:    fest.UniqueHash(s.User.Email),
+		User:    s.User.ID,
 		Used:    false,
 		Time:    &now,
 		Expires: &expires,
@@ -74,7 +74,7 @@ func DeactivatePost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int
 	}
 
 	data := make(map[string]interface{})
-	data["Name"] = s.User().FirstName + " " + s.User().LastName
+	data["Name"] = s.User.FirstName + " " + s.User.LastName
 	data["Hash"] = link.Hash
 	data["Host"] = c.BaseAddress
 
@@ -84,7 +84,7 @@ func DeactivatePost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int
 		},
 		To: &mail.Address{
 			Name:    data["Name"].(string),
-			Address: s.User().Email,
+			Address: s.User.Email,
 		},
 		Subject: "Deactivate your account",
 	}

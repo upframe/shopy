@@ -22,7 +22,7 @@ type adminTable struct {
 
 // AdminGet ...
 func AdminGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	s := r.Context().Value("session").(*fest.SessionCookie)
+	s := r.Context().Value("session").(*fest.Session)
 	return Render(w, c, s, nil, "admin/home")
 }
 
@@ -33,14 +33,14 @@ func AdminRedirect(w http.ResponseWriter, r *http.Request, c *fest.Config) (int,
 
 // AdminNew ...
 func AdminNew(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	s := r.Context().Value("session").(*fest.SessionCookie)
+	s := r.Context().Value("session").(*fest.Session)
 	category := mux.Vars(r)["category"]
 	return Render(w, c, s, nil, "admin/"+category+"-new", "admin/"+category+"-form")
 }
 
 // AdminListing ...
 func AdminListing(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	s := r.Context().Value("session").(*fest.SessionCookie)
+	s := r.Context().Value("session").(*fest.Session)
 
 	category := mux.Vars(r)["category"]
 

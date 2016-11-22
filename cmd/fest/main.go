@@ -9,11 +9,13 @@ import (
 	"github.com/gorilla/securecookie"
 	"github.com/upframe/fest"
 	h "github.com/upframe/fest/http"
+	"github.com/upframe/fest/http/cookie"
 	"github.com/upframe/fest/mysql"
 	"github.com/upframe/fest/smtp"
 )
 
 func main() {
+
 	// Execute with all of the CPUs available
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
@@ -51,6 +53,10 @@ func main() {
 	email.TemplatesPath = conf.Assets + "templates/email/"
 	email.FromDefaultEmail = "noreply@upframe.xyz"
 
+	store := securecookie.New([]byte(conf.Key1), []byte(conf.Key2))
+
+	userService := &mysql.UserService{DB: db}
+
 	c := &fest.Config{
 		Domain:         conf.Domain,
 		Scheme:         conf.Scheme,
@@ -61,14 +67,19 @@ func main() {
 		BaseAddress:    conf.Scheme + "://" + conf.Domain,
 		Templates:      conf.Assets + "templates/",
 		PayPal:         paypal,
-		CookieStore:    securecookie.New([]byte(conf.Key1), []byte(conf.Key2)),
+		CookieStore:    store,
 		Services: &fest.Services{
-			User:      &mysql.UserService{DB: db},
+			User:      userService,
 			Link:      &mysql.LinkService{DB: db},
 			Product:   &mysql.ProductService{DB: db},
 			Promocode: &mysql.PromocodeService{DB: db},
 			Order:     &mysql.OrderService{DB: db},
 			Email:     email,
+			Session: &cookie.SessionService{
+				Store:       store,
+				Secure:      conf.Scheme == "https",
+				UserService: userService,
+			},
 		},
 	}
 

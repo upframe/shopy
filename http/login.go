@@ -9,7 +9,7 @@ import (
 
 // LoginGet ...
 func LoginGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	s := r.Context().Value("session").(*fest.SessionCookie)
+	s := r.Context().Value("session").(*fest.Session)
 
 	if s.Logged {
 		return Redirect(w, r, "/")
@@ -20,7 +20,7 @@ func LoginGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, erro
 
 // LoginPost ...
 func LoginPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	s := r.Context().Value("session").(*fest.SessionCookie)
+	s := r.Context().Value("session").(*fest.Session)
 
 	if s.Logged {
 		return http.StatusBadRequest, fest.ErrAlreadyLoggedIn
@@ -87,10 +87,10 @@ func LoginPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, err
 
 	// Sets the session cookie values
 	s.Logged = true
-	s.UserID = user.ID
+	s.User.ID = user.ID
 
 	// Saves the cookie and checks for errors
-	err = SetSessionCookie(w, c, s)
+	err = c.Services.Session.Save(w, s)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}

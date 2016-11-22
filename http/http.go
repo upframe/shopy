@@ -77,20 +77,9 @@ func Inject(h FestHandler, c *fest.Config) http.HandlerFunc {
 			w.Write([]byte(msg.Message))
 		}()
 
-		s, err := ReadSessionCookie(w, r, c)
+		s, err := c.Services.Session.Get(w, r)
 		if err != nil {
 			return
-		}
-
-		// Get the user info from the database and add it to the session data
-		if s.Logged {
-			var u *fest.User
-			u, err = c.Services.User.Get(s.UserID)
-			if err != nil {
-				return
-			}
-
-			s.SetUser(u)
 		}
 
 		r = r.WithContext(context.WithValue(r.Context(), "session", s))
@@ -101,7 +90,7 @@ func Inject(h FestHandler, c *fest.Config) http.HandlerFunc {
 // MustLogin ...
 func MustLogin(h FestHandler) FestHandler {
 	return func(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-		s := r.Context().Value("session").(*fest.SessionCookie)
+		s := r.Context().Value("session").(*fest.Session)
 
 		if s.Logged {
 			return h(w, r, c)
@@ -118,9 +107,9 @@ func MustLogin(h FestHandler) FestHandler {
 // MustAdmin ...
 func MustAdmin(h FestHandler) FestHandler {
 	return MustLogin(func(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-		s := r.Context().Value("session").(*fest.SessionCookie)
+		s := r.Context().Value("session").(*fest.Session)
 
-		if s.User().Admin {
+		if s.User.Admin {
 			return h(w, r, c)
 		}
 
@@ -153,7 +142,7 @@ type page struct {
 
 // Render renders an HTML response and send it to the client based on the
 // chosen templates
-func Render(w http.ResponseWriter, c *fest.Config, s *fest.SessionCookie, data interface{}, templates ...string) (int, error) {
+func Render(w http.ResponseWriter, c *fest.Config, s *fest.Session, data interface{}, templates ...string) (int, error) {
 	if strings.HasPrefix(templates[0], "admin/") {
 		templates = append(templates, "admin/base")
 	} else {
@@ -205,13 +194,13 @@ func Render(w http.ResponseWriter, c *fest.Config, s *fest.SessionCookie, data i
 
 	// Refresh user information
 	if p.IsLoggedIn {
-		p.Session.FirstName = s.User().FirstName
-		p.Session.LastName = s.User().LastName
-		p.Session.Email = s.User().Email
-		p.Session.Referral = s.User().Referral
-		p.Session.IsAdmin = s.User().Admin
-		p.Session.Credit = s.User().Credit
-		p.Session.Invites = s.User().Invites
+		p.Session.FirstName = s.User.FirstName
+		p.Session.LastName = s.User.LastName
+		p.Session.Email = s.User.Email
+		p.Session.Referral = s.User.Referral
+		p.Session.IsAdmin = s.User.Admin
+		p.Session.Credit = s.User.Credit
+		p.Session.Invites = s.User.Invites
 	}
 
 	buf := &bytes.Buffer{}
@@ -244,7 +233,7 @@ func displayCents(cents int) string {
 // StaticHandler ...
 func StaticHandler(templates ...string) FestHandler {
 	return func(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-		s := r.Context().Value("session").(*fest.SessionCookie)
+		s := r.Context().Value("session").(*fest.Session)
 
 		return Render(w, c, s, nil, templates...)
 	}

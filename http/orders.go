@@ -11,9 +11,9 @@ import (
 
 // OrdersGet ...
 func OrdersGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	s := r.Context().Value("session").(*fest.SessionCookie)
+	s := r.Context().Value("session").(*fest.Session)
 
-	data, err := c.Services.Order.GetsWhere(0, 0, "ID", "User.ID", strconv.Itoa(s.UserID))
+	data, err := c.Services.Order.GetsWhere(0, 0, "ID", "User.ID", strconv.Itoa(s.User.ID))
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -23,12 +23,12 @@ func OrdersGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, err
 
 // OrderCancel ...
 func OrderCancel(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
+	s := r.Context().Value("session").(*fest.Session)
+
 	cart, err := ReadCartCookie(w, r, c)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
-
-	session, err := ReadSessionCookie(w, r, c)
 
 	id, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
@@ -47,7 +47,7 @@ func OrderCancel(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, e
 		return http.StatusNotFound, nil
 	}
 
-	if order.User.ID == session.UserID {
+	if order.User.ID == s.User.ID {
 		order.Status = fest.OrderCanceled
 	} else {
 		return http.StatusForbidden, nil
@@ -76,6 +76,5 @@ func OrderCancel(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, e
 		return http.StatusInternalServerError, err
 	}
 
-	s := r.Context().Value("session").(*fest.SessionCookie)
-	return Render(w, c, s, s, "order-canceled")
+	return Render(w, c, s, nil, "order-canceled")
 }
