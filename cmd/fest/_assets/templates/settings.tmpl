@@ -5,7 +5,7 @@
 
     <div id="form-error"></div>
 
-    {{ with .Data.User }}
+    {{ with .Data }}
     <form id="settings">
         <input name="ID" id="ID" type="number" value="{{ .ID }}">
 
@@ -24,7 +24,5 @@
         <button type="submit">Update</button> <button id="deactivate">Deactivate my account</button>
     </form>
     {{ end }}
-
-
 </main>
 {{ end }}

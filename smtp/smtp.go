@@ -28,6 +28,24 @@ type EmailService struct {
 	SMTP             *Config
 }
 
+// InitSMTP configures the email variables
+func InitSMTP(user, pass, host, port string) *EmailService {
+	s := &EmailService{
+		SMTP: &Config{
+			Host:       host,
+			Port:       port,
+			ServerName: host + ":" + port,
+			Auth:       smtp.PlainAuth("", user, pass, host),
+			TLSConfig: &tls.Config{
+				InsecureSkipVerify: true,
+				ServerName:         host,
+			},
+		},
+	}
+
+	return s
+}
+
 // UseTemplate adds  the template to the email and renders it to the Body field
 func (s *EmailService) UseTemplate(e *fest.Email, data interface{}, name string) error {
 	// Opens the template file and checks if there is any error
@@ -132,22 +150,4 @@ func (s *EmailService) Send(e *fest.Email) error {
 
 	c.Quit()
 	return nil
-}
-
-// InitSMTP configures the email variables
-func InitSMTP(user, pass, host, port string) *EmailService {
-	s := &EmailService{
-		SMTP: &Config{
-			Host:       host,
-			Port:       port,
-			ServerName: host + ":" + port,
-			Auth:       smtp.PlainAuth("", user, pass, host),
-			TLSConfig: &tls.Config{
-				InsecureSkipVerify: true,
-				ServerName:         host,
-			},
-		},
-	}
-
-	return s
 }

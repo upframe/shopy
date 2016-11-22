@@ -55,7 +55,7 @@ func Inject(h FestHandler, c *fest.Config) http.HandlerFunc {
 			}
 
 			if code >= 400 && err != nil {
-				c.Logger.Print(err.Error())
+				c.Logger.Print(err)
 			}
 
 			if code != 0 {
@@ -65,8 +65,8 @@ func Inject(h FestHandler, c *fest.Config) http.HandlerFunc {
 			if strings.HasPrefix(r.URL.Path, "/api") || r.Method != http.MethodGet {
 				data, e := json.MarshalIndent(msg, "", "\t")
 				if e != nil {
-					// TODO I think this musst be removed
-					w.WriteHeader(http.StatusInternalServerError)
+					c.Logger.Print(e)
+					return
 				}
 
 				w.Write(data)

@@ -10,9 +10,7 @@ import (
 	"github.com/upframe/fest"
 )
 
-// TODO?
-
-const itemsPerPage = 10
+const itemsPerPage = 30
 
 type adminTable struct {
 	Items        interface{}

@@ -7,11 +7,6 @@ import (
 	"github.com/upframe/fest"
 )
 
-type settings struct {
-	User    *fest.User
-	BaseURL string
-}
-
 // SettingsGet ...
 func SettingsGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
 	s := r.Context().Value("session").(*fest.SessionCookie)
@@ -25,8 +20,5 @@ func SettingsGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, e
 		return http.StatusInternalServerError, err
 	}
 
-	return Render(w, c, s, settings{
-		User:    user,
-		BaseURL: c.BaseAddress,
-	}, "settings")
+	return Render(w, c, s, user, "settings")
 }
