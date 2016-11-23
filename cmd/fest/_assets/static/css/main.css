@@ -24,11 +24,15 @@ img {
     max-width: 100%;
 }
 
+h1 {
+    text-align: center;
+}
+
 body>main,
 body>nav>ul {
     width: 90%;
     max-width: 950px;
-    margin: 0 auto;
+    margin: 1em auto;
 }
 
 
@@ -142,8 +146,21 @@ input#ID {
 }
 
 #settings-page {
-    max-width: 500px;
+    max-width: 400px;
     word-wrap: break-word;
+}
+
+#settings-page .buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+#settings-page button {
+    margin: 0;
+}
+
+#settings-page #deactivate {
+    opacity: .5;
 }
 
 .shake {
