@@ -97,11 +97,11 @@ input#ID {
 }
 
 #form-error pre {
-     margin: 0;
+    margin: 0;
     display: inline;
     word-wrap: break-word;
     font-size: .8em;
-    background: rgba(0,0,0,0.1);
+    background: rgba(0, 0, 0, 0.1);
     padding: .15em;
 }
 
@@ -137,8 +137,8 @@ input#ID {
 }
 
 .notice-box {
-  max-width: 40em;
-  text-align: center;
+    max-width: 40em;
+    text-align: center;
 }
 
 #settings-page {
@@ -286,7 +286,7 @@ body>nav li>ul>li a {
 }
 
 body>nav>ul ul a:hover {
-    background-color: #121952;
+    background-color: #31eadc;
 }
 
 body>nav li>ul>li:first-child,
@@ -298,6 +298,7 @@ body>nav li>ul>li:nth-child(3) {
 body>nav li>ul>li:nth-child(2),
 body>nav li>ul>li:nth-child(3) {
     display: flex;
+    line-height: 1;
 }
 
 body>nav li>ul>li:first-child,

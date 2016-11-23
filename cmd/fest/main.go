@@ -86,7 +86,7 @@ func main() {
 	}
 
 	if f.Errors == "stdout" {
-		c.Logger = log.New(os.Stdout, "", log.Ldate|log.Ltime|log.Lshortfile)
+		c.Logger = log.New(os.Stdout, "", log.Ldate|log.Ltime)
 	} else {
 		var file *os.File
 		file, err = os.OpenFile(f.Errors, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
@@ -95,7 +95,7 @@ func main() {
 		}
 
 		defer file.Close()
-		c.Logger = log.New(file, "", log.Ldate|log.Ltime|log.Lshortfile)
+		c.Logger = log.New(file, "", log.Ldate|log.Ltime)
 	}
 
 	h.Serve(c)
