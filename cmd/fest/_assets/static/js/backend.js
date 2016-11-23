@@ -180,7 +180,7 @@ function deactivateHandler(event) {
         request.onreadystatechange = function() {
             if (request.readyState == 4) {
                 if (request.status == 200) {
-                    row.querySelector('td[data-name="Deactivated"] input[type="checkbox"]').checked = true;
+                    row.querySelector('td[data-field="Deactivated"] input[type="checkbox"]').checked = true;
                     row.classList.remove("highlight");
                     refreshButtons();
                 }
@@ -206,7 +206,7 @@ function activateHandler(event) {
         request.onreadystatechange = function() {
             if (request.readyState == 4) {
                 if (request.status == 200) {
-                    row.querySelector('td[data-name="Deactivated"] input[type="checkbox"]').checked = false;
+                    row.querySelector('td[data-field="Deactivated"] input[type="checkbox"]').checked = false;
                     row.classList.remove("highlight");
                     refreshButtons();
                 }
@@ -253,7 +253,7 @@ function copyFormToRow(row) {
         return;
     }
 
-    let inputs = form.querySelectorAll('input');
+    let inputs = form.querySelectorAll('input, select, textarea');
 
     Array.from(inputs).forEach((input) => {
         let name = input.name;
@@ -262,9 +262,14 @@ function copyFormToRow(row) {
             return;
         }
 
-        let space = row.querySelector('td[data-name="' + name + '"]');
+        let space = row.querySelector('td[data-field="' + name + '"]');
 
         if (typeof space == 'undefined' || space == null) {
+            return;
+        }
+
+        if (input.tagName === "SELECT") {
+            space.innerHTML = input.options[input.selectedIndex].text;
             return;
         }
 
@@ -310,9 +315,11 @@ function copyRowToForm(row) {
         return;
     }
 
-    for (var x = 0; x < row.childElementCount - 1; x++) {
-        let data = row.children[x].dataset.name,
-            input = form.querySelector("input[name=\"" + data + "\"]"),
+    let childs = row.querySelectorAll('[data-field]');
+
+    for (var x = 0; x < childs.length; x++) {
+        let data = childs[x].dataset.field,
+            input = form.querySelector("[name=\"" + data + "\"]"),
             barID = form.querySelector("#barID");
 
         if (data == undefined || input == undefined) {
@@ -320,18 +327,32 @@ function copyRowToForm(row) {
         }
 
         if (data == "ID") {
-            barID.innerHTML = row.children[x].innerHTML;
+            barID.innerHTML = childs[x].innerHTML;
         }
 
-        switch (input.type) {
-            case "datetime-local":
-                input.value = new Date(row.children[x].innerHTML).toISOString().substr(0, 16);
-                break;
-            case "checkbox":
-                input.checked = row.children[x].querySelector('input[type="checkbox"]').checked;
-                break;
-            default:
-                input.value = row.children[x].innerHTML;
+        if (input.tagName == "SELECT") {
+            let value = childs[x].dataset.value,
+                opts = input.options;
+
+            for (let opt, j = 0; opt = opts[j]; j++) {
+                if (opt.value == value) {
+                    input.selectedIndex = j;
+                    break;
+                }
+            }
+        }
+
+        if (input.tagName == "INPUT") {
+            switch (input.type) {
+                case "datetime-local":
+                    input.value = new Date(childs[x].innerHTML).toISOString().substr(0, 16);
+                    break;
+                case "checkbox":
+                    input.checked = childs[x].querySelector('input[type="checkbox"]').checked;
+                    break;
+                default:
+                    input.value = childs[x].innerHTML;
+            }
         }
     }
 }

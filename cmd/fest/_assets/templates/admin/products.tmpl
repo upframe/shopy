@@ -25,12 +25,12 @@
 
     {{range $product := .Data.Items }}
     <tr data-id="{{ $product.ID }}">
-        <td data-name="ID">{{ $product.ID }}</td>
-        <td data-name="Name">{{ $product.Name }}</td>
-        <td data-name="Description">{{ $product.Description }}</td>
-        <td data-name="Price">{{ $product.Price }}</td>
-        <td data-name="Picture">{{ $product.Picture }}</td>
-        <td data-name="Deactivated">
+        <td data-field="ID">{{ $product.ID }}</td>
+        <td data-field="Name">{{ $product.Name }}</td>
+        <td data-field="Description">{{ $product.Description }}</td>
+        <td data-field="Price">{{ $product.Price }}</td>
+        <td data-field="Picture">{{ $product.Picture }}</td>
+        <td data-field="Deactivated">
             <div class="checkbox">
                 <input type="checkbox" disabled value="second_checkbox" {{ if $product.Deactivated }}checked{{ end }}>
                 <label></label>

@@ -29,27 +29,27 @@
     </thead>
     {{range $user := .Data.Items }}
     <tr data-id="{{ $user.ID }}">
-        <td data-name="ID">{{ $user.ID }}</td>
-        <td data-name="FirstName">{{ $user.FirstName }}</td>
-        <td data-name="LastName">{{ $user.LastName }}</td>
-        <td data-name="Email">{{ $user.Email }}</td>
-        <td data-name="Address">{{ if $user.Address.Valid }}{{ $user.Address.String }}{{ else }}null{{ end }}</td>
-        <td data-name="Invites">{{ $user.Invites }}</td>
-        <td data-name="Credit">{{ $user.Credit }}</td>
-        <td data-name="Confirmed">
+        <td data-field="ID">{{ $user.ID }}</td>
+        <td data-field="FirstName">{{ $user.FirstName }}</td>
+        <td data-field="LastName">{{ $user.LastName }}</td>
+        <td data-field="Email">{{ $user.Email }}</td>
+        <td data-field="Address">{{ if $user.Address.Valid }}{{ $user.Address.String }}{{ else }}null{{ end }}</td>
+        <td data-field="Invites">{{ $user.Invites }}</td>
+        <td data-field="Credit">{{ $user.Credit }}</td>
+        <td data-field="Confirmed">
             <div class="checkbox">
                 <input type="checkbox" disabled value="second_checkbox" {{ if $user.Confirmed }}checked{{ end }}>
                 <label></label>
             </div>
         </td>
         <td>{{ if $user.Referrer.Valid }}{{ $user.Referrer.Int64 }}{{ else }}null{{ end }}</td> <!-- This is readyonly; at least for now. -->
-        <td data-name="Admin">
+        <td data-field="Admin">
             <div class="checkbox">
                 <input type="checkbox" disabled value="second_checkbox" {{ if $user.Admin }}checked{{ end }}>
                 <label></label>
             </div>
         </td>
-        <td data-name="Deactivated">
+        <td data-field="Deactivated">
             <div class="checkbox">
                 <input type="checkbox" disabled value="second_checkbox" {{ if $user.Deactivated }}checked{{ end }}>
                 <label></label>

@@ -34,8 +34,8 @@ func CheckoutConfirmGet(w http.ResponseWriter, r *http.Request, c *fest.Config) 
 		return http.StatusInternalServerError, err
 	}
 
-	order.Status = executeResult.State
-	err = c.Services.Order.Update(order, "Status")
+	order.PaymentStatus = paypalState(executeResult.State)
+	err = c.Services.Order.Update(order, "PaymentStatus")
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -48,6 +48,19 @@ func CheckoutConfirmGet(w http.ResponseWriter, r *http.Request, c *fest.Config) 
 
 	// TODO: send email with the invoice
 	return Redirect(w, r, "/orders")
+}
+
+func paypalState(state string) int16 {
+	switch state {
+	case "created":
+		return fest.OrderPaymentWaiting
+	case "approved":
+		return fest.OrderPaymentDone
+	case "failed":
+		return fest.OrderPaymentFailed
+	}
+
+	return 0
 }
 
 // CheckoutGet ...
@@ -99,10 +112,10 @@ func CheckoutPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, 
 	}
 
 	order := &fest.Order{
-		User:     &fest.User{ID: s.User.ID},
-		Status:   fest.OrderWaitingPayment,
-		Products: []*fest.OrderProduct{},
-		Value:    cart.GetTotal(),
+		User:          &fest.User{ID: s.User.ID},
+		PaymentStatus: fest.OrderPaymentWaiting,
+		Products:      []*fest.OrderProduct{},
+		Value:         cart.GetTotal(),
 	}
 
 	for _, product := range cart.Products {

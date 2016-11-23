@@ -87,7 +87,7 @@ func LoginPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, err
 
 	// Sets the session cookie values
 	s.Logged = true
-	s.User.ID = user.ID
+	s.User = user
 
 	// Saves the cookie and checks for errors
 	err = c.Services.Session.Save(w, s)

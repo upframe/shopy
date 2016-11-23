@@ -25,23 +25,23 @@
     </thead>
     {{range $promocode := .Data.Items }}
     <tr data-id="{{ $promocode.ID }}">
-        <td data-name="ID">{{ $promocode.ID }}</td>
-        <td data-name="Code">{{ $promocode.Code }}</td>
-        <td data-name="Percentage">
+        <td data-field="ID">{{ $promocode.ID }}</td>
+        <td data-field="Code">{{ $promocode.Code }}</td>
+        <td data-field="Percentage">
             <div class="checkbox">
                 <input type="checkbox" disabled value="second_checkbox" {{ if $promocode.Percentage }}checked{{ end }}>
                 <label></label>
             </div>
         </td>
-        <td data-name="Discount">{{ $promocode.Discount }}</td>
-        <td data-name="Expires">{{ $promocode.Expires.Format "02 Jan 06 15:04 MST" }}</td>
-        <td data-name="Deactivated">
+        <td data-field="Discount">{{ $promocode.Discount }}</td>
+        <td data-field="Expires">{{ $promocode.Expires.Format "02 Jan 06 15:04 MST" }}</td>
+        <td data-field="Deactivated">
             <div class="checkbox">
                 <input type="checkbox" disabled value="second_checkbox" {{ if $promocode.Deactivated }}checked{{ end }}>
                 <label></label>
             </div>
         </td>
-        <td data-name="Usage">{{ $promocode.Usage }}</td>
+        <td data-field="Usage">{{ $promocode.Usage }}</td>
         <td><button class="edit"><i class="material-icons">mode_edit</i></button></td>
     </tr>
     {{ end }}

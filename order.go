@@ -1,23 +1,61 @@
 package fest
 
 const (
-	OrderWaitingPayment = "pending"
-	OrderApproved       = "approved"
-	OrderCreated        = "created"
-	OrderFailed         = "failed"
-	OrderCanceled       = "canceled"
+	// OrderCanceled represents the order canceled status.
+	OrderCanceled = -1
+	// OrderPaymentWaiting represents an waiting payment status.
+	OrderPaymentWaiting = 0
+	// OrderPaymentDone represents the payment done status.
+	OrderPaymentDone = 1
+	// OrderPaymentFailed represents the failed payment status.
+	OrderPaymentFailed = 2
+	// OrderUnfulfilled represents a unfulfilled order.
+	OrderUnfulfilled = 0
+	// OrderFulfilled represents a fulfilled order.
+	OrderFulfilled = 1
 )
 
 // Order ...
 type Order struct {
-	ID        int
-	PayPal    string
-	Value     int
-	Status    string
-	Credits   int
-	User      *User
-	Promocode *Promocode
-	Products  []*OrderProduct
+	ID                int
+	PayPal            string
+	Value             int
+	PaymentStatus     int16
+	FulfillmentStatus int16
+	Credits           int
+	User              *User
+	Promocode         *Promocode
+	Products          []*OrderProduct
+}
+
+// PaymentStatusText returns the text corresponding to the status variable.
+func (o *Order) PaymentStatusText() string {
+	switch o.PaymentStatus {
+	case OrderPaymentWaiting:
+		return "Waiting"
+	case OrderPaymentDone:
+		return "Done"
+	case OrderPaymentFailed:
+		return "Failed"
+	case OrderCanceled:
+		return "Canceled"
+	}
+
+	return "Unknown"
+}
+
+// FulfillmentStatusText returns the text corresponding to the status variable.
+func (o *Order) FulfillmentStatusText() string {
+	switch o.FulfillmentStatus {
+	case OrderFulfilled:
+		return "Fulfilled"
+	case OrderUnfulfilled:
+		return "Unfulfilled"
+	case OrderCanceled:
+		return "Canceled"
+	}
+
+	return "Unknown"
 }
 
 // OrderProduct ...

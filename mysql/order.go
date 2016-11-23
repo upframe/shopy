@@ -19,7 +19,8 @@ var ordersMap = map[string]string{
 	"User.ID":               "o.user_id",
 	"PayPal":                "o.paypal",
 	"Value":                 "o.value",
-	"Status":                "o.status",
+	"PaymentStatus":         "o.payment_status",
+	"FulfillmentStatus":     "o.fulfillment_status",
 	"Credits":               "o.credits",
 	"Promocode.ID":          "p.id",
 	"Promocode.Code":        "p.code",
@@ -67,7 +68,8 @@ var orderBaseSelectQuery = "SELECT " +
 	"o.user_id AS `order_user`," +
 	"o.paypal AS `order_paypal`," +
 	"o.value AS `order_value`," +
-	"o.status AS `order_status`," +
+	"o.payment_status AS `order_payment_status`," +
+	"o.fulfillment_status AS `order_fulfillment_status`," +
 	"o.credits AS `order_credits`," +
 	"pc.id AS `promocode_id`," +
 	"pc.code AS `promocode_code`," +
@@ -125,8 +127,8 @@ func (s *OrderService) GetsWhere(first, limit int, order, where, sth string) ([]
 		)
 
 		err = rows.Scan(
-			&order.ID, &order.User.ID, &order.PayPal, &order.Value, &order.Status, &order.Credits,
-			&id, &code, &expires, &discount, &percentage, &deactivated)
+			&order.ID, &order.User.ID, &order.PayPal, &order.Value, &order.PaymentStatus,
+			&order.FulfillmentStatus, &order.Credits, &id, &code, &expires, &discount, &percentage, &deactivated)
 		if err != nil {
 			return orders, err
 		}
@@ -184,19 +186,21 @@ func (s *OrderService) Create(o *fest.Order) error {
 
 	if o.Promocode == nil {
 		res, err = s.DB.Exec(
-			"INSERT INTO orders (`user_id`, `value`, `status`, `paypal`) VALUES (?, ?, ?, ?)",
+			"INSERT INTO orders (`user_id`, `value`, `payment_status`, `fulfillment_status`, `paypal`) VALUES (?, ?, ?, ?, ?)",
 			o.User.ID,
 			o.Value,
-			o.Status,
+			o.PaymentStatus,
+			o.FulfillmentStatus,
 			o.PayPal,
 		)
 	} else {
 		res, err = s.DB.Exec(
-			"INSERT INTO orders (`user_id`, `promocode_id`, `value`, `status`, `paypal`) VALUES (?, ?, ?, ?, ?)",
+			"INSERT INTO orders (`user_id`, `promocode_id`, `value`, `payment_status`, `fulfillment_status`, `paypal`) VALUES (?, ?, ?, ?, ?, ?)",
 			o.User.ID,
 			o.Promocode.ID,
 			o.Value,
-			o.Status,
+			o.PaymentStatus,
+			o.FulfillmentStatus,
 			o.PayPal,
 		)
 	}
@@ -229,35 +233,38 @@ func (s *OrderService) Create(o *fest.Order) error {
 }
 
 var ordersUpdateMap = map[string]string{
-	"ID":        "id",
-	"User":      "user_id",
-	"PayPal":    "paypal",
-	"Value":     "value",
-	"Status":    "status",
-	"Credits":   "credits",
-	"Promocode": "promocode_id",
+	"ID":                "id",
+	"User":              "user_id",
+	"PayPal":            "paypal",
+	"Value":             "value",
+	"PaymentStatus":     "payment_status",
+	"FulfillmentStatus": "fulfillment_status",
+	"Credits":           "credits",
+	"Promocode":         "promocode_id",
 }
 
 type updateOrder struct {
-	ID          int           `db:"id"`
-	UserID      int           `db:"user_id"`
-	PromocodeID sql.NullInt64 `db:"promocode_id"`
-	PayPal      string        `db:"paypal"`
-	Status      string        `db:"status"`
-	Value       int           `db:"value"`
-	Credits     int           `db:"credits"`
+	ID                int           `db:"id"`
+	UserID            int           `db:"user_id"`
+	PromocodeID       sql.NullInt64 `db:"promocode_id"`
+	PayPal            string        `db:"paypal"`
+	PaymentStatus     int16         `db:"payment_status"`
+	FulfillmentStatus int16         `db:"fulfillment_status"`
+	Value             int           `db:"value"`
+	Credits           int           `db:"credits"`
 }
 
 // Update ...
 func (s *OrderService) Update(o *fest.Order, fields ...string) error {
 	obj := &updateOrder{
-		ID:          o.ID,
-		UserID:      0,
-		PromocodeID: sql.NullInt64{Valid: false},
-		PayPal:      o.PayPal,
-		Status:      o.Status,
-		Value:       o.Value,
-		Credits:     o.Credits,
+		ID:                o.ID,
+		UserID:            0,
+		PromocodeID:       sql.NullInt64{Valid: false},
+		PayPal:            o.PayPal,
+		PaymentStatus:     o.PaymentStatus,
+		FulfillmentStatus: o.FulfillmentStatus,
+		Value:             o.Value,
+		Credits:           o.Credits,
 	}
 
 	if o.User != nil {
@@ -283,6 +290,7 @@ func (s *OrderService) Delete(id int) error {
 		return err
 	}
 
-	o.Status = fest.OrderCanceled
+	o.PaymentStatus = fest.OrderCanceled
+	o.FulfillmentStatus = fest.OrderCanceled
 	return s.Update(o, "Status")
 }

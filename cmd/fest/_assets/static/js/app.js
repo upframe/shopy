@@ -5,6 +5,9 @@ if (document.querySelector("main.covered")) {
     document.querySelector("body").classList.add("covered");
 }
 
+// TODO: add requests here
+var Requests = {};
+
 document.addEventListener("DOMContentLoaded", () => {
     let thing;
 

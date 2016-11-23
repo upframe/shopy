@@ -16,8 +16,20 @@
     <label for="Value">Value</label>
     <input name="Value" id="Value" required type="number" value="">
 
-    <label for="Status">Status</label>
-    <input name="Status" id="Status" required type="text" value="">
+    <label for="PaymentStatus">Payment Status</label>
+    <select data-type="number" name="PaymentStatus" id="PaymentStatus" required>
+        <option value="-1">Canceled</option>
+        <option value="0">Waiting</option>
+        <option value="1">Done</option>
+        <option value="2">Failed</option>
+    </select>
+
+    <label for="FulfillmentStatus">Fulfillment Status</label>
+    <select data-type="number" name="FulfillmentStatus" id="FulfillmentStatus" required>
+        <option value="-1">Canceled</option>
+        <option value="0">Unfulfilled</option>
+        <option value="1">Fulfilled</option>
+    </select>
 
     <button type="submit">Save</button>
 </div>

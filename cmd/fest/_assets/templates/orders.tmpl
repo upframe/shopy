@@ -4,21 +4,23 @@
         <table id="orders">
             <tr>
                 <th>ID</th>
-                <th>Promocode</th>
-                <th>Status</th>
                 <th>Products</th>
+                <th>Payment Status</th>
+                <th>Fulfillment Status</th>
+                <th>Promocode</th>
                 <th>Total</th>
             </tr>
             {{ range $order := .Data }}
             <tr>
                 <td>{{ $order.ID }}</td>
-                <td>{{ if $order.Promocode }}{{ $order.Promocode.Code }} (-{{ if $order.Promocode.Percentage}}{{ $order.Promocode.Discount}}%{{ else }}{{ DisplayCents $order.Promocode.Discount }}€{{ end }}){{ else }}--{{ end }}</td>
-                <td style="text-transform: capitalize;">{{ $order.Status }}</td>
                 <td id="order-products">
                     {{ range $product := $order.Products }}
                         {{ $product.Quantity }}x {{ $product.Name }}<br>
                     {{ end }}
                 </td>
+                <td>{{ $order.PaymentStatusText }}</td>
+                <td>{{ $order.FulfillmentStatusText }}</td>
+                <td>{{ if $order.Promocode }}{{ $order.Promocode.Code }} (-{{ if $order.Promocode.Percentage}}{{ $order.Promocode.Discount}}%{{ else }}{{ DisplayCents $order.Promocode.Discount }}€{{ end }}){{ else }}--{{ end }}</td>
                 <td>{{ DisplayCents $order.Value }}€</td>
             </tr>
             {{ end }}

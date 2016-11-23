@@ -31,7 +31,7 @@ function copyFormToObject(form) {
     let object = new Object();
     object.ID = 0;
 
-    let inputs = form.querySelectorAll('input, textarea');
+    let inputs = form.querySelectorAll('input, textarea, select');
 
     Array.from(inputs).forEach((input) => {
         let name = input.name;
@@ -66,6 +66,14 @@ function copyFormToObject(form) {
 }
 
 function inputToValue(input) {
+    if (input.tagName === "SELECT") {
+        if (input.dataset.type == "number") {
+            return parseInt(input.options[input.selectedIndex].value);
+        }
+
+        return input.options[input.selectedIndex].value;
+    }
+
     switch (input.type) {
         case "number":
             if (input.value == "") {

@@ -43,17 +43,19 @@ func OrderCancel(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, e
 		return http.StatusInternalServerError, err
 	}
 
-	if order.Status != fest.OrderWaitingPayment {
+	if order.PaymentStatus != fest.OrderPaymentWaiting {
+		// TODO: show invalid page instead
 		return http.StatusNotFound, nil
 	}
 
-	if order.User.ID == s.User.ID {
-		order.Status = fest.OrderCanceled
-	} else {
+	if order.User.ID != s.User.ID {
 		return http.StatusForbidden, nil
 	}
 
-	err = c.Services.Order.Update(order, "Status")
+	order.PaymentStatus = fest.OrderCanceled
+	order.FulfillmentStatus = fest.OrderCanceled
+
+	err = c.Services.Order.Update(order, "PaymentStatus", "FulfillmentStatus")
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
