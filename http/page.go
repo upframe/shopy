@@ -8,7 +8,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"path/filepath"
-	"strconv"
 	"strings"
 
 	"github.com/upframe/fest"
@@ -48,7 +47,7 @@ func Render(w http.ResponseWriter, c *fest.Config, s *fest.Session, data interfa
 			hasher.Write([]byte(s))
 			return hex.EncodeToString(hasher.Sum(nil))
 		},
-		"DisplayCents": displayCents,
+		"DisplayCents": fest.DisplayCents,
 	}
 
 	// For each template, add it to the the tpl variable
@@ -104,19 +103,4 @@ func Render(w http.ResponseWriter, c *fest.Config, s *fest.Session, data interfa
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	_, err = buf.WriteTo(w)
 	return 0, nil
-}
-
-func displayCents(cents int) string {
-	price := strconv.Itoa(cents)
-
-	if len(price) == 1 {
-		price = "0.0" + price
-	} else if len(price) == 2 {
-		price = "0." + price
-	} else {
-		cents := price[len(price)-2:]
-		price = price[0:len(price)-2] + "." + cents
-	}
-
-	return price
 }

@@ -8,8 +8,8 @@ import (
 	"github.com/upframe/fest"
 )
 
-// TODO: definately move this function to CMD
 // Serve ...
+// TODO: definately move this function to CMD
 func Serve(c *fest.Config) {
 	r := mux.NewRouter()
 

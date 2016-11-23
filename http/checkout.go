@@ -172,7 +172,7 @@ func CheckoutPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, 
 	}
 
 	amount := paypalsdk.Amount{
-		Total:    displayCents(order.Value),
+		Total:    fest.DisplayCents(order.Value),
 		Currency: "EUR",
 	}
 

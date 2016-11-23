@@ -15,57 +15,51 @@ import (
 )
 
 func main() {
-
 	// Execute with all of the CPUs available
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	path := "config.json"
-	if len(os.Args) > 1 {
-		path = os.Args[1]
-	}
-
-	conf, err := configFile(path)
+	f, err := configFile("config.json")
 	if err != nil {
 		panic(err)
 	}
 
 	// Connects to the database and checks for an error
 	db, err := mysql.InitDB(
-		conf.Database.User,
-		conf.Database.Password,
-		conf.Database.Host,
-		conf.Database.Port,
-		conf.Database.Name,
+		f.Database.User,
+		f.Database.Password,
+		f.Database.Host,
+		f.Database.Port,
+		f.Database.Name,
 	)
 
 	if err != nil {
 		panic(err)
 	}
 
-	// Configures PayPal
-	paypal, err := fest.InitPayPal(conf.PayPal.Client, conf.PayPal.Secret, conf.Development)
+	// figures PayPal
+	paypal, err := fest.InitPayPal(f.PayPal.Client, f.PayPal.Secret, f.Development)
 
 	if err != nil {
 		panic(err)
 	}
 
-	email := smtp.InitSMTP(conf.SMTP.User, conf.SMTP.Password, conf.SMTP.Host, conf.SMTP.Port)
-	email.TemplatesPath = conf.Assets + "templates/email/"
+	email := smtp.InitSMTP(f.SMTP.User, f.SMTP.Password, f.SMTP.Host, f.SMTP.Port)
+	email.TemplatesPath = f.Assets + "templates/email/"
 	email.FromDefaultEmail = "noreply@upframe.xyz"
 
-	store := securecookie.New([]byte(conf.Key1), []byte(conf.Key2))
+	store := securecookie.New([]byte(f.Key1), []byte(f.Key2))
 
 	userService := &mysql.UserService{DB: db}
 
 	c := &fest.Config{
-		Domain:         conf.Domain,
-		Scheme:         conf.Scheme,
-		Port:           strconv.Itoa(conf.Port),
-		Assets:         conf.Assets,
-		InviteOnly:     conf.InviteOnly,
-		DefaultInvites: conf.DefaultInvites,
-		BaseAddress:    conf.Scheme + "://" + conf.Domain,
-		Templates:      conf.Assets + "templates/",
+		Domain:         f.Domain,
+		Scheme:         f.Scheme,
+		Port:           strconv.Itoa(f.Port),
+		Assets:         f.Assets,
+		InviteOnly:     f.InviteOnly,
+		DefaultInvites: f.DefaultInvites,
+		BaseAddress:    f.Scheme + "://" + f.Domain,
+		Templates:      f.Assets + "templates/",
 		PayPal:         paypal,
 		CookieStore:    store,
 		Services: &fest.Services{
@@ -77,25 +71,25 @@ func main() {
 			Email:     email,
 			Session: &cookie.SessionService{
 				Store:       store,
-				Secure:      conf.Scheme == "https",
+				Secure:      f.Scheme == "https",
 				UserService: userService,
 			},
 			Cart: &cookie.CartService{
 				Store:  store,
-				Secure: conf.Scheme == "https",
+				Secure: f.Scheme == "https",
 			},
 		},
 	}
 
-	if conf.Errors == "" {
-		conf.Errors = "stdout"
+	if f.Errors == "" {
+		f.Errors = "stdout"
 	}
 
-	if conf.Errors == "stdout" {
+	if f.Errors == "stdout" {
 		c.Logger = log.New(os.Stdout, "", log.Ldate|log.Ltime|log.Lshortfile)
 	} else {
 		var file *os.File
-		file, err = os.OpenFile(conf.Errors, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
+		file, err = os.OpenFile(f.Errors, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 		if err != nil {
 			panic(err)
 		}
