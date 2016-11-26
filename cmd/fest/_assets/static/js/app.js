@@ -79,6 +79,11 @@ function copyReferral(event) {
 function validateCoupon(e) {
     let el = document.getElementById("promocode");
 
+    if (el.classList == "works") {
+      e.preventDefault();
+      return;
+    }
+
     if (this.value == "") {
         el.classList.remove("error");
         el.classList.remove("works");
@@ -92,15 +97,15 @@ function validateCoupon(e) {
         if (request.readyState == 4) {
             switch (request.status) {
                 case 200:
-                    useCoupon(request.responseText);
-                    el.classList.add("works");
-                    el.classList.remove("error");
-                    el.setAttribute("readonly", true);
-                    break;
+                  useCoupon(request.responseText);
+                  el.classList.add("works");
+                  el.classList.remove("error");
+                  el.setAttribute("readonly", true);
+                  break;
                 case 404:
-                    el.classList.remove("works");
-                    el.classList.add("error");
-                    break;
+                  el.classList.remove("works");
+                  el.classList.add("error");
+                  break;
             }
         }
     }
@@ -110,8 +115,7 @@ function useCoupon(response) {
     var ob = JSON.parse(response),
         total = document.getElementById("total"),
         subtotal = document.getElementById("subtotal"),
-        promocode = document.getElementById("promocode-value"),
-        credits = document.getElementById("credits");
+        promocode = document.getElementById("promocode-value");
 
     let base = subtotal.innerHTML * 100;
     let discount = 0;
@@ -122,19 +126,17 @@ function useCoupon(response) {
         discount = ob.Discount;
     }
 
-    total.innerHTML = ((base - discount - credits.innerHTML) / 100).toFixed(2);
+    promocode.innerHTML = " " + parseInt(discount / 100).toFixed(2);
+    total.innerHTML = parseInt((base - discount - credits.innerHTML) / 100).toFixed(2);
 }
 
 function validateCredits(e) {
-    let input = this;
-    if (input.value > input.max) {
-        input.value = input.max;
-    }
-
-    let credits = document.getElementById("credits"),
+    let subtotal = document.getElementById("subtotal"),
+        promocode = document.getElementById("promocode-value"),
+        credits = document.getElementById("credits"),
         total = document.getElementById("total");
-    credits.innerHTML = (input.value).toFixed(2);
-    total.innerHTML = (total.innerHTML - input.value).toFixed(2);
+    credits.innerHTML = " " + parseInt(this.value).toFixed(2);
+    total.innerHTML = " " + parseInt(subtotal.innerHTML - promocode.innerHTML - this.value).toFixed(2);
 }
 
 function initializeStore() {
