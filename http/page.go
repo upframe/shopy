@@ -5,7 +5,6 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"html/template"
-	"io/ioutil"
 	"net/http"
 	"path/filepath"
 	"strings"
@@ -39,8 +38,6 @@ func Render(w http.ResponseWriter, c *fest.Config, s *fest.Session, data interfa
 		templates = append(templates, "base")
 	}
 
-	var tpl *template.Template
-
 	funcs := template.FuncMap{
 		"MD5": func(s string) string {
 			hasher := md5.New()
@@ -50,29 +47,14 @@ func Render(w http.ResponseWriter, c *fest.Config, s *fest.Session, data interfa
 		"DisplayCents": fest.DisplayCents,
 	}
 
-	// For each template, add it to the the tpl variable
 	for i := range templates {
-		// Get the template from the assets
-		page, err := ioutil.ReadFile(filepath.Clean(c.Templates + templates[i] + ".tmpl"))
+		templates[i] = filepath.Clean(c.Templates + templates[i] + ".tmpl")
+	}
 
-		// Check if there is some error. If so, the template doesn't exist
-		if err != nil {
-			c.Logger.Print(err)
-			return http.StatusInternalServerError, err
-		}
-
-		// If it's the first iteration, creates a new template and add the
-		// functions map
-		if i == 0 {
-			tpl, err = template.New(templates[i]).Funcs(funcs).Parse(string(page))
-		} else {
-			tpl, err = tpl.Parse(string(page))
-		}
-
-		if err != nil {
-			c.Logger.Print(err)
-			return http.StatusInternalServerError, err
-		}
+	tpl, err := template.New("main").Funcs(funcs).ParseFiles(templates...)
+	if err != nil {
+		c.Logger.Print(err)
+		return http.StatusInternalServerError, err
 	}
 
 	p := &page{
@@ -94,7 +76,7 @@ func Render(w http.ResponseWriter, c *fest.Config, s *fest.Session, data interfa
 	}
 
 	buf := &bytes.Buffer{}
-	err := tpl.Execute(buf, p)
+	err = tpl.ExecuteTemplate(buf, "base.tmpl", p)
 
 	if err != nil {
 		return http.StatusInternalServerError, err
