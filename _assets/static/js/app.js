@@ -91,7 +91,7 @@ function validateCoupon(e) {
     }
 
     let request = new XMLHttpRequest();
-    request.open("GET", "/api/promocodes/" + this.value + "?code=true", true);
+    request.open("GET", `/api/promocodes/${this.value}?code=true`, true);
     request.send();
     request.onreadystatechange = function() {
         if (request.readyState == 4) {
