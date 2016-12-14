@@ -13,4 +13,4 @@ Certify yourself that the variable `GOPATH` is set and that `$GOPATH/bin` is in 
 
 To build a final version, execute:
 
-+ `go build -a -ldflags '-s' github.com/mholt/caddy/caddy -o caddy`
++ `go build github.com/upframe/whosthere -o whosthere`
