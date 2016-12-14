@@ -61,13 +61,15 @@ func Inject(h FestHandler, c *fest.Config) http.HandlerFunc {
 				w.WriteHeader(code)
 			}
 
-			if strings.HasPrefix(r.URL.Path, "/api") || r.Method != http.MethodGet {
+			accept := strings.ToLower(r.Header.Get("Accept"))
+			if strings.HasPrefix(r.URL.Path, "/api") || strings.Contains(accept, "application/json") {
 				data, e := json.MarshalIndent(msg, "", "\t")
 				if e != nil {
 					c.Logger.Print(e)
 					return
 				}
 
+				w.Header().Set("Content-Type", "application/json")
 				w.Write(data)
 				return
 			}

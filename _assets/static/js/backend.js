@@ -177,6 +177,7 @@ function deactivateHandler(event) {
         let request = new XMLHttpRequest();
 
         request.open("DELETE", link);
+        request.setRequestHeader("Accept", "application/json");
         request.onreadystatechange = function() {
             if (request.readyState == 4) {
                 if (request.status == 200) {
@@ -202,6 +203,7 @@ function activateHandler(event) {
 
         let request = new XMLHttpRequest();
         request.open("PATCH", link);
+        request.setRequestHeader("Accept", "application/json");
         request.send('{"Deactivated":true}');
         request.onreadystatechange = function() {
             if (request.readyState == 4) {
@@ -228,6 +230,7 @@ function submitHandler(event) {
 
     let request = new XMLHttpRequest();
     request.open(method, link);
+    request.setRequestHeader("Accept", "application/json");
     request.send(JSON.stringify(data));
     request.onreadystatechange = function() {
         if (request.readyState == 4) {

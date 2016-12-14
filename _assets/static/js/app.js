@@ -80,8 +80,8 @@ function validateCoupon(e) {
     let el = document.getElementById("promocode");
 
     if (el.classList == "works") {
-      e.preventDefault();
-      return;
+        e.preventDefault();
+        return;
     }
 
     if (this.value == "") {
@@ -91,21 +91,22 @@ function validateCoupon(e) {
     }
 
     let request = new XMLHttpRequest();
+    request.setRequestHeader("Accept", "application/json");
     request.open("GET", `/api/promocodes/${this.value}?code=true`, true);
     request.send();
     request.onreadystatechange = function() {
         if (request.readyState == 4) {
             switch (request.status) {
                 case 200:
-                  useCoupon(request.responseText);
-                  el.classList.add("works");
-                  el.classList.remove("error");
-                  el.setAttribute("readonly", true);
-                  break;
+                    useCoupon(request.responseText);
+                    el.classList.add("works");
+                    el.classList.remove("error");
+                    el.setAttribute("readonly", true);
+                    break;
                 case 404:
-                  el.classList.remove("works");
-                  el.classList.add("error");
-                  break;
+                    el.classList.remove("works");
+                    el.classList.add("error");
+                    break;
             }
         }
     }
@@ -170,6 +171,7 @@ function initializeCart() {
 
 function cartRequest(method, link, data, itemID) {
     let request = new XMLHttpRequest();
+    request.setRequestHeader("Accept", "application/json");
     request.open(method, link, true);
     request.send(data);
     request.onreadystatechange = function() {
@@ -197,28 +199,29 @@ function cartRequest(method, link, data, itemID) {
 }
 
 var checkoutMessages = {
-  400: "Check your credits input value or refresh the page.",
-  404: "That promocode isn't available right now.",
-  'default': "Something went wrong but we're trying to fix it now."
+    400: "Check your credits input value or refresh the page.",
+    404: "That promocode isn't available right now.",
+    'default': "Something went wrong but we're trying to fix it now."
 }
 
 function submitCheckout(event) {
-  event.preventDefault();
+    event.preventDefault();
 
-  let request = new XMLHttpRequest(),
-    form = document.querySelector("form#checkout");
-  request.open("POST", window.location, true);
-  request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-  request.send(form.serialize());
-  request.onreadystatechange = function() {
-    if (request.readyState == 4) {
-      if (request.status == 200) {
-          window.location = JSON.parse(request.responseText).Link;
-          return;
-      }
-      printMessage(request.status, request.responseText, checkoutMessages);
+    let request = new XMLHttpRequest(),
+        form = document.querySelector("form#checkout");
+    request.setRequestHeader("Accept", "application/json");
+    request.open("POST", window.location, true);
+    request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    request.send(form.serialize());
+    request.onreadystatechange = function() {
+        if (request.readyState == 4) {
+            if (request.status == 200) {
+                window.location = JSON.parse(request.responseText).Link;
+                return;
+            }
+            printMessage(request.status, request.responseText, checkoutMessages);
+        }
     }
-  }
 }
 
 function deactivateAccount(event) {
@@ -250,6 +253,7 @@ function submitSettings(event) {
     var request = new XMLHttpRequest();
     request.open("PATCH", "/api/users/current", true);
     request.setRequestHeader("Content-type", "application/json; charset=utf-8");
+    request.setRequestHeader("Accept", "application/json");
     request.send(JSON.stringify(copyFormToObject(this)));
     request.onreadystatechange = function() {
         if (request.readyState == 4) {
@@ -305,6 +309,7 @@ function registerHandler(event) {
 
     request.open("POST", window.location, true);
     request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    request.setRequestHeader("Accept", "application/json");
     request.send(form.serialize());
     request.onreadystatechange = function() {
         if (request.readyState == 4) {
@@ -333,15 +338,16 @@ function loginHandler(event) {
     form.password = hash.getHash("HEX");
 
     request.open("POST", window.location, true);
+    request.setRequestHeader("Accept", "application/json");
     request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     request.send(form.serialize());
     request.onreadystatechange = function() {
         if (request.readyState == 4) {
             if (request.status == 200) {
                 if (getURLVariables("redirect") != false) {
-                  window.location = getURLVariables("redirect");
+                    window.location = getURLVariables("redirect");
                 } else {
-                  window.location = "/";
+                    window.location = "/";
                 }
                 return;
             }
@@ -363,6 +369,7 @@ function resetEmailForm(event) {
         request = new XMLHttpRequest();
 
     request.open("POST", window.location, true);
+    request.setRequestHeader("Accept", "application/json");
     request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     request.send(form.serialize());
     request.onreadystatechange = function() {
@@ -387,6 +394,7 @@ function resetForm(event) {
     form.password = hash.getHash("HEX");
 
     request.open("POST", window.location, true);
+    request.setRequestHeader("Accept", "application/json");
     request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     request.send(form.serialize());
     request.onreadystatechange = function() {
@@ -419,6 +427,7 @@ function resendConfirmation() {
     request.open("POST", window.location, true);
     request.setRequestHeader("Resend", "true");
     request.setRequestHeader("Email", email.value);
+    request.setRequestHeader("Accept", "application/json");
     request.send();
     request.onreadystatechange = function() {
         if (request.readyState == 4) {
@@ -449,12 +458,12 @@ function checkRegisterFields(form) {
 }
 
 function getURLVariables(variable) {
-  let query = window.location.search.substring(1),
-    vars = query.split("&");
+    let query = window.location.search.substring(1),
+        vars = query.split("&");
 
-  for (var i = 0; i < vars.length; i++) {
-    let pair = vars[i].split("=");
-    if(pair[0] == variable){return pair[1];}
-  }
-  return false;
+    for (var i = 0; i < vars.length; i++) {
+        let pair = vars[i].split("=");
+        if (pair[0] == variable) { return pair[1]; }
+    }
+    return false;
 }
