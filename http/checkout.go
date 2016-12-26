@@ -156,13 +156,13 @@ func CheckoutPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, 
 			return http.StatusInternalServerError, err
 		}
 
-		if time.Now().Unix() > order.Promocode.Expires.Unix() || order.Promocode.Usage == 0 {
+		if time.Now().Unix() > order.Promocode.Expires.Unix() || order.Promocode.Used == order.Promocode.MaxUsage {
 			return http.StatusGone, nil
 		}
 
-		if order.Promocode.Usage > 0 {
-			order.Promocode.Usage--
-			err = c.Services.Promocode.Update(order.Promocode, "Usage")
+		if order.Promocode.Used < order.Promocode.MaxUsage {
+			order.Promocode.Used++
+			err = c.Services.Promocode.Update(order.Promocode, "Used")
 			if err != nil {
 				return http.StatusInternalServerError, err
 			}

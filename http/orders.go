@@ -61,10 +61,10 @@ func OrderCancel(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, e
 	}
 
 	if order.Promocode != nil {
-		if order.Promocode.Usage != -1 {
-			order.Promocode.Usage++
+		if order.Promocode.Used != -1 {
+			order.Promocode.Used++
 
-			err = c.Services.Promocode.Update(order.Promocode, "Usage")
+			err = c.Services.Promocode.Update(order.Promocode, "Used")
 			if err != nil {
 				return http.StatusInternalServerError, err
 			}

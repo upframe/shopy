@@ -9,8 +9,9 @@ type Promocode struct {
 	Expires     *time.Time `db:"expires"`
 	Discount    int        `db:"discount"`
 	Percentage  bool       `db:"percentage"`
+	Used        int        `db:"used"`
+	MaxUsage    int        `db:"maxusage"`
 	Deactivated bool       `db:"deactivated"`
-	Usage       int        `db:"usage"`
 }
 
 // PromocodeService ...

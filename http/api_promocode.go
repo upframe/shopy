@@ -22,8 +22,7 @@ func APIPromocodeGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (in
 
 	if r.URL.Query().Get("code") == "true" {
 		p, err = c.Services.Promocode.GetByCode(code)
-
-		if time.Now().Unix() > p.Expires.Unix() || p.Usage == 0 {
+		if time.Now().Unix() > p.Expires.Unix() || p.Used == p.MaxUsage {
 			return http.StatusNotFound, nil
 		}
 

@@ -19,7 +19,7 @@
             <th>Discount</th>
             <th>Expiration Date (UTC)</th>
             <th>Deactivated</th>
-            <th>Usage</th>
+            <th>Usage/Max Usage</th>
             <th></th>
         </tr>
     </thead>
@@ -41,7 +41,7 @@
                 <label></label>
             </div>
         </td>
-        <td data-field="Usage">{{ $promocode.Usage }}</td>
+        <td data-field="Usage/Max Usage">{{ $promocode.Used }}/{{ $promocode.MaxUsage}}</td>
         <td><button class="edit"><i class="material-icons">mode_edit</i></button></td>
     </tr>
     {{ end }}

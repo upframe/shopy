@@ -91,8 +91,8 @@ function validateCoupon(e) {
     }
 
     let request = new XMLHttpRequest();
-    request.setRequestHeader("Accept", "application/json");
     request.open("GET", `/api/promocodes/${this.value}?code=true`, true);
+    request.setRequestHeader("Accept", "application/json");
     request.send();
     request.onreadystatechange = function() {
         if (request.readyState == 4) {
@@ -209,8 +209,8 @@ function submitCheckout(event) {
 
     let request = new XMLHttpRequest(),
         form = document.querySelector("form#checkout");
-    request.setRequestHeader("Accept", "application/json");
     request.open("POST", window.location, true);
+    request.setRequestHeader("Accept", "application/json");
     request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     request.send(form.serialize());
     request.onreadystatechange = function() {
