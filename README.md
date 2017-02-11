@@ -1,6 +1,7 @@
 # Shopy
 
 [![Build](https://img.shields.io/travis/bruhs/shopy.svg?style=flat-square)](https://travis-ci.org/bruhs/shopy)
+[![Documentation](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat-square)](http://godoc.org/github.com/bruhs/shopy)
 [![Go Report Card](https://goreportcard.com/badge/github.com/bruhs/shopy?style=flat-square)](https://goreportcard.com/report/bruhs/shopy)
 
 ## Get the environment ready FOR DEVELOPMENT
