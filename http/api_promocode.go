@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/gorilla/mux"
 	"github.com/bruhs/shopy"
+	"github.com/gorilla/mux"
 )
 
 // APIPromocodeGet ...

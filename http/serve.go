@@ -4,8 +4,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/bruhs/shopy"
+	"github.com/gorilla/mux"
 )
 
 // Serve ...

@@ -3,8 +3,8 @@ package mysql
 import (
 	"fmt"
 
-	"github.com/jmoiron/sqlx"
 	"github.com/bruhs/shopy"
+	"github.com/jmoiron/sqlx"
 )
 
 // PromocodeService ...

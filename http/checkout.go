@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/logpacker/PayPal-Go-SDK"
 	"github.com/bruhs/shopy"
+	"github.com/logpacker/PayPal-Go-SDK"
 )
 
 // CheckoutConfirmGet ...

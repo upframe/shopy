@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/gorilla/mux"
 	"github.com/bruhs/shopy"
+	"github.com/gorilla/mux"
 )
 
 // APIUserGet  ...

@@ -4,8 +4,8 @@ import (
 	"encoding/gob"
 	"net/http"
 
-	"github.com/gorilla/securecookie"
 	"github.com/bruhs/shopy"
+	"github.com/gorilla/securecookie"
 )
 
 // SessionCookie ...
