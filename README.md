@@ -10,7 +10,3 @@ Certify yourself that the variable `GOPATH` is set and that `$GOPATH/bin` is in 
 1. `go get github.com/bruhs/shopy`
 2. `cd $GOPATH/src/github.com/bruhs/shopy/cmd/fest`
 3. `go install && shopy`
-
-To build a final version, execute:
-
-+ `go build github.com/upframe/whosthere -o whosthere`
