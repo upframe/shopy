@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/upframe/fest"
+	"github.com/bruhs/shopy"
 )
 
 type message struct {
@@ -20,10 +20,10 @@ type message struct {
 }
 
 // FestHandler ...
-type FestHandler func(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error)
+type FestHandler func(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error)
 
 // Inject ...
-func Inject(h FestHandler, c *fest.Config) http.HandlerFunc {
+func Inject(h FestHandler, c *shopy.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var (
 			code int
@@ -103,8 +103,8 @@ func Inject(h FestHandler, c *fest.Config) http.HandlerFunc {
 
 // MustLogin ...
 func MustLogin(h FestHandler) FestHandler {
-	return func(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-		s := r.Context().Value("session").(*fest.Session)
+	return func(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
+		s := r.Context().Value("session").(*shopy.Session)
 
 		if s.Logged {
 			return h(w, r, c)
@@ -114,14 +114,14 @@ func MustLogin(h FestHandler) FestHandler {
 			return Redirect(w, r, "/login?redirect="+url.QueryEscape(r.URL.Path))
 		}
 
-		return http.StatusUnauthorized, fest.ErrNotLoggedIn
+		return http.StatusUnauthorized, shopy.ErrNotLoggedIn
 	}
 }
 
 // MustAdmin ...
 func MustAdmin(h FestHandler) FestHandler {
-	return MustLogin(func(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-		s := r.Context().Value("session").(*fest.Session)
+	return MustLogin(func(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
+		s := r.Context().Value("session").(*shopy.Session)
 
 		if s.User.Admin {
 			return h(w, r, c)
@@ -139,8 +139,8 @@ func Redirect(w http.ResponseWriter, r *http.Request, path string) (int, error) 
 
 // StaticHandler ...
 func StaticHandler(templates ...string) FestHandler {
-	return func(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-		s := r.Context().Value("session").(*fest.Session)
+	return func(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
+		s := r.Context().Value("session").(*shopy.Session)
 
 		return Render(w, c, s, nil, templates...)
 	}

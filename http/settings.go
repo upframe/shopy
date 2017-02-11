@@ -4,12 +4,12 @@ import (
 	"database/sql"
 	"net/http"
 
-	"github.com/upframe/fest"
+	"github.com/bruhs/shopy"
 )
 
 // SettingsGet ...
-func SettingsGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	s := r.Context().Value("session").(*fest.Session)
+func SettingsGet(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
+	s := r.Context().Value("session").(*shopy.Session)
 
 	user, err := c.Services.User.Get(s.User.ID)
 	if err == sql.ErrNoRows {

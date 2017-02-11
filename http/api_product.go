@@ -8,11 +8,11 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
-	"github.com/upframe/fest"
+	"github.com/bruhs/shopy"
 )
 
 // APIProductGet ...
-func APIProductGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
+func APIProductGet(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
 	id, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
 		return http.StatusNotFound, nil
@@ -31,8 +31,8 @@ func APIProductGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int,
 }
 
 // APIProductPost ...
-func APIProductPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	p := &fest.Product{}
+func APIProductPost(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
+	p := &shopy.Product{}
 
 	// Get the JSON information
 	rawBuffer := new(bytes.Buffer)
@@ -54,13 +54,13 @@ func APIProductPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int
 }
 
 // APIProductPatch ...
-func APIProductPatch(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
+func APIProductPatch(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
 	id, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
 		return http.StatusNotFound, nil
 	}
 
-	p := &fest.Product{}
+	p := &shopy.Product{}
 
 	// Get the JSON information
 	rawBuffer := new(bytes.Buffer)
@@ -90,7 +90,7 @@ func APIProductPatch(w http.ResponseWriter, r *http.Request, c *fest.Config) (in
 }
 
 // APIProductDelete  ...
-func APIProductDelete(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
+func APIProductDelete(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
 	id, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
 		return http.StatusNotFound, nil

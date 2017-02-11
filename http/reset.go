@@ -6,12 +6,12 @@ import (
 	"net/mail"
 	"time"
 
-	"github.com/upframe/fest"
+	"github.com/bruhs/shopy"
 )
 
 // ResetGet ...
-func ResetGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	s := r.Context().Value("session").(*fest.Session)
+func ResetGet(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
+	s := r.Context().Value("session").(*shopy.Session)
 
 	if hash := r.URL.Query().Get("hash"); hash != "" {
 		// Fetches the link from the database
@@ -35,7 +35,7 @@ func ResetGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, erro
 }
 
 // ResetPost ...
-func ResetPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
+func ResetPost(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
 	err := r.ParseForm()
 	if err != nil {
 		return http.StatusInternalServerError, err
@@ -43,7 +43,7 @@ func ResetPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, err
 
 	if hash := r.URL.Query().Get("hash"); hash != "" {
 		// Fetches the link from the database
-		var link *fest.Link
+		var link *shopy.Link
 		link, err = c.Services.Link.Get(hash)
 
 		// If the error is no rows, or the link is used, or it's expired or the path
@@ -63,7 +63,7 @@ func ResetPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, err
 		}
 
 		// SET USER PASSWORD AND UPDATE PWD HASH AND PWD SALT
-		var user *fest.User
+		var user *shopy.User
 		user, err = c.Services.User.Get(link.User)
 		if err != nil {
 			return http.StatusInternalServerError, err
@@ -97,7 +97,7 @@ func ResetPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, err
 	}
 
 	// get user by email
-	var user *fest.User
+	var user *shopy.User
 	user, err = c.Services.User.GetByEmail(formEmail)
 	if err == sql.ErrNoRows {
 		return http.StatusNotFound, err
@@ -111,9 +111,9 @@ func ResetPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, err
 	now := time.Now()
 	expires := time.Now().Add(time.Hour * 1)
 
-	link := &fest.Link{
+	link := &shopy.Link{
 		Path:    "/reset",
-		Hash:    fest.UniqueHash(formEmail),
+		Hash:    shopy.UniqueHash(formEmail),
 		User:    user.ID,
 		Used:    false,
 		Time:    &now,
@@ -130,7 +130,7 @@ func ResetPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, err
 	data["Hash"] = link.Hash
 	data["Host"] = c.BaseAddress
 
-	email := &fest.Email{
+	email := &shopy.Email{
 		From: &mail.Address{
 			Name: "Upframe",
 		},

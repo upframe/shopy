@@ -5,12 +5,12 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/upframe/fest"
+	"github.com/bruhs/shopy"
 )
 
 // Serve ...
 // TODO: definately move this function to CMD
-func Serve(c *fest.Config) {
+func Serve(c *shopy.Config) {
 	r := mux.NewRouter()
 
 	r.NotFoundHandler = &notFoundHandler{Config: c}
@@ -96,17 +96,17 @@ func Serve(c *fest.Config) {
 }
 
 type notFoundHandler struct {
-	Config *fest.Config
+	Config *shopy.Config
 }
 
 func (h *notFoundHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	Inject(func(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
+	Inject(func(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
 		return http.StatusNotFound, nil
 	}, h.Config)(w, r)
 }
 
 // logout resets the session values and saves the cookie
-func logout(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
+func logout(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
 	err := c.Services.Session.Reset(w)
 	if err != nil {
 		return http.StatusInternalServerError, err

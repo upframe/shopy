@@ -4,12 +4,12 @@ import (
 	"database/sql"
 	"net/http"
 
-	"github.com/upframe/fest"
+	"github.com/bruhs/shopy"
 )
 
 // LoginGet ...
-func LoginGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	s := r.Context().Value("session").(*fest.Session)
+func LoginGet(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
+	s := r.Context().Value("session").(*shopy.Session)
 
 	if s.Logged {
 		return Redirect(w, r, "/")
@@ -19,11 +19,11 @@ func LoginGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, erro
 }
 
 // LoginPost ...
-func LoginPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	s := r.Context().Value("session").(*fest.Session)
+func LoginPost(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
+	s := r.Context().Value("session").(*shopy.Session)
 
 	if s.Logged {
-		return http.StatusBadRequest, fest.ErrAlreadyLoggedIn
+		return http.StatusBadRequest, shopy.ErrAlreadyLoggedIn
 	}
 
 	if r.Header.Get("Resend") == "true" {

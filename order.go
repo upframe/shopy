@@ -1,4 +1,4 @@
-package fest
+package shopy
 
 const (
 	// OrderCanceled represents the order canceled status.

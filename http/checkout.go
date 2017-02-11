@@ -7,11 +7,11 @@ import (
 	"time"
 
 	"github.com/logpacker/PayPal-Go-SDK"
-	"github.com/upframe/fest"
+	"github.com/bruhs/shopy"
 )
 
 // CheckoutConfirmGet ...
-func CheckoutConfirmGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
+func CheckoutConfirmGet(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
 	paymentID := r.URL.Query().Get("paymentId")
 	payerID := r.URL.Query().Get("PayerID")
 
@@ -53,19 +53,19 @@ func CheckoutConfirmGet(w http.ResponseWriter, r *http.Request, c *fest.Config) 
 func paypalState(state string) int16 {
 	switch state {
 	case "created":
-		return fest.OrderPaymentWaiting
+		return shopy.OrderPaymentWaiting
 	case "approved":
-		return fest.OrderPaymentDone
+		return shopy.OrderPaymentDone
 	case "failed":
-		return fest.OrderPaymentFailed
+		return shopy.OrderPaymentFailed
 	}
 
 	return 0
 }
 
 // CheckoutGet ...
-func CheckoutGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	s := r.Context().Value("session").(*fest.Session)
+func CheckoutGet(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
+	s := r.Context().Value("session").(*shopy.Session)
 
 	cart, err := c.Services.Cart.Get(w, r)
 	if err != nil {
@@ -92,8 +92,8 @@ func CheckoutGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, e
 }
 
 // CheckoutPost ...
-func CheckoutPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	s := r.Context().Value("session").(*fest.Session)
+func CheckoutPost(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
+	s := r.Context().Value("session").(*shopy.Session)
 
 	// Parses the form and checks for errors
 	err := r.ParseForm()
@@ -111,15 +111,15 @@ func CheckoutPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, 
 		return http.StatusInternalServerError, err
 	}
 
-	order := &fest.Order{
-		User:          &fest.User{ID: s.User.ID},
-		PaymentStatus: fest.OrderPaymentWaiting,
-		Products:      []*fest.OrderProduct{},
+	order := &shopy.Order{
+		User:          &shopy.User{ID: s.User.ID},
+		PaymentStatus: shopy.OrderPaymentWaiting,
+		Products:      []*shopy.OrderProduct{},
 		Value:         cart.GetTotal(),
 	}
 
 	for _, product := range cart.Products {
-		order.Products = append(order.Products, &fest.OrderProduct{
+		order.Products = append(order.Products, &shopy.OrderProduct{
 			ID:       product.ID,
 			Quantity: product.Quantity,
 		})
@@ -185,7 +185,7 @@ func CheckoutPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, 
 	}
 
 	amount := paypalsdk.Amount{
-		Total:    fest.DisplayCents(order.Value),
+		Total:    shopy.DisplayCents(order.Value),
 		Currency: "EUR",
 	}
 

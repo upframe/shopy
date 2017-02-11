@@ -7,12 +7,12 @@ import (
 	"net/mail"
 	"time"
 
-	"github.com/upframe/fest"
+	"github.com/bruhs/shopy"
 )
 
 // RegisterGet ...
-func RegisterGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	s := r.Context().Value("session").(*fest.Session)
+func RegisterGet(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
+	s := r.Context().Value("session").(*shopy.Session)
 	if s.Logged {
 		return Redirect(w, r, "/")
 	}
@@ -70,8 +70,8 @@ func RegisterGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, e
 }
 
 // RegisterPost ...
-func RegisterPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	s := r.Context().Value("session").(*fest.Session)
+func RegisterPost(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
+	s := r.Context().Value("session").(*shopy.Session)
 
 	if s.Logged {
 		return http.StatusBadRequest, nil
@@ -84,20 +84,20 @@ func RegisterPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, 
 	}
 
 	// Builds the user variable
-	user := &fest.User{
+	user := &shopy.User{
 		FirstName: r.FormValue("first_name"),
 		LastName:  r.FormValue("last_name"),
 		Email:     r.FormValue("email"),
 		Invites:   c.DefaultInvites,
 		Credit:    0,
 		Confirmed: false,
-		Referrer:  fest.NullInt64{NullInt64: sql.NullInt64{Int64: 0, Valid: false}},
+		Referrer:  shopy.NullInt64{NullInt64: sql.NullInt64{Int64: 0, Valid: false}},
 	}
 
 	if c.InviteOnly {
 		// Gets the referrer user using the ?referral= option in the URL. If it doesn't
 		// find the user, return a 403 Forbidden status
-		var referrer *fest.User
+		var referrer *shopy.User
 		referrer, err = c.Services.User.GetByReferral(r.URL.Query().Get("ref"))
 		if err != nil {
 			return http.StatusForbidden, err
@@ -109,7 +109,7 @@ func RegisterPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, 
 			return http.StatusGone, nil
 		}
 
-		user.Referrer = fest.NullInt64{
+		user.Referrer = shopy.NullInt64{
 			NullInt64: sql.NullInt64{
 				Int64: int64(referrer.ID),
 				Valid: true,
@@ -146,7 +146,7 @@ func RegisterPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, 
 	}
 
 	// Generates a unique referral hash for this user
-	user.Referral = fest.UniqueHash(user.Email)
+	user.Referral = shopy.UniqueHash(user.Email)
 
 	// Sets the password hash and salt for the user and checks for errors
 	err = user.SetPassword(r.FormValue("password"))
@@ -168,14 +168,14 @@ func RegisterPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, 
 	return http.StatusCreated, err
 }
 
-func confirmationEmail(c *fest.Config, user *fest.User) (int, error) {
+func confirmationEmail(c *shopy.Config, user *shopy.User) (int, error) {
 	// Sets the current time and expiration time of the confirmation email
 	now := time.Now()
 	expires := time.Now().Add(time.Hour * 24 * 20)
 
-	link := &fest.Link{
+	link := &shopy.Link{
 		Path:    "/register",
-		Hash:    fest.UniqueHash(user.Email),
+		Hash:    shopy.UniqueHash(user.Email),
 		User:    user.ID,
 		Used:    false,
 		Time:    &now,
@@ -192,7 +192,7 @@ func confirmationEmail(c *fest.Config, user *fest.User) (int, error) {
 	data["Hash"] = link.Hash
 	data["Host"] = c.BaseAddress
 
-	email := &fest.Email{
+	email := &shopy.Email{
 		From: &mail.Address{
 			Name: "Upframe",
 		},
@@ -218,7 +218,7 @@ func confirmationEmail(c *fest.Config, user *fest.User) (int, error) {
 
 // isExistentUser checks if there is an user with the specified email
 // and returns true and nil if the user exists and there is no error
-func isExistentUser(s fest.UserService, mail string) (bool, error) {
+func isExistentUser(s shopy.UserService, mail string) (bool, error) {
 	// Fetches the user from the database and checks for errors
 	user, err := s.GetByEmail(mail)
 	if err != nil {

@@ -1,4 +1,4 @@
-package fest
+package shopy
 
 // Product ...
 type Product struct {

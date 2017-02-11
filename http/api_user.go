@@ -8,17 +8,17 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
-	"github.com/upframe/fest"
+	"github.com/bruhs/shopy"
 )
 
 // APIUserGet  ...
-func APIUserGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
+func APIUserGet(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
 	id, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
 		return http.StatusNotFound, nil
 	}
 
-	s := r.Context().Value("session").(*fest.Session)
+	s := r.Context().Value("session").(*shopy.Session)
 	if !s.User.Admin && s.User.ID != id {
 		return http.StatusForbidden, nil
 	}
@@ -36,15 +36,15 @@ func APIUserGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, er
 }
 
 // APICurrentUser ...
-func APICurrentUser(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	s := r.Context().Value("session").(*fest.Session)
+func APICurrentUser(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
+	s := r.Context().Value("session").(*shopy.Session)
 
 	return Redirect(w, r, "/api/users/"+strconv.Itoa(s.User.ID))
 }
 
 // APIUserPost  ...
-func APIUserPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	u := &fest.User{}
+func APIUserPost(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
+	u := &shopy.User{}
 
 	// Get the JSON information
 	rawBuffer := new(bytes.Buffer)
@@ -66,13 +66,13 @@ func APIUserPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, e
 }
 
 // APIUserPatch ...
-func APIUserPatch(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
+func APIUserPatch(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
 	id, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
 		return http.StatusNotFound, nil
 	}
 
-	u := &fest.User{}
+	u := &shopy.User{}
 
 	// Get the JSON information
 	rawBuffer := new(bytes.Buffer)
@@ -108,7 +108,7 @@ func APIUserPatch(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, 
 }
 
 // APIUserDelete  ...
-func APIUserDelete(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
+func APIUserDelete(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
 	id, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
 		return http.StatusNotFound, nil

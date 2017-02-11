@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/securecookie"
-	"github.com/upframe/fest"
+	"github.com/bruhs/shopy"
 )
 
 // SessionCookie ...
@@ -21,12 +21,12 @@ func init() {
 // SessionService ...
 type SessionService struct {
 	Store       *securecookie.SecureCookie
-	UserService fest.UserService
+	UserService shopy.UserService
 	Secure      bool
 }
 
 // Save ...
-func (s *SessionService) Save(w http.ResponseWriter, sess *fest.Session) error {
+func (s *SessionService) Save(w http.ResponseWriter, sess *shopy.Session) error {
 	obj := &session{Logged: sess.Logged}
 	if sess.Logged {
 		obj.UserID = sess.User.ID
@@ -51,22 +51,22 @@ func (s *SessionService) Save(w http.ResponseWriter, sess *fest.Session) error {
 }
 
 // Get ...
-func (s *SessionService) Get(w http.ResponseWriter, r *http.Request) (*fest.Session, error) {
+func (s *SessionService) Get(w http.ResponseWriter, r *http.Request) (*shopy.Session, error) {
 	cookie, err := r.Cookie("session")
 	if err != nil {
-		return &fest.Session{Logged: false}, s.Reset(w)
+		return &shopy.Session{Logged: false}, s.Reset(w)
 	}
 
 	var value *session
 	// if the decryption keys aren't right
 	err = s.Store.Decode("session", cookie.Value, &value)
 	if err != nil {
-		return &fest.Session{Logged: false}, s.Reset(w)
+		return &shopy.Session{Logged: false}, s.Reset(w)
 	}
 
-	object := &fest.Session{Logged: value.Logged}
+	object := &shopy.Session{Logged: value.Logged}
 	if value.Logged {
-		object.User = &fest.User{}
+		object.User = &shopy.User{}
 	}
 
 	if value.Logged {
@@ -81,5 +81,5 @@ func (s *SessionService) Get(w http.ResponseWriter, r *http.Request) (*fest.Sess
 
 // Reset ...
 func (s *SessionService) Reset(w http.ResponseWriter) error {
-	return s.Save(w, &fest.Session{Logged: false})
+	return s.Save(w, &shopy.Session{Logged: false})
 }

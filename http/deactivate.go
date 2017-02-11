@@ -6,11 +6,11 @@ import (
 	"net/mail"
 	"time"
 
-	"github.com/upframe/fest"
+	"github.com/bruhs/shopy"
 )
 
 // DeactivateGet ...
-func DeactivateGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
+func DeactivateGet(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
 	// Checks if the hash is indicated in the URL
 	if r.URL.Query().Get("hash") == "" {
 		return http.StatusNotFound, nil
@@ -48,20 +48,20 @@ func DeactivateGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int,
 }
 
 // DeactivatePost ...
-func DeactivatePost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	s := r.Context().Value("session").(*fest.Session)
+func DeactivatePost(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
+	s := r.Context().Value("session").(*shopy.Session)
 
 	if !s.Logged {
-		return http.StatusBadRequest, fest.ErrNotLoggedIn
+		return http.StatusBadRequest, shopy.ErrNotLoggedIn
 	}
 
 	// Sets the current time and expiration time of the deactivation email
 	now := time.Now()
 	expires := time.Now().Add(time.Hour * 2)
 
-	link := &fest.Link{
+	link := &shopy.Link{
 		Path:    "/settings/deactivate",
-		Hash:    fest.UniqueHash(s.User.Email),
+		Hash:    shopy.UniqueHash(s.User.Email),
 		User:    s.User.ID,
 		Used:    false,
 		Time:    &now,
@@ -78,7 +78,7 @@ func DeactivatePost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int
 	data["Hash"] = link.Hash
 	data["Host"] = c.BaseAddress
 
-	email := &fest.Email{
+	email := &shopy.Email{
 		From: &mail.Address{
 			Name: "Upframe",
 		},

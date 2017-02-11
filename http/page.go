@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/upframe/fest"
+	"github.com/bruhs/shopy"
 )
 
 // page is the type that contains the information that goes into the page
@@ -31,7 +31,7 @@ type page struct {
 
 // Render renders an HTML response and send it to the client based on the
 // chosen templates
-func Render(w http.ResponseWriter, c *fest.Config, s *fest.Session, data interface{}, templates ...string) (int, error) {
+func Render(w http.ResponseWriter, c *shopy.Config, s *shopy.Session, data interface{}, templates ...string) (int, error) {
 	if strings.HasPrefix(templates[0], "admin/") {
 		templates = append(templates, "admin/base")
 	} else {
@@ -44,7 +44,7 @@ func Render(w http.ResponseWriter, c *fest.Config, s *fest.Session, data interfa
 			hasher.Write([]byte(s))
 			return hex.EncodeToString(hasher.Sum(nil))
 		},
-		"DisplayCents": fest.DisplayCents,
+		"DisplayCents": shopy.DisplayCents,
 	}
 
 	for i := range templates {
@@ -84,5 +84,5 @@ func Render(w http.ResponseWriter, c *fest.Config, s *fest.Session, data interfa
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	_, err = buf.WriteTo(w)
-	return 0, nil
+	return 0, err
 }

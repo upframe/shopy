@@ -3,12 +3,12 @@ package http
 import (
 	"net/http"
 
-	"github.com/upframe/fest"
+	"github.com/bruhs/shopy"
 )
 
 // StoreGet ...
-func StoreGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	s := r.Context().Value("session").(*fest.Session)
+func StoreGet(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
+	s := r.Context().Value("session").(*shopy.Session)
 
 	products, err := c.Services.Product.GetsWhere(0, 0, "Name", "Deactivated", "0")
 	if err != nil {

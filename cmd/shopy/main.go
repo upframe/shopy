@@ -6,12 +6,12 @@ import (
 	"runtime"
 	"strconv"
 
+	"github.com/bruhs/shopy"
+	h "github.com/bruhs/shopy/http"
+	"github.com/bruhs/shopy/http/cookie"
+	"github.com/bruhs/shopy/mysql"
+	"github.com/bruhs/shopy/smtp"
 	"github.com/gorilla/securecookie"
-	"github.com/upframe/fest"
-	h "github.com/upframe/fest/http"
-	"github.com/upframe/fest/http/cookie"
-	"github.com/upframe/fest/mysql"
-	"github.com/upframe/fest/smtp"
 )
 
 func main() {
@@ -37,7 +37,7 @@ func main() {
 	}
 
 	// figures PayPal
-	paypal, err := fest.InitPayPal(f.PayPal.Client, f.PayPal.Secret, f.Development)
+	paypal, err := shopy.InitPayPal(f.PayPal.Client, f.PayPal.Secret, f.Development)
 
 	if err != nil {
 		panic(err)
@@ -51,7 +51,7 @@ func main() {
 
 	userService := &mysql.UserService{DB: db}
 
-	c := &fest.Config{
+	c := &shopy.Config{
 		Domain:         f.Domain,
 		Scheme:         f.Scheme,
 		Port:           strconv.Itoa(f.Port),
@@ -62,7 +62,7 @@ func main() {
 		Templates:      f.Assets + "templates/",
 		PayPal:         paypal,
 		CookieStore:    store,
-		Services: &fest.Services{
+		Services: &shopy.Services{
 			User:      userService,
 			Link:      &mysql.LinkService{DB: db},
 			Product:   &mysql.ProductService{DB: db},

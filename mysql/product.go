@@ -2,7 +2,7 @@ package mysql
 
 import (
 	"github.com/jmoiron/sqlx"
-	"github.com/upframe/fest"
+	"github.com/bruhs/shopy"
 )
 
 // ProductService ...
@@ -20,16 +20,16 @@ var productMap = map[string]string{
 }
 
 // Get ...
-func (s *ProductService) Get(id int) (*fest.Product, error) {
-	product := &fest.Product{}
+func (s *ProductService) Get(id int) (*shopy.Product, error) {
+	product := &shopy.Product{}
 	err := s.DB.Get(product, "SELECT * FROM products WHERE id=?", id)
 
 	return product, err
 }
 
 // Gets ...
-func (s *ProductService) Gets(first, limit int, order string) ([]*fest.Product, error) {
-	products := []*fest.Product{}
+func (s *ProductService) Gets(first, limit int, order string) ([]*shopy.Product, error) {
+	products := []*shopy.Product{}
 	var err error
 
 	order = fieldsToColumns(productMap, order)[0]
@@ -44,8 +44,8 @@ func (s *ProductService) Gets(first, limit int, order string) ([]*fest.Product, 
 }
 
 // GetsWhere ...
-func (s *ProductService) GetsWhere(first, limit int, order, where, sth string) ([]*fest.Product, error) {
-	products := []*fest.Product{}
+func (s *ProductService) GetsWhere(first, limit int, order, where, sth string) ([]*shopy.Product, error) {
+	products := []*shopy.Product{}
 	var err error
 
 	where = fieldsToColumns(productMap, where)[0]
@@ -61,8 +61,8 @@ func (s *ProductService) GetsWhere(first, limit int, order, where, sth string) (
 }
 
 // GetsWhereIn ...
-func (s *ProductService) GetsWhereIn(first, limit int, order, where, in string) ([]*fest.Product, error) {
-	products := []*fest.Product{}
+func (s *ProductService) GetsWhereIn(first, limit int, order, where, in string) ([]*shopy.Product, error) {
+	products := []*shopy.Product{}
 	var err error
 
 	where = fieldsToColumns(productMap, where)[0]
@@ -83,7 +83,7 @@ func (s *ProductService) Total() (int, error) {
 }
 
 // Create ...
-func (s *ProductService) Create(p *fest.Product) error {
+func (s *ProductService) Create(p *shopy.Product) error {
 	if p.ID != 0 {
 		return nil
 	}
@@ -99,7 +99,7 @@ func (s *ProductService) Create(p *fest.Product) error {
 }
 
 // Update ...
-func (s *ProductService) Update(p *fest.Product, fields ...string) error {
+func (s *ProductService) Update(p *shopy.Product, fields ...string) error {
 	_, err := s.DB.NamedExec(updateQuery("products", "id", fieldsToColumns(productMap, fields...)), p)
 	return err
 }

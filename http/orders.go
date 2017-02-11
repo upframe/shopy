@@ -6,12 +6,12 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
-	"github.com/upframe/fest"
+	"github.com/bruhs/shopy"
 )
 
 // OrdersGet ...
-func OrdersGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	s := r.Context().Value("session").(*fest.Session)
+func OrdersGet(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
+	s := r.Context().Value("session").(*shopy.Session)
 
 	data, err := c.Services.Order.GetsWhere(0, 0, "ID", "User.ID", strconv.Itoa(s.User.ID))
 	if err != nil {
@@ -22,8 +22,8 @@ func OrdersGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, err
 }
 
 // OrderCancel ...
-func OrderCancel(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	s := r.Context().Value("session").(*fest.Session)
+func OrderCancel(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
+	s := r.Context().Value("session").(*shopy.Session)
 
 	cart, err := c.Services.Cart.Get(w, r)
 	if err != nil {
@@ -43,7 +43,7 @@ func OrderCancel(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, e
 		return http.StatusInternalServerError, err
 	}
 
-	if order.PaymentStatus != fest.OrderPaymentWaiting {
+	if order.PaymentStatus != shopy.OrderPaymentWaiting {
 		// TODO: show invalid page instead
 		return http.StatusNotFound, nil
 	}
@@ -52,8 +52,8 @@ func OrderCancel(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, e
 		return http.StatusForbidden, nil
 	}
 
-	order.PaymentStatus = fest.OrderCanceled
-	order.FulfillmentStatus = fest.OrderCanceled
+	order.PaymentStatus = shopy.OrderCanceled
+	order.FulfillmentStatus = shopy.OrderCanceled
 
 	err = c.Services.Order.Update(order, "PaymentStatus", "FulfillmentStatus")
 	if err != nil {

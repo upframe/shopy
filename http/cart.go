@@ -6,12 +6,12 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/upframe/fest"
+	"github.com/bruhs/shopy"
 )
 
 // CartGet ...
-func CartGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	s := r.Context().Value("session").(*fest.Session)
+func CartGet(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
+	s := r.Context().Value("session").(*shopy.Session)
 
 	cart, err := c.Services.Cart.Get(w, r)
 	if err != nil {
@@ -27,7 +27,7 @@ func CartGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error
 }
 
 // CartItemPost ...
-func CartItemPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
+func CartItemPost(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
 	id, err := strconv.Atoi(strings.Replace(r.URL.Path, "/cart/", "", -1))
 	if err != nil {
 		return http.StatusInternalServerError, err
@@ -72,7 +72,7 @@ func CartItemPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, 
 }
 
 // CartItemDelete ...
-func CartItemDelete(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
+func CartItemDelete(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
 	id, err := strconv.Atoi(strings.Replace(r.URL.Path, "/cart/", "", 1))
 	if err != nil {
 		return http.StatusInternalServerError, err

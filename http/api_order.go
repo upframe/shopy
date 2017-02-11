@@ -7,12 +7,12 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/bruhs/shopy"
 	"github.com/gorilla/mux"
-	"github.com/upframe/fest"
 )
 
 // APIOrderGet  ...
-func APIOrderGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
+func APIOrderGet(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
 	id, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
 		return http.StatusNotFound, nil
@@ -27,7 +27,7 @@ func APIOrderGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, e
 		return http.StatusInternalServerError, err
 	}
 
-	s := r.Context().Value("session").(*fest.Session)
+	s := r.Context().Value("session").(*shopy.Session)
 	if !s.User.Admin && s.User.ID != o.User.ID {
 		return http.StatusForbidden, nil
 	}
@@ -36,8 +36,8 @@ func APIOrderGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, e
 }
 
 // APIOrderPost ...
-func APIOrderPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	o := &fest.Order{}
+func APIOrderPost(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
+	o := &shopy.Order{}
 
 	// Get the JSON information
 	rawBuffer := new(bytes.Buffer)
@@ -59,13 +59,13 @@ func APIOrderPost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, 
 }
 
 // APIOrderPatch ...
-func APIOrderPatch(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
+func APIOrderPatch(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
 	id, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
 		return http.StatusNotFound, nil
 	}
 
-	o := &fest.Order{}
+	o := &shopy.Order{}
 
 	// Get the JSON information
 	rawBuffer := new(bytes.Buffer)
@@ -95,7 +95,7 @@ func APIOrderPatch(w http.ResponseWriter, r *http.Request, c *fest.Config) (int,
 }
 
 // APIOrderDelete  ...
-func APIOrderDelete(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
+func APIOrderDelete(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
 	id, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
 		return http.StatusNotFound, nil

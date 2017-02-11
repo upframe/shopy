@@ -2,7 +2,7 @@ package mysql
 
 import (
 	"github.com/jmoiron/sqlx"
-	"github.com/upframe/fest"
+	"github.com/bruhs/shopy"
 )
 
 // UserService ...
@@ -28,32 +28,32 @@ var userMap = map[string]string{
 }
 
 // Get ...
-func (s *UserService) Get(id int) (*fest.User, error) {
-	user := &fest.User{}
+func (s *UserService) Get(id int) (*shopy.User, error) {
+	user := &shopy.User{}
 	err := s.DB.Get(user, "SELECT * FROM users WHERE id=?", id)
 
 	return user, err
 }
 
 // GetByEmail ...
-func (s *UserService) GetByEmail(email string) (*fest.User, error) {
-	user := &fest.User{}
+func (s *UserService) GetByEmail(email string) (*shopy.User, error) {
+	user := &shopy.User{}
 	err := s.DB.Get(user, "SELECT * FROM users WHERE email=?", email)
 
 	return user, err
 }
 
 // GetByReferral ...
-func (s *UserService) GetByReferral(referral string) (*fest.User, error) {
-	user := &fest.User{}
+func (s *UserService) GetByReferral(referral string) (*shopy.User, error) {
+	user := &shopy.User{}
 	err := s.DB.Get(user, "SELECT * FROM users WHERE referral=?", referral)
 
 	return user, err
 }
 
 // Gets ...
-func (s *UserService) Gets(first, limit int, order string) ([]*fest.User, error) {
-	users := []*fest.User{}
+func (s *UserService) Gets(first, limit int, order string) ([]*shopy.User, error) {
+	users := []*shopy.User{}
 	var err error
 
 	order = fieldsToColumns(userMap, order)[0]
@@ -73,7 +73,7 @@ func (s *UserService) Total() (int, error) {
 }
 
 // Create ...
-func (s *UserService) Create(u *fest.User) error {
+func (s *UserService) Create(u *shopy.User) error {
 	if u.ID != 0 {
 		return nil
 	}
@@ -89,7 +89,7 @@ func (s *UserService) Create(u *fest.User) error {
 }
 
 // Update ...
-func (s *UserService) Update(u *fest.User, fields ...string) error {
+func (s *UserService) Update(u *shopy.User, fields ...string) error {
 	_, err := s.DB.NamedExec(updateQuery("users", "id", fieldsToColumns(userMap, fields...)), u)
 	return err
 }

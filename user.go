@@ -1,4 +1,4 @@
-package fest
+package shopy
 
 import (
 	"crypto/rand"

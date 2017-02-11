@@ -8,7 +8,7 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
-	"github.com/upframe/fest"
+	"github.com/bruhs/shopy"
 )
 
 // InitDB establishes a connection with the database
@@ -84,7 +84,7 @@ func insertQuery(table string, fields []string) string {
 func fieldsToColumns(m map[string]string, fields ...string) []string {
 	columns := []string{}
 
-	if fields[0] == fest.UpdateAll {
+	if fields[0] == shopy.UpdateAll {
 		columns = getAllColumns(m)
 	} else {
 		for i := range fields {

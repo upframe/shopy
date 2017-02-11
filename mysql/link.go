@@ -2,7 +2,7 @@ package mysql
 
 import (
 	"github.com/jmoiron/sqlx"
-	"github.com/upframe/fest"
+	"github.com/bruhs/shopy"
 )
 
 // LinkService ...
@@ -20,16 +20,16 @@ var linkMap = map[string]string{
 }
 
 // Get ...
-func (s *LinkService) Get(hash string) (*fest.Link, error) {
-	link := &fest.Link{}
+func (s *LinkService) Get(hash string) (*shopy.Link, error) {
+	link := &shopy.Link{}
 	err := s.DB.Get(link, "SELECT * FROM links WHERE hash=?", hash)
 
 	return link, err
 }
 
 // Gets ...
-func (s *LinkService) Gets(first, limit int, order string) ([]*fest.Link, error) {
-	links := []*fest.Link{}
+func (s *LinkService) Gets(first, limit int, order string) ([]*shopy.Link, error) {
+	links := []*shopy.Link{}
 	var err error
 
 	order = fieldsToColumns(linkMap, order)[0]
@@ -44,13 +44,13 @@ func (s *LinkService) Gets(first, limit int, order string) ([]*fest.Link, error)
 }
 
 // Create ...
-func (s *LinkService) Create(l *fest.Link) error {
+func (s *LinkService) Create(l *shopy.Link) error {
 	_, err := s.DB.NamedExec(insertQuery("links", getAllColumns(linkMap)), l)
 	return err
 }
 
 // Update ...
-func (s *LinkService) Update(l *fest.Link, fields ...string) error {
+func (s *LinkService) Update(l *shopy.Link, fields ...string) error {
 	_, err := s.DB.NamedExec(updateQuery("links", "hash", fieldsToColumns(linkMap, fields...)), l)
 	return err
 }

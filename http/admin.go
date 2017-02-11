@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/bruhs/shopy"
 	"github.com/gorilla/mux"
-	"github.com/upframe/fest"
 )
 
 const itemsPerPage = 30
@@ -21,26 +21,26 @@ type adminTable struct {
 }
 
 // AdminGet ...
-func AdminGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	s := r.Context().Value("session").(*fest.Session)
+func AdminGet(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
+	s := r.Context().Value("session").(*shopy.Session)
 	return Render(w, c, s, nil, "admin/home")
 }
 
 // AdminRedirect ...
-func AdminRedirect(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
+func AdminRedirect(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
 	return Redirect(w, r, "/admin/"+mux.Vars(r)["category"]+"/1")
 }
 
 // AdminNew ...
-func AdminNew(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	s := r.Context().Value("session").(*fest.Session)
+func AdminNew(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
+	s := r.Context().Value("session").(*shopy.Session)
 	category := mux.Vars(r)["category"]
 	return Render(w, c, s, nil, "admin/"+category+"-new", "admin/"+category+"-form")
 }
 
 // AdminListing ...
-func AdminListing(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	s := r.Context().Value("session").(*fest.Session)
+func AdminListing(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
+	s := r.Context().Value("session").(*shopy.Session)
 
 	category := mux.Vars(r)["category"]
 
@@ -109,7 +109,7 @@ func AdminListing(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, 
 }
 
 // AdminListingLast ...
-func AdminListingLast(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
+func AdminListingLast(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
 	category := mux.Vars(r)["category"]
 	var err error
 

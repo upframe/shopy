@@ -9,7 +9,7 @@ import (
 	"net/smtp"
 	"path/filepath"
 
-	"github.com/upframe/fest"
+	"github.com/bruhs/shopy"
 )
 
 // Config ...
@@ -47,7 +47,7 @@ func InitSMTP(user, pass, host, port string) *EmailService {
 }
 
 // UseTemplate adds  the template to the email and renders it to the Body field
-func (s *EmailService) UseTemplate(e *fest.Email, data interface{}, name string) error {
+func (s *EmailService) UseTemplate(e *shopy.Email, data interface{}, name string) error {
 	// Opens the template file and checks if there is any error
 	page, err := ioutil.ReadFile(filepath.Clean(s.TemplatesPath + name + ".tmpl"))
 	if err != nil {
@@ -86,7 +86,7 @@ func (s *EmailService) UseTemplate(e *fest.Email, data interface{}, name string)
 }
 
 // Send sends the email
-func (s *EmailService) Send(e *fest.Email) error {
+func (s *EmailService) Send(e *shopy.Email) error {
 	if e.From.Address == "" {
 		e.From.Address = s.FromDefaultEmail
 	}

@@ -9,13 +9,13 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/upframe/fest"
+	"github.com/bruhs/shopy"
 )
 
 // APIPromocodeGet ...
-func APIPromocodeGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
+func APIPromocodeGet(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
 	var (
-		p   *fest.Promocode
+		p   *shopy.Promocode
 		err error
 	)
 	code := mux.Vars(r)["id"]
@@ -27,7 +27,7 @@ func APIPromocodeGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (in
 		}
 
 	} else {
-		s := r.Context().Value("session").(*fest.Session)
+		s := r.Context().Value("session").(*shopy.Session)
 		if !s.User.Admin {
 			return http.StatusForbidden, nil
 		}
@@ -51,8 +51,8 @@ func APIPromocodeGet(w http.ResponseWriter, r *http.Request, c *fest.Config) (in
 }
 
 // APIPromocodePost ...
-func APIPromocodePost(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
-	p := &fest.Promocode{}
+func APIPromocodePost(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
+	p := &shopy.Promocode{}
 
 	// Get the JSON information
 	rawBuffer := new(bytes.Buffer)
@@ -74,13 +74,13 @@ func APIPromocodePost(w http.ResponseWriter, r *http.Request, c *fest.Config) (i
 }
 
 // APIPromocodePatch ...
-func APIPromocodePatch(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
+func APIPromocodePatch(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
 	id, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
 		return http.StatusNotFound, nil
 	}
 
-	p := &fest.Promocode{}
+	p := &shopy.Promocode{}
 
 	// Get the JSON information
 	rawBuffer := new(bytes.Buffer)
@@ -110,7 +110,7 @@ func APIPromocodePatch(w http.ResponseWriter, r *http.Request, c *fest.Config) (
 }
 
 // APIPromocodeDelete  ...
-func APIPromocodeDelete(w http.ResponseWriter, r *http.Request, c *fest.Config) (int, error) {
+func APIPromocodeDelete(w http.ResponseWriter, r *http.Request, c *shopy.Config) (int, error) {
 	id, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
 		return http.StatusNotFound, nil

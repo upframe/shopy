@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/upframe/fest"
+	"github.com/bruhs/shopy"
 )
 
 // PromocodeService ...
@@ -23,24 +23,24 @@ var promocodeMap = map[string]string{
 }
 
 // Get ...
-func (s *PromocodeService) Get(id int) (*fest.Promocode, error) {
-	promocode := &fest.Promocode{}
+func (s *PromocodeService) Get(id int) (*shopy.Promocode, error) {
+	promocode := &shopy.Promocode{}
 	err := s.DB.Get(promocode, "SELECT * FROM promocodes WHERE id=?", id)
 
 	return promocode, err
 }
 
 // GetByCode ...
-func (s *PromocodeService) GetByCode(code string) (*fest.Promocode, error) {
-	promocode := &fest.Promocode{}
+func (s *PromocodeService) GetByCode(code string) (*shopy.Promocode, error) {
+	promocode := &shopy.Promocode{}
 	err := s.DB.Get(promocode, "SELECT * FROM promocodes WHERE code=?", code)
 
 	return promocode, err
 }
 
 // Gets ...
-func (s *PromocodeService) Gets(first, limit int, order string) ([]*fest.Promocode, error) {
-	promocodes := []*fest.Promocode{}
+func (s *PromocodeService) Gets(first, limit int, order string) ([]*shopy.Promocode, error) {
+	promocodes := []*shopy.Promocode{}
 	var err error
 
 	order = fieldsToColumns(promocodeMap, order)[0]
@@ -60,7 +60,7 @@ func (s *PromocodeService) Total() (int, error) {
 }
 
 // Create ...
-func (s *PromocodeService) Create(p *fest.Promocode) error {
+func (s *PromocodeService) Create(p *shopy.Promocode) error {
 	if p.ID != 0 {
 		return nil
 	}
@@ -78,7 +78,7 @@ func (s *PromocodeService) Create(p *fest.Promocode) error {
 }
 
 // Update ...
-func (s *PromocodeService) Update(p *fest.Promocode, fields ...string) error {
+func (s *PromocodeService) Update(p *shopy.Promocode, fields ...string) error {
 	_, err := s.DB.NamedExec(updateQuery("promocodes", "id", fieldsToColumns(promocodeMap, fields...)), p)
 	return err
 }

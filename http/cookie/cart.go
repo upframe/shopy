@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/securecookie"
-	"github.com/upframe/fest"
+	"github.com/bruhs/shopy"
 )
 
 // SessionCookie ...
@@ -25,7 +25,7 @@ type CartService struct {
 }
 
 // Save ...
-func (s *CartService) Save(w http.ResponseWriter, c *fest.Cart) error {
+func (s *CartService) Save(w http.ResponseWriter, c *shopy.Cart) error {
 	encoded, err := s.Store.Encode("cart", &cart{Products: c.RawList, Locked: c.Locked})
 	if err != nil {
 		return err
@@ -45,8 +45,8 @@ func (s *CartService) Save(w http.ResponseWriter, c *fest.Cart) error {
 }
 
 // Get ...
-func (s *CartService) Get(w http.ResponseWriter, r *http.Request) (*fest.Cart, error) {
-	c := &fest.Cart{Locked: false, RawList: map[int]int{}}
+func (s *CartService) Get(w http.ResponseWriter, r *http.Request) (*shopy.Cart, error) {
+	c := &shopy.Cart{Locked: false, RawList: map[int]int{}}
 
 	cookie, err := r.Cookie("cart")
 	if err != nil {
@@ -67,5 +67,5 @@ func (s *CartService) Get(w http.ResponseWriter, r *http.Request) (*fest.Cart, e
 
 // Reset ...
 func (s *CartService) Reset(w http.ResponseWriter) error {
-	return s.Save(w, &fest.Cart{Locked: false, RawList: map[int]int{}})
+	return s.Save(w, &shopy.Cart{Locked: false, RawList: map[int]int{}})
 }

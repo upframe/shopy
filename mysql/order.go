@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/upframe/fest"
+	"github.com/bruhs/shopy"
 )
 
 // OrderService ...
@@ -31,35 +31,35 @@ var ordersMap = map[string]string{
 }
 
 // Get ...
-func (s *OrderService) Get(id int) (*fest.Order, error) {
+func (s *OrderService) Get(id int) (*shopy.Order, error) {
 	orders, err := s.GetsWhere(0, 0, "ID", "ID", strconv.Itoa(id))
 	if err != nil {
-		return &fest.Order{}, err
+		return &shopy.Order{}, err
 	}
 
 	if len(orders) == 0 {
-		return &fest.Order{}, sql.ErrNoRows
+		return &shopy.Order{}, sql.ErrNoRows
 	}
 
 	return orders[0], nil
 }
 
 // GetByPayPal ...
-func (s *OrderService) GetByPayPal(token string) (*fest.Order, error) {
+func (s *OrderService) GetByPayPal(token string) (*shopy.Order, error) {
 	orders, err := s.GetsWhere(0, 0, "ID", "PayPal", token)
 	if err != nil {
-		return &fest.Order{}, err
+		return &shopy.Order{}, err
 	}
 
 	if len(orders) == 0 {
-		return &fest.Order{}, sql.ErrNoRows
+		return &shopy.Order{}, sql.ErrNoRows
 	}
 
 	return orders[0], nil
 }
 
 // Gets ...
-func (s *OrderService) Gets(first, limit int, order string) ([]*fest.Order, error) {
+func (s *OrderService) Gets(first, limit int, order string) ([]*shopy.Order, error) {
 	return s.GetsWhere(first, limit, order, "", "")
 }
 
@@ -83,13 +83,13 @@ var orderBaseSelectQuery = "SELECT " +
 	"promocodes AS pc ON o.promocode_id = pc.id"
 
 // GetsWhere ...
-func (s *OrderService) GetsWhere(first, limit int, order, where, sth string) ([]*fest.Order, error) {
+func (s *OrderService) GetsWhere(first, limit int, order, where, sth string) ([]*shopy.Order, error) {
 	var (
 		rows *sql.Rows
 		err  error
 	)
 
-	orders := []*fest.Order{}
+	orders := []*shopy.Order{}
 	order = fieldsToColumns(ordersMap, order)[0]
 
 	if where == "" {
@@ -115,7 +115,7 @@ func (s *OrderService) GetsWhere(first, limit int, order, where, sth string) ([]
 	defer rows.Close()
 
 	for rows.Next() {
-		order := &fest.Order{Products: []*fest.OrderProduct{}, User: &fest.User{}}
+		order := &shopy.Order{Products: []*shopy.OrderProduct{}, User: &shopy.User{}}
 
 		var (
 			id          sql.NullInt64
@@ -134,7 +134,7 @@ func (s *OrderService) GetsWhere(first, limit int, order, where, sth string) ([]
 		}
 
 		if id.Valid {
-			order.Promocode = &fest.Promocode{
+			order.Promocode = &shopy.Promocode{
 				ID:          int(id.Int64),
 				Code:        code.String,
 				Discount:    int(discount.Int64),
@@ -156,7 +156,7 @@ func (s *OrderService) GetsWhere(first, limit int, order, where, sth string) ([]
 		defer rowsps.Close()
 
 		for rowsps.Next() {
-			prod := &fest.OrderProduct{}
+			prod := &shopy.OrderProduct{}
 			rowsps.Scan(&prod.ID, &prod.Quantity, &prod.Name)
 			order.Products = append(order.Products, prod)
 		}
@@ -178,7 +178,7 @@ func (s *OrderService) Total() (int, error) {
 }
 
 // Create ...
-func (s *OrderService) Create(o *fest.Order) error {
+func (s *OrderService) Create(o *shopy.Order) error {
 	var (
 		res sql.Result
 		err error
@@ -255,7 +255,7 @@ type updateOrder struct {
 }
 
 // Update ...
-func (s *OrderService) Update(o *fest.Order, fields ...string) error {
+func (s *OrderService) Update(o *shopy.Order, fields ...string) error {
 	obj := &updateOrder{
 		ID:                o.ID,
 		UserID:            0,
@@ -290,7 +290,7 @@ func (s *OrderService) Delete(id int) error {
 		return err
 	}
 
-	o.PaymentStatus = fest.OrderCanceled
-	o.FulfillmentStatus = fest.OrderCanceled
+	o.PaymentStatus = shopy.OrderCanceled
+	o.FulfillmentStatus = shopy.OrderCanceled
 	return s.Update(o, "Status")
 }
