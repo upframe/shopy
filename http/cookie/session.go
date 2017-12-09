@@ -4,7 +4,7 @@ import (
 	"encoding/gob"
 	"net/http"
 
-	"github.com/bruhs/shopy"
+	"github.com/upframe/shopy"
 	"github.com/gorilla/securecookie"
 )
 

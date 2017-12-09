@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/bruhs/shopy"
+	"github.com/upframe/shopy"
 )
 
 // page is the type that contains the information that goes into the page

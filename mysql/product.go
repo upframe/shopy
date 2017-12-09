@@ -2,7 +2,7 @@ package mysql
 
 import (
 	"github.com/jmoiron/sqlx"
-	"github.com/bruhs/shopy"
+	"github.com/upframe/shopy"
 )
 
 // ProductService ...

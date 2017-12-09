@@ -9,7 +9,7 @@ import (
 	"net/smtp"
 	"path/filepath"
 
-	"github.com/bruhs/shopy"
+	"github.com/upframe/shopy"
 )
 
 // Config ...

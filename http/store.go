@@ -3,7 +3,7 @@ package http
 import (
 	"net/http"
 
-	"github.com/bruhs/shopy"
+	"github.com/upframe/shopy"
 )
 
 // StoreGet ...

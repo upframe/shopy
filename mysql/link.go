@@ -1,8 +1,8 @@
 package mysql
 
 import (
-	"github.com/bruhs/shopy"
 	"github.com/jmoiron/sqlx"
+	"github.com/upframe/shopy"
 )
 
 // LinkService ...

@@ -1,7 +1,7 @@
 package mysql
 
 import (
-	"github.com/bruhs/shopy"
+	"github.com/upframe/shopy"
 	"github.com/jmoiron/sqlx"
 )
 

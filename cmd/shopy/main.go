@@ -6,11 +6,11 @@ import (
 	"runtime"
 	"strconv"
 
-	"github.com/bruhs/shopy"
-	h "github.com/bruhs/shopy/http"
-	"github.com/bruhs/shopy/http/cookie"
-	"github.com/bruhs/shopy/mysql"
-	"github.com/bruhs/shopy/smtp"
+	"github.com/upframe/shopy"
+	h "github.com/upframe/shopy/http"
+	"github.com/upframe/shopy/http/cookie"
+	"github.com/upframe/shopy/mysql"
+	"github.com/upframe/shopy/smtp"
 	"github.com/gorilla/securecookie"
 )
 

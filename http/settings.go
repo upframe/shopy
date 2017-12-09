@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"net/http"
 
-	"github.com/bruhs/shopy"
+	"github.com/upframe/shopy"
 )
 
 // SettingsGet ...

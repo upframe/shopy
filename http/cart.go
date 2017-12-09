@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/bruhs/shopy"
+	"github.com/upframe/shopy"
 )
 
 // CartGet ...

@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/bruhs/shopy"
+	"github.com/upframe/shopy"
 	"github.com/jmoiron/sqlx"
 )
 
